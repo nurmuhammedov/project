@@ -1,0 +1,65 @@
+:root {
+  --loader-size: 4rem;
+  --primary-blue: #2352D4; /* Primary blue */
+  --light-gray: #F6F6F6; /* Light gray */
+  --white: #FFF; /* White */
+}
+
+/* Global Reset */
+*,
+*::before,
+*::after {
+  padding: 0;
+  margin: 0;
+  box-sizing: inherit;
+}
+
+/* Scrollbar */
+*::-webkit-scrollbar {
+  background-color: transparent;
+  width: 0.3rem;
+  height: 0.3rem;
+}
+
+*::-webkit-scrollbar-thumb {
+  border-radius: 0.8rem;
+  background-color: silver;
+}
+
+*::-webkit-scrollbar-button {
+  display: none;
+}
+
+/* HTML */
+html {
+  box-sizing: border-box;
+}
+
+/* Body */
+body {
+  background: #F0F0F0;
+}
+
+/* Images */
+img {
+  user-select: none;
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Links */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Lists */
+ul,
+ol {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+/*# sourceMappingURL=index.css.map */
