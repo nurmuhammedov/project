@@ -9,7 +9,7 @@
 }
 .root .right {
   border-radius: 0 0.5rem 0.5rem 0;
-  background: var(--color-green-1);
+  background: var(--ocean-green);
   width: 0.25rem;
   height: calc(100% - 2rem);
   position: absolute;
@@ -24,8 +24,8 @@
   padding: 1rem 1rem 1rem 1.25rem;
 }
 .root .inner .title {
-  color: var(--color-green-1);
-  font-family: "Inter-Medium", sans-serif;
+  color: var(--ocean-green);
+  font-family: Manrope, Arial, Helvetica, sans-serif;
   font-feature-settings: "salt" on, "liga" off;
   font-size: 1rem;
   font-style: normal;
@@ -35,17 +35,17 @@
 }
 
 .alert .right {
-  background: var(--color-orange-1);
+  background: var(--orange);
 }
 .alert .inner .title {
-  color: var(--color-orange-1);
+  color: var(--orange);
 }
 
 .error .right {
-  background: var(--color-red-1);
+  background: var(--red);
 }
 .error .inner .title {
-  color: var(--color-red-1);
+  color: var(--red);
 }
 
 .enter {

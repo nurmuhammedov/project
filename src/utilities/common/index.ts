@@ -1,4 +1,4 @@
-import {ISearchParams} from '@interfaces/params.interface'
+import {ISearchParams} from 'interfaces/params.interface'
 
 
 const noop = (): void => {}

@@ -1,5 +1,5 @@
+import {AlertItem} from 'components'
 import toast, {Toast} from 'react-hot-toast'
-import {AlertItem} from '@app/components'
 
 
 const showMessage = (message: string = '', type: 'success' | 'error' | 'alert' = 'alert', duration: number = 5000, position: 'top-right' | 'top-center' = 'top-right'): void => {
@@ -14,10 +14,7 @@ const showMessage = (message: string = '', type: 'success' | 'error' | 'alert' =
 				/>
 			)
 		},
-		{
-			position,
-			duration
-		}
+		{position, duration}
 	)
 }
 

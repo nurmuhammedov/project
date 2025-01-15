@@ -1,11 +1,13 @@
-import {StrictMode} from 'react'
+// import { I18nextProvider } from 'react-i18next';
 import {createRoot} from 'react-dom/client'
-import './styles/index.scss'
-import App from './App'
+// import {StrictMode} from 'react'
+import {Alert, App} from 'components'
+import 'styles/index.scss'
 
 
 createRoot(document.getElementById('root')!).render(
-    <StrictMode>
-        <App/>
-    </StrictMode>
+	<>
+		<App/>
+		<Alert/>
+	</>
 )

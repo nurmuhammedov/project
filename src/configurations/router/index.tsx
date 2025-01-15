@@ -1,5 +1,10 @@
+import {App} from 'components'
 import {createBrowserRouter, Navigate} from 'react-router-dom'
-import App from '../../App'
+
+// Screens
+import {
+	Login
+} from 'screens'
 
 
 export const router = createBrowserRouter([

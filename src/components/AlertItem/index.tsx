@@ -1,4 +1,4 @@
-import {Success, Error, Alert} from '@assets/icons'
+import {Success, Error, Alert} from 'assets/icons'
 import React from 'react'
 import styles from './styles.module.scss'
 import classNames from 'classnames'
