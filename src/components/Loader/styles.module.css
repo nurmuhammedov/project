@@ -22,7 +22,7 @@
   box-sizing: border-box;
   border-width: calc(var(--loader-size) / 2);
   border-style: solid;
-  border-color: var(--primary-blue) transparent var(--primary-blue) transparent;
+  border-color: var(--teal-green) transparent var(--teal-green) transparent;
   animation: motion 1.5s infinite;
 }
 
@@ -35,7 +35,7 @@
 }
 
 .background {
-  background: var(--primary-blue);
+  background: var(--teal-green);
 }
 .background .spinner::after {
   border-color: var(--white) transparent var(--white) transparent;

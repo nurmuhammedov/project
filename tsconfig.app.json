@@ -25,19 +25,20 @@
     "noUncheckedSideEffectImports": true,
     "baseUrl": "./src",
     "paths": {
-      "assets/*": ["assets/*"],
-      "components/*": ["components/*"],
       "configurations/*": ["configurations/*"],
-      "constants/*": ["constants/*"],
-      "contexts/*": ["contexts/*"],
-      "helpers/*": ["helpers/*"],
-      "hooks/*": ["hooks/*"],
+      "components/*": ["components/*"],
       "interfaces/*": ["interfaces/*"],
       "libraries/*": ["libraries/*"],
-      "screens/*": ["screens/*"],
+      "constants/*": ["constants/*"],
+      "utilities/*": ["utilities/*"],
+      "contexts/*": ["contexts/*"],
       "services/*": ["services/*"],
+      "helpers/*": ["helpers/*"],
+      "modules/*": ["modules/*"],
+      "assets/*": ["assets/*"],
       "styles/*": ["styles/*"],
-      "utilities/*": ["utilities/*"]
+      "hooks/*": ["hooks/*"],
+      "i18n/*": ["i18n/*"],
     }
   },
   "include": [

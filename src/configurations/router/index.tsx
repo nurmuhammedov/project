@@ -4,7 +4,7 @@ import {createBrowserRouter, Navigate} from 'react-router-dom'
 // Screens
 import {
 	Login
-} from 'screens'
+} from 'modules'
 
 
 export const router = createBrowserRouter([
@@ -14,7 +14,7 @@ export const router = createBrowserRouter([
 		children: [
 			{
 				index: true,
-				element: <></>
+				element: <h1>Successful</h1>
 			}
 		],
 		errorElement: <h1>Error</h1>

@@ -1,6 +1,7 @@
-import {BASE_URL} from '@configurations/environment'
-import {cleanParams} from '@utilities/common'
 import axios from 'axios'
+import {BASE_URL} from 'configurations/environment'
+import {showMessage} from 'utilities/alert'
+import {cleanParams} from 'utilities/common'
 
 
 const instance = axios.create({

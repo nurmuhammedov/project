@@ -1,20 +1,20 @@
-import {ROLE_LIST} from '@constants/roles'
+import {ROLE_LIST} from 'constants/roles'
 
 
-export type IRole = ROLE_LIST.USER | ROLE_LIST.ADMIN
+type IRole = ROLE_LIST.USER | ROLE_LIST.ADMIN
 
-export interface ILoginResponse {
-	id: string | number;
-	first_name: string;
-	last_name: string;
-	patronymic: string | null;
-	username: string;
-	email: string;
+interface ILogin {
+	full_name: string;
 	role: IRole;
 }
 
-export interface IUser {
-	id: string | number;
+interface IUser {
 	fullName: string;
 	role: IRole;
+}
+
+export type{
+	ILogin,
+	IUser,
+	IRole
 }

@@ -1,33 +1,8 @@
-import {Loader} from 'components/index'
-import {FC, useEffect} from 'react'
-import {showMessage} from 'utilities/alert'
+import {AppContextProvider} from 'contexts/AppContext'
+import {Outlet} from 'react-router-dom'
+import {FC} from 'react'
 
 
-const Index: FC = () => {
-
-
-	useEffect(() => {
-		fetch('https://jr.technocorp.uz/api/accounts/login/', {
-			method: 'POST',
-			credentials: 'include',
-			headers: {
-				'Content-Type': 'json/application'
-			},
-			body: JSON.stringify({username: 'admin2', password: '123'})
-		})
-	}, [])
-
-	const aasd = () => {
-
-		showMessage('aasdasd', 'success')
-	}
-
-	return (
-		<>
-			<div><Loader background/></div>
-			<button onClick={aasd}>sdasdasd</button>
-		</>
-	)
-}
+const Index: FC = () => <AppContextProvider><Outlet/></AppContextProvider>
 
 export default Index

@@ -20,10 +20,11 @@ export default defineConfig({
 			'services': '/src/services',
 			'contexts': '/src/contexts',
 			'helpers': '/src/helpers',
-			'screens': '/src/screens',
+			'modules': '/src/modules',
 			'assets': '/src/assets',
 			'styles': '/src/styles',
-			'hooks': '/src/hooks'
+			'hooks': '/src/hooks',
+			'i18n': '/src/i18n'
 		}
 	}
 })
