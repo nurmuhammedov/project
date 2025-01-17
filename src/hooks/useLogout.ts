@@ -1,6 +1,6 @@
 import {useMutation, useQueryClient} from "@tanstack/react-query";
-import {AuthenticationService} from "@app/services";
 import {useNavigate} from "react-router-dom";
+import {AuthenticationService} from 'services/authentication.service'
 
 export default function Index() {
     const navigate = useNavigate()

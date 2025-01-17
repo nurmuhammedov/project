@@ -17,21 +17,20 @@
   gap: 2rem;
 }
 .root .wrapper h1 {
-  color: var(--color-gray-2);
-  text-align: center;
-  font-feature-settings: "liga" off;
-  font-family: "Inter-SemiBold", sans-serif;
-  font-size: 2.25rem;
+  color: var(--dark-slate);
+  font-family: Manrope, Arial, Helvetica, sans-serif;
+  font-size: 2rem;
   font-style: normal;
-  font-weight: 600;
-  line-height: 132%;
-  letter-spacing: 0.0225rem;
+  font-weight: 700;
+  line-height: 150%; /* 3rem */
+  letter-spacing: -0.06rem;
+  text-align: center;
 }
 .root .wrapper form {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 2rem;
 }
 
 /*# sourceMappingURL=styles.module.css.map */

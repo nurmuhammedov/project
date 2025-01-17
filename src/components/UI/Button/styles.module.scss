@@ -9,7 +9,7 @@
   font-style: normal;
   font-weight: 600;
   line-height: 150%; /* 1.5rem */
-  letter-spacing: -0.02rem;
+  //letter-spacing: -0.02rem;
   border-radius: 0.875rem;
   display: flex;
   height: 3rem;
@@ -50,7 +50,7 @@
   }
 
   &--disabled {
-    background: var(--light-gray-2);
+    background: var(--silver);
     color: var(--white);
     cursor: not-allowed;
     pointer-events: none;

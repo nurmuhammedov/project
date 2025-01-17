@@ -1,8 +1,19 @@
+import {Button} from 'components/index'
 import {AppContextProvider} from 'contexts/AppContext'
-import {Outlet} from 'react-router-dom'
+import {useLogout} from 'hooks/index'
 import {FC} from 'react'
 
 
-const Index: FC = () => <AppContextProvider><Outlet/></AppContextProvider>
+const Index: FC = () => {
+	const {handleLogout, isPending} = useLogout()
+
+	return (
+		<AppContextProvider>
+			<Button onClick={() => handleLogout()} disabled={isPending}>
+				Logout
+			</Button>
+		</AppContextProvider>
+	)
+}
 
 export default Index
