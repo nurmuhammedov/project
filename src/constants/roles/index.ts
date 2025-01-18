@@ -1,5 +1,5 @@
 enum ROLE_LIST {
-	ADMIN = 'admin',
+	ADMIN = 'simple',
 	USER = 'user'
 }
 

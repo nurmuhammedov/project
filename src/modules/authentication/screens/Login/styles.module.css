@@ -1,12 +1,63 @@
 .root {
-  display: flex;
-  padding: 2rem 1.5rem 1.5rem 1.5rem;
-  justify-content: center;
-  align-items: center;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   width: 100%;
   min-height: 100vh;
+  background: var(--light-gray-2);
+}
+.root .left {
+  background: var(--dark-slate);
+  display: flex;
+  flex-direction: column;
+}
+.root .left .top {
+  background: var(--teal);
+  flex: 1;
+}
+.root .left .bottom {
+  padding: 3rem 3rem 4.7rem 3rem;
+}
+.root .left .bottom .logo {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 2.5rem;
+}
+.root .left .bottom .logo span {
+  color: var(--white);
+  font-family: Manrope, Arial, Helvetica, sans-serif;
+  font-size: 1.75rem;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+}
+.root .left .bottom .slogan {
+  color: var(--white);
+  font-family: Manrope, Arial, Helvetica, sans-serif;
+  font-size: 2.5rem;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 150%; /* 3.75rem */
+  letter-spacing: -0.075rem;
+  margin-bottom: 1rem;
+}
+.root .left .bottom .tagline {
+  color: var(--light-gray-3, #DCE4E8);
+  font-family: Manrope, Arial, Helvetica, sans-serif;
+  font-size: 1.25rem;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 150%; /* 1.875rem */
+  letter-spacing: -0.025rem;
 }
 .root .wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.5rem;
+}
+.root .wrapper .form {
   display: flex;
   align-items: center;
   flex-direction: column;
@@ -16,7 +67,7 @@
   padding: 2rem;
   gap: 2rem;
 }
-.root .wrapper h1 {
+.root .wrapper .form h1 {
   color: var(--dark-slate);
   font-family: Manrope, Arial, Helvetica, sans-serif;
   font-size: 2rem;
@@ -26,7 +77,7 @@
   letter-spacing: -0.06rem;
   text-align: center;
 }
-.root .wrapper form {
+.root .wrapper .form form {
   width: 100%;
   display: flex;
   flex-direction: column;

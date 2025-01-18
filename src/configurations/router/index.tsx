@@ -14,8 +14,9 @@ export const router = createBrowserRouter([
 		children: [
 			{
 				index: true,
-				element: <h1>Successful</h1>
-			}
+				element: <></>
+			},
+
 		],
 		errorElement: <h1>Error</h1>
 	},
