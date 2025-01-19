@@ -1,1 +1,5 @@
 export * from './authentication'
+export * from './dashboard'
+export * from './database'
+export * from './products'
+export * from './clients'

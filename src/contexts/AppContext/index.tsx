@@ -3,6 +3,7 @@ import {useNavigate} from 'react-router-dom'
 import {IUser} from 'interfaces/authentication.interface'
 import {useUser} from 'hooks/index'
 import {Loader} from 'components/index'
+import {routeByRole} from 'utilities/authentication'
 
 
 interface IAppContext {
@@ -21,11 +22,12 @@ function AppContextProvider({children}: PropsWithChildren) {
 			if (!user) {
 				navigate('/login')
 			} else {
+				navigate(routeByRole(user.role))
 				const timer = setTimeout(() => setIsLoading(false), 1250)
 				return () => clearTimeout(timer)
 			}
 		}
-	}, [isPending, navigate, user])
+	}, [isPending])
 
 
 	if (isPending || isLoading || !user) {

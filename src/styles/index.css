@@ -62,6 +62,8 @@
   --teal-green: #31B099; /* Teal Green */
   --silver: silver; /* Silver */
   --teal: #187D7E; /* Teal */
+  --light-white-opacity: rgba(255, 255, 255, 0.10);
+  --cool-gray: #A2A6AA;
 }
 
 /*
@@ -82,12 +84,6 @@ body {
 /* Render the `main` element consistently in IE */
 main {
   display: block;
-}
-
-/* Correct the font size and margin on `h1` elements within `section` and `article` contexts in Chrome, Firefox, and Safari */
-h1 {
-  font-size: 2em;
-  margin: 0.67em 0;
 }
 
 /* ========================================================================== */

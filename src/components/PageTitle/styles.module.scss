@@ -1,0 +1,18 @@
+.root {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+
+  h1 {
+    color: var(--white);
+    font-family: Manrope, Arial, Helvetica, sans-serif;
+    font-size: 2rem;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 150%; /* 3rem */
+    letter-spacing: -0.06rem;
+  }
+}
+

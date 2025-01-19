@@ -1,3 +1,4 @@
+import PageTitle from './PageTitle'
 import AlertItem from './AlertItem'
 import Button from './UI/Button'
 import Input from './UI/Input'
@@ -7,6 +8,7 @@ import App from './App'
 
 
 export {
+	PageTitle,
 	AlertItem,
 	Button,
 	Loader,

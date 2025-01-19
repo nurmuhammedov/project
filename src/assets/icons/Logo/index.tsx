@@ -21,8 +21,8 @@ const Index = () => {
 					x2="24.0999"
 					y2="40.7114"
 				>
-					<stop stop-color="#2AAC95"/>
-					<stop offset="0.989583" stop-color="#76D1F7"/>
+					<stop stopColor="#2AAC95"/>
+					<stop offset="0.989583" stopColor="#76D1F7"/>
 				</linearGradient>
 			</defs>
 		</svg>

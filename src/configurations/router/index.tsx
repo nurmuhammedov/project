@@ -1,9 +1,14 @@
 import {App} from 'components'
 import {createBrowserRouter, Navigate} from 'react-router-dom'
+import AdminLayout from 'components/layouts/AdminLayout'
 
 // Screens
 import {
-	Login
+	ProductsTable,
+	DatabaseTable,
+	ClientsTable,
+	Login,
+	Home
 } from 'modules'
 
 
@@ -13,10 +18,27 @@ export const router = createBrowserRouter([
 		element: <App/>,
 		children: [
 			{
-				index: true,
-				element: <></>
-			},
-
+				path: 'admin',
+				element: <AdminLayout/>,
+				children: [
+					{
+						path: 'home',
+						element: <Home/>
+					},
+					{
+						path: 'clients',
+						element: <ClientsTable/>
+					},
+					{
+						path: 'products',
+						element: <ProductsTable/>
+					},
+					{
+						path: 'database',
+						element: <DatabaseTable/>
+					}
+				]
+			}
 		],
 		errorElement: <h1>Error</h1>
 	},
