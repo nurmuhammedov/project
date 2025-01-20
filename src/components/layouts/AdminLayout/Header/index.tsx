@@ -1,6 +1,6 @@
 import {useTranslation} from 'react-i18next'
 import styles from './styles.module.scss'
-import {useAppContext, useLogout, useSideMenu} from 'hooks/index'
+import {useAppContext, useLogout, useSideMenu} from 'hooks'
 import {Logo, Logout, SelectIcon} from 'assets/icons'
 import NavItem from './NavItem'
 import classNames from 'classnames'

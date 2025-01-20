@@ -1,12 +1,10 @@
-import {PageTitle} from 'components/index'
+import {PageTitle} from 'components'
 
 
 const Index = () => {
 	return (
 		<>
-			<PageTitle title="Products">
-
-			</PageTitle>
+			<PageTitle title="Products"/>
 		</>
 	)
 }

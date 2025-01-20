@@ -25,7 +25,6 @@ interface IButton extends ButtonHTMLAttributes<HTMLButtonElement> {
 	navigate?: string,
 	icon?: React.ReactNode,
 	iconPosition?: 'left' | 'right',
-	// onClick?: (e?: React.BaseSyntheticEvent) => Promise<void>
 }
 
 // Select Option Interface
@@ -33,15 +32,12 @@ interface ISelectOption {
 	value: string | number;
 	label: string | number;
 	icon?: React.ReactNode;
-	validTo?: Date;
-	dropdownIndicator?: React.ReactNode;
 }
 
 // Select Interface
 interface ISelect extends SelectProps<ISelectOption> {
 	id: string;
 	options: ISelectOption[];
-	type?: 'form';
 	placeholder?: string;
 	icon?: React.ReactNode;
 	handleOnChange?: (e: string | number | boolean | string[] | number[] | boolean[] | null) => void;

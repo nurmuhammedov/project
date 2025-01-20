@@ -1,6 +1,6 @@
 import {ILogin} from 'interfaces/authentication.interface'
 import {ILoginForm} from 'interfaces/yup.interface'
-import {interceptor} from 'libraries/index'
+import {interceptor} from 'libraries'
 
 
 export const AuthenticationService = {

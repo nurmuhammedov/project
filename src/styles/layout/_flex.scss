@@ -1,0 +1,25 @@
+// FLEX
+
+.flex {
+  display: flex !important;
+}
+
+.align-center {
+  align-items: center !important;
+}
+
+.justify-end {
+  justify-content: flex-end !important;
+}
+
+.items-center {
+  justify-content: center !important;
+}
+
+.justify-between {
+  justify-content: space-between !important;
+}
+
+.flex-1 {
+  flex: 1 !important;
+}

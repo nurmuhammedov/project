@@ -20,7 +20,6 @@
   line-height: 1.2rem;
   font-style: normal;
   font-weight: 500;
-  letter-spacing: -0.015rem;
 }
 
 .input,
@@ -30,7 +29,6 @@ textarea {
   font-style: normal;
   font-weight: 500;
   line-height: 150%; /* 1.3125rem */
-  letter-spacing: 0.02rem;
   padding: 1rem 1.25rem;
   /* =================================================== */
   border-radius: 0.9375rem;
@@ -56,8 +54,8 @@ textarea::placeholder {
 }
 .input:focus,
 textarea:focus {
-  border-color: var(--ocean-green);
-  box-shadow: 0 0 0 1px var(--ocean-green);
+  border-color: var(--teal);
+  box-shadow: 0 0 0 1px var(--teal);
 }
 
 textarea {
@@ -72,7 +70,6 @@ textarea {
   color: var(--red);
   margin-top: 0.3rem;
   font-style: normal;
-  letter-spacing: -0.015rem;
 }
 
 .icon .input-wrapper {
@@ -88,16 +85,17 @@ textarea {
   display: flex;
   justify-content: center;
   align-items: center;
-  left: 1.25rem;
+  left: 1rem;
   top: 50%;
-  transform: translateY(-50%);
+  transform: translateY(-52%);
   cursor: pointer;
 }
 .icon .right .input {
-  padding-left: 3.5rem !important;
+  padding-right: 3.5rem !important;
+  padding-left: 1.25rem !important;
 }
 .icon .right .icon-wrapper {
-  right: 1.25rem;
+  right: 1rem;
   left: auto;
 }
 

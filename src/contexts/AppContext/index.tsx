@@ -1,8 +1,8 @@
 import {PropsWithChildren, createContext, useEffect, useState} from 'react'
 import {useNavigate} from 'react-router-dom'
 import {IUser} from 'interfaces/authentication.interface'
-import {useUser} from 'hooks/index'
-import {Loader} from 'components/index'
+import {useUser} from 'hooks'
+import {Loader} from 'components'
 import {routeByRole} from 'utilities/authentication'
 
 

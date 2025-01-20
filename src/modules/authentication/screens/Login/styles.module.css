@@ -39,7 +39,6 @@
   font-style: normal;
   font-weight: 700;
   line-height: 150%; /* 3.75rem */
-  letter-spacing: -0.075rem;
   margin-bottom: 1rem;
 }
 .root .left .bottom .tagline {
@@ -49,7 +48,6 @@
   font-style: normal;
   font-weight: 500;
   line-height: 150%; /* 1.875rem */
-  letter-spacing: -0.025rem;
 }
 .root .wrapper {
   display: flex;
@@ -74,7 +72,6 @@
   font-style: normal;
   font-weight: 700;
   line-height: 150%; /* 3rem */
-  letter-spacing: -0.06rem;
   text-align: center;
 }
 .root .wrapper .form form {
