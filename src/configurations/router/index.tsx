@@ -18,6 +18,10 @@ export const router = createBrowserRouter([
 		element: <App/>,
 		children: [
 			{
+				index: true,
+				element: <Navigate to="/admin/home"/>
+			},
+			{
 				path: 'admin',
 				element: <AdminLayout/>,
 				children: [
@@ -49,8 +53,7 @@ export const router = createBrowserRouter([
 	},
 	{
 		path: '*',
-		element: <Navigate to="/"/>,
+		element: <Navigate to="/login"/>,
 		errorElement: <h1>Error</h1>
 	}
 ])
-

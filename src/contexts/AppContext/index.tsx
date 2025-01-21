@@ -3,7 +3,7 @@ import {useNavigate} from 'react-router-dom'
 import {IUser} from 'interfaces/authentication.interface'
 import {useUser} from 'hooks'
 import {Loader} from 'components'
-import {routeByRole} from 'utilities/authentication'
+// import {routeByRole} from 'utilities/authentication'
 
 
 interface IAppContext {
@@ -22,7 +22,7 @@ function AppContextProvider({children}: PropsWithChildren) {
 			if (!user) {
 				navigate('/login')
 			} else {
-				navigate(routeByRole(user.role))
+				// navigate(routeByRole(user.role))
 				const timer = setTimeout(() => setIsLoading(false), 1250)
 				return () => clearTimeout(timer)
 			}

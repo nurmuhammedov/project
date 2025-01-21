@@ -1,0 +1,46 @@
+.root {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.root .tab {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.625rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.16);
+  padding: 1rem;
+  color: var(--dark-teal);
+  background: var(--white);
+  font-family: Manrope, Arial, Helvetica, sans-serif;
+  font-size: 1.125rem;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 150%; /* 1.6875rem */
+  letter-spacing: -0.03375rem;
+  transition: all 0.15s ease-in-out;
+  cursor: pointer;
+}
+.root .tab svg {
+  transform: rotate(-90deg);
+}
+.root .tab svg path {
+  stroke: var(--light-gray-2);
+}
+.root .tab:hover {
+  color: var(--white);
+  background: var(--teal-green);
+}
+.root .tab:hover svg path {
+  stroke: var(--white);
+}
+.root .active {
+  color: var(--white);
+  background: var(--teal-green);
+}
+.root .active svg path {
+  stroke: var(--white);
+}
+
+/*# sourceMappingURL=styles.module.css.map */

@@ -1,3 +1,4 @@
+import {ISelectOption} from 'interfaces/form.interface'
 import {ISearchParams} from 'interfaces/params.interface'
 
 
@@ -21,8 +22,26 @@ const cleanParams = (params: ISearchParams) => {
 	return filteredParams
 }
 
+function isString(val: unknown): val is string {
+	return typeof val === 'string'
+}
+
+function isObject(val: unknown): val is ISearchParams {
+	return typeof val === 'object' && val !== null
+}
+
+function getSelectValue(options: ISelectOption[], value: string | number | boolean | (string | number | boolean)[] | undefined | null): ISelectOption[] | null | ISelectOption {
+	if (Array.isArray(value)) {
+		return options.filter((item) => value.includes(item.value))
+	}
+	return options.find((item) => item?.value == value) ?? null
+}
+
 export {
 	noop,
-	cleanParams
+	isString,
+	isObject,
+	cleanParams,
+	getSelectValue
 	// ensureHttps
 }

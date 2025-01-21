@@ -1,5 +1,6 @@
-import {Cart, Income, Search} from 'assets/icons'
-import {Button, Input, PageTitle} from 'components'
+import {Cart, Income} from 'assets/icons'
+import {Button, Card, PageTitle, Pagination} from 'components'
+import ReactTable from 'components/ReactTable'
 import {BUTTON_THEME} from 'constants/fields'
 
 
@@ -20,11 +21,16 @@ const Index = () => {
 					>
 						Making income
 					</Button>
-					<Input iconPosition='right' icon={<Search/>} id={'search'} placeholder={'Search'}>
-
-					</Input>
 				</div>
 			</PageTitle>
+			<Card className="gap-2xl" screen={true}>
+				<ReactTable
+					screen={true}
+					columns={[]}
+					data={[]}
+				/>
+				<Pagination totalPages={100}/>
+			</Card>
 		</>
 	)
 }
