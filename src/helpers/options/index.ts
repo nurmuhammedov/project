@@ -13,7 +13,7 @@ const databaseTabOptions = [
 	{label: 'Countries', value: 'countries'},
 	{label: 'Product Type', value: 'productType'},
 	{label: 'Brands', value: 'brands'},
-	{label: 'Measurement Units', value: 'measurementUnits'},
+	// {label: 'Measurement Units', value: 'measurementUnits'},
 	{label: 'Expense Types', value: 'expenseTypes'},
 	{label: 'Price Types', value: 'priceTypes'}
 ]

@@ -18,12 +18,11 @@ const Index = () => {
 	const {addParams, removeParams} = useSearchParams()
 
 	const {data, totalPages, isPending, refetch} = usePaginatedData<IDatabaseItemDetail[]>(
-		'expenseTypes',
+		'organization/cost-type/',
 		{
 			page: page,
 			page_size: pageSize
-		},
-		false
+		}
 	)
 
 	const columns: Column<IDatabaseItemDetail>[] = useMemo(() =>
@@ -51,7 +50,7 @@ const Index = () => {
 		resolver: yupResolver(databaseSchema)
 	})
 
-	const {mutateAsync, isPending: IsLoading} = useAdd('expenseTypes')
+	const {mutateAsync, isPending: IsLoading} = useAdd('organization/cost-type/create/')
 
 
 	return (
@@ -65,7 +64,7 @@ const Index = () => {
 						radius={true}
 						style={{width: 400}}
 					/>
-					<Button disabled={true} icon={<Plus/>} onClick={() => addParams({modal: 'brands'})}>
+					<Button icon={<Plus/>} onClick={() => addParams({modal: 'brands'})}>
 						Add
 					</Button>
 				</div>
@@ -96,7 +95,7 @@ const Index = () => {
 					Save
 				</Button>
 			</Modal>
-			<DeleteModal endpoint="expenseTypes/" onDelete={() => refetch()}/>
+			<DeleteModal endpoint="organization/cost-type/delete/" onDelete={() => refetch()}/>
 		</>
 	)
 }
