@@ -1,3 +1,4 @@
+import {SelectIcon} from 'assets/icons'
 import Card from 'components/Card'
 import {ISelectOption} from 'interfaces/form.interface'
 import styles from './styles.module.scss'
@@ -14,17 +15,13 @@ interface IProperties {
 }
 
 const Index: FC<IProperties> = ({tabs, fallbackValue, query = 'tab'}) => {
-	const {paramsObject, addParams, removeParams} = useSearchParams()
+	const {paramsObject, addParams} = useSearchParams()
 	const status = paramsObject[query] || fallbackValue
 	const {t} = useTranslation()
 
 
 	const handleTabChange = (value: string | number) => {
-		if (status === fallbackValue) {
-			removeParams(query)
-		} else {
-			addParams({[query]: String(value)})
-		}
+		addParams({[query]: String(value)}, 'page', 'limit')
 	}
 
 	return (
@@ -32,13 +29,14 @@ const Index: FC<IProperties> = ({tabs, fallbackValue, query = 'tab'}) => {
 			{
 				tabs?.map(item => {
 					return (
-						<div
+						<button
 							key={item.value}
 							className={classNames(styles.tab, {[styles.active]: item.value === status})}
 							onClick={() => handleTabChange(item.value)}
 						>
 							{t(item.label as string)}
-						</div>
+							<SelectIcon/>
+						</button>
 					)
 				})
 			}

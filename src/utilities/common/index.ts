@@ -3,6 +3,7 @@ import {ISearchParams} from 'interfaces/params.interface'
 
 
 const noop = (): void => {}
+const noopAsync = async (): Promise<undefined> => {}
 
 // function ensureHttps(url: string | undefined | null): string | undefined | null {
 // 	if (url?.startsWith('http://')) {
@@ -41,7 +42,9 @@ export {
 	noop,
 	isString,
 	isObject,
+	noopAsync,
 	cleanParams,
 	getSelectValue
+
 	// ensureHttps
 }

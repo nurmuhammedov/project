@@ -14,6 +14,12 @@ const loginSchema = yup.object().shape({
 		.max(30, 'Password must not exceed 30 characters')
 })
 
+const databaseSchema = yup.object().shape({
+	name: yup.string().trim().required('This field is required')
+})
+
+
 export {
-	loginSchema
+	loginSchema,
+	databaseSchema
 }

@@ -26,7 +26,7 @@
   transition: color 0.15s ease-in-out;
 }
 .root table tbody tr td {
-  padding: 1.25rem 1rem;
+  padding: 1.25rem 0.75rem;
   max-width: 15rem;
   color: var(--dark-slate);
   font-family: Manrope, Arial, Helvetica, sans-serif;

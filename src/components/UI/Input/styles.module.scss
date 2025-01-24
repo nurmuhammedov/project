@@ -8,6 +8,13 @@
       box-shadow: 0 0 0 1px var(--red);
     }
   }
+
+  &.radius {
+    input[data-title='input'],
+    textarea {
+      border-radius: 6.25rem;
+    }
+  }
 }
 
 

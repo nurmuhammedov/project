@@ -1,6 +1,5 @@
 import {Cart, Income} from 'assets/icons'
-import {Button, Card, PageTitle, Pagination} from 'components'
-import ReactTable from 'components/ReactTable'
+import {Button, PageTitle} from 'components'
 import {BUTTON_THEME} from 'constants/fields'
 
 
@@ -23,14 +22,6 @@ const Index = () => {
 					</Button>
 				</div>
 			</PageTitle>
-			<Card className="gap-2xl" screen={true}>
-				<ReactTable
-					screen={true}
-					columns={[]}
-					data={[]}
-				/>
-				<Pagination totalPages={100}/>
-			</Card>
 		</>
 	)
 }

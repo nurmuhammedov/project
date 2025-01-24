@@ -9,6 +9,16 @@ const paginationOptions: ISelectOption[] = [
 	{value: 100, label: '100'}
 ]
 
+const databaseTabOptions = [
+	{label: 'Countries', value: 'countries'},
+	{label: 'Product Type', value: 'productType'},
+	{label: 'Brands', value: 'brands'},
+	{label: 'Measurement Units', value: 'measurementUnits'},
+	{label: 'Expense Types', value: 'expenseTypes'},
+	{label: 'Price Types', value: 'priceTypes'}
+]
+
 export {
-	paginationOptions
+	paginationOptions,
+	databaseTabOptions
 }

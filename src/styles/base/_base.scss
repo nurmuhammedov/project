@@ -49,3 +49,15 @@ ol {
   padding-left: 0;
   margin: 0;
 }
+
+/* Modal */
+.rodal-mask {
+  background: rgba(0, 0, 0, 0.60) !important;
+}
+
+.rodal-dialog {
+  padding: 0 !important;
+  flex-direction: column !important;
+  border-radius: 1rem !important;
+  background: var(--white) !important;
+}

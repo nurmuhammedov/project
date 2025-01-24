@@ -6,6 +6,10 @@
   border: 1px solid var(--red);
   box-shadow: 0 0 0 1px var(--red);
 }
+.root.radius input[data-title=input],
+.root.radius textarea {
+  border-radius: 6.25rem;
+}
 
 .wrapper {
   display: flex;

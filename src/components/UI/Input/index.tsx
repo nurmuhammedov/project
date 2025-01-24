@@ -13,6 +13,7 @@ const Index = forwardRef<HTMLInputElement | HTMLTextAreaElement, IField>(
 			autocomplete = false,
 			type = FIELD.TEXT,
 			textarea = false,
+			radius = false,
 			handleIcon,
 			children,
 			label,
@@ -26,7 +27,11 @@ const Index = forwardRef<HTMLInputElement | HTMLTextAreaElement, IField>(
 		const {t} = useTranslation()
 
 		return (
-			<div className={classNames(styles.root, {[styles.error]: error, [styles.icon]: icon})}>
+			<div className={classNames(styles.root, {
+				[styles.error]: error,
+				[styles.icon]: icon,
+				[styles.radius]: radius
+			})}>
 				{
 					label && (
 						<div className={styles.wrapper}>
@@ -40,7 +45,7 @@ const Index = forwardRef<HTMLInputElement | HTMLTextAreaElement, IField>(
 							<textarea
 								rows={5}
 								{...props}
-								data-title='input'
+								data-title="input"
 								ref={ref as React.Ref<HTMLTextAreaElement>}
 								id={id.toString()}
 								className={styles.input}
@@ -62,7 +67,7 @@ const Index = forwardRef<HTMLInputElement | HTMLTextAreaElement, IField>(
 									ref={ref as React.Ref<HTMLInputElement>}
 									id={id.toString()}
 									type={type}
-									data-title='input'
+									data-title="input"
 									className={styles.input}
 									placeholder={props.placeholder ? t(props.placeholder as string) : ''}
 									autoComplete={autocomplete ? 'on' : 'off'}

@@ -4,6 +4,10 @@
   display: flex !important;
 }
 
+.flex-col {
+  flex-direction: column !important;
+}
+
 .align-center {
   align-items: center !important;
 }

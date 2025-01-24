@@ -11,6 +11,7 @@ interface IFieldProperties {
 	textarea?: boolean;
 	autocomplete?: boolean;
 	required?: boolean;
+	radius?: boolean,
 	icon?: React.ReactNode;
 	iconPosition?: 'right' | 'left';
 	handleIcon?: () => void;
