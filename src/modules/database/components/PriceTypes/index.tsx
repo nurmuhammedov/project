@@ -95,7 +95,7 @@ const Index = () => {
 					Save
 				</Button>
 			</Modal>
-			<DeleteModal endpoint="organization/cost-type/delete/" onDelete={() => refetch()}/>
+			<DeleteModal endpoint="organization/price-type/delete/" onDelete={() => refetch()}/>
 		</>
 	)
 }
