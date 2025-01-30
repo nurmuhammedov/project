@@ -8,7 +8,7 @@ import {
 	DatabaseTable,
 	ClientsTable,
 	Login,
-	Home
+	Home, StoresTable
 } from 'modules'
 
 
@@ -40,6 +40,15 @@ export const router = createBrowserRouter([
 					{
 						path: 'database',
 						element: <DatabaseTable/>
+					},
+					{
+						path: 'stores',
+						children: [
+							{
+								index: true,
+								element: <StoresTable/>
+							}
+						]
 					}
 				]
 			}

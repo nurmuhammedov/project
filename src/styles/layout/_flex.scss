@@ -8,16 +8,24 @@
   flex-direction: column !important;
 }
 
+.items-start {
+  justify-content: flex-start !important;
+}
+
 .align-center {
   align-items: center !important;
 }
 
-.justify-end {
-  justify-content: flex-end !important;
+.justify-start {
+  justify-content: flex-start !important;
 }
 
 .items-center {
   justify-content: center !important;
+}
+
+.justify-end {
+  justify-content: flex-end !important;
 }
 
 .justify-between {

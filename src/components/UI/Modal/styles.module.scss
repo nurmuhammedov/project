@@ -2,8 +2,7 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: 6rem 1.1rem 1.5rem;
-  overflow: hidden;
+  padding: 6rem 0 1.5rem;
   position: relative;
 
   .title-wrapper {
@@ -48,7 +47,8 @@
   }
 
   .children {
-    padding: 1.5rem .2rem 0;
+    overflow-y: scroll;
+    padding: 1.5rem 1.5rem 0;
     flex: 1;
     display: flex;
     flex-direction: column;

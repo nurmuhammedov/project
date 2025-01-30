@@ -4,8 +4,10 @@ import VerticalTab from './VerticalTab'
 import DeleteModal from './DeleteModal'
 import MaskInput from './UI/MaskInput'
 import Pagination from './Pagination'
+import EditButton from './EditButton'
 import ReactTable from './ReactTable'
 import PageTitle from './PageTitle'
+import EditModal from './EditModal'
 import AlertItem from './AlertItem'
 import Button from './UI/Button'
 import Select from './UI/Select'
@@ -25,9 +27,11 @@ export {
 	DeleteModal,
 	Pagination,
 	ReactTable,
+	EditButton,
 	MaskInput,
 	PageTitle,
 	AlertItem,
+	EditModal,
 	Button,
 	Select,
 	Loader,

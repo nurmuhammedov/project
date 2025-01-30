@@ -9,17 +9,17 @@ import {
 	EditModal,
 	HR,
 	Input,
-	Modal,
+	Modal, NumberFormattedInput,
 	Pagination,
 	ReactTable,
 	Select
 } from 'components'
 import Form from 'components/Form'
 import {FIELD} from 'constants/fields'
-import {measurementUnitsOptions} from 'helpers/options'
-import {measurementUnitsSchema} from 'helpers/yup'
-import {useAdd, useDetail, usePaginatedData, usePagination, useSearchParams, useUpdate} from 'hooks'
-import {IMeasureItemDetail} from 'interfaces/database.interface'
+import {PackagesSchema} from 'helpers/yup'
+import {useAdd, useData, useDetail, usePaginatedData, usePagination, useSearchParams, useUpdate} from 'hooks'
+import {IPackageItemDetail} from 'interfaces/database.interface'
+import {ISelectOption} from 'interfaces/form.interface'
 import {useEffect, useMemo} from 'react'
 import {Controller, useForm} from 'react-hook-form'
 import {useTranslation} from 'react-i18next'
@@ -31,10 +31,11 @@ import {formatDate} from 'utilities/data'
 const Index = () => {
 	const {t} = useTranslation()
 	const {page, pageSize} = usePagination()
-	const {addParams, removeParams, paramsObject: {updateId = undefined}} = useSearchParams()
+	const {addParams, removeParams, paramsObject: {updateId = undefined, modal = undefined}} = useSearchParams()
 
-	const {data, totalPages, isPending: isLoading, refetch} = usePaginatedData<IMeasureItemDetail[]>(
-		'organization/measurement',
+	const {data: measurementUnitsOptions = []} = useData<ISelectOption[]>('organization/measurement/select', modal === 'packages' || modal === 'edit')
+	const {data, totalPages, isPending: isLoading, refetch} = usePaginatedData<IPackageItemDetail[]>(
+		'/packages',
 		{
 			page: page,
 			page_size: pageSize
@@ -46,18 +47,19 @@ const Index = () => {
 		register: registerAdd,
 		reset: resetAdd,
 		control: controlAdd,
+		watch: watchAdd,
 		formState: {errors: addErrors}
 	} = useForm({
 		mode: 'onTouched',
-		defaultValues: {name: '', value_type: undefined},
-		resolver: yupResolver(measurementUnitsSchema)
+		defaultValues: {name: '', measure: undefined, quantity: '', amount: ''},
+		resolver: yupResolver(PackagesSchema)
 	})
 
-	const columns: Column<IMeasureItemDetail>[] = useMemo(() =>
+	const columns: Column<IPackageItemDetail>[] = useMemo(() =>
 			[
 				{
 					Header: t('№'),
-					accessor: (_: IMeasureItemDetail, index: number) => ((page - 1) * pageSize) + (index + 1),
+					accessor: (_: IPackageItemDetail, index: number) => ((page - 1) * pageSize) + (index + 1),
 					style: {
 						width: '3rem',
 						textAlign: 'center'
@@ -65,20 +67,20 @@ const Index = () => {
 				},
 				{
 					Header: t('Name'),
-					accessor: (row: IMeasureItemDetail) => row.name
+					accessor: (row: IPackageItemDetail) => row.name
 				},
 				{
-					Header: t('Type'),
-					accessor: (row: IMeasureItemDetail) => t(measurementUnitsOptions.find(i => i.value == row.value_type)?.label?.toString() ?? '')
+					Header: t('Number of products per package'),
+					accessor: (row: IPackageItemDetail) => row.quantity
 				},
 				{
 					Header: t('Date added'),
-					accessor: (row: IMeasureItemDetail) => formatDate(row.created_at)
+					accessor: (row: IPackageItemDetail) => formatDate(row.created_at)
 
 				},
 				{
 					Header: t('Actions'),
-					accessor: (row: IMeasureItemDetail) => <div className="flex items-start gap-lg">
+					accessor: (row: IPackageItemDetail) => <div className="flex items-start gap-lg">
 						<EditButton id={row.id}/>
 						<DeleteButton id={row.id}/>
 					</div>
@@ -92,23 +94,29 @@ const Index = () => {
 		register: registerEdit,
 		reset: resetEdit,
 		control: controlEdit,
+		watch: watchEdit,
 		formState: {errors: editErrors}
 	} = useForm({
 		mode: 'onTouched',
-		defaultValues: {name: '', value_type: undefined},
-		resolver: yupResolver(measurementUnitsSchema)
+		defaultValues: {name: '', measure: undefined, quantity: '', amount: ''},
+		resolver: yupResolver(PackagesSchema)
 	})
 
-	const {mutateAsync, isPending: isAdding} = useAdd('organization/measurement/create')
-	const {mutateAsync: update, isPending: isUpdating} = useUpdate('organization/measurement/update/', updateId)
+	const {mutateAsync, isPending: isAdding} = useAdd('packages')
+	const {mutateAsync: update, isPending: isUpdating} = useUpdate('packages/', updateId)
 	const {
 		data: detail,
 		isPending: isDetailLoading
-	} = useDetail<IMeasureItemDetail>('organization/measurement/detail/', updateId)
+	} = useDetail<IPackageItemDetail>('packages/', updateId)
 
 	useEffect(() => {
 		if (detail) {
-			resetEdit({name: detail.name, value_type: detail.value_type})
+			resetEdit({
+				name: detail.name,
+				measure: detail.measure.id,
+				amount: detail.amount,
+				quantity: detail?.quantity
+			})
 		}
 	}, [detail, resetEdit])
 
@@ -123,7 +131,7 @@ const Index = () => {
 						radius={true}
 						style={{width: 400}}
 					/>
-					<Button icon={<Plus/>} onClick={() => addParams({modal: 'expenseTypes'})}>
+					<Button icon={<Plus/>} onClick={() => addParams({modal: 'packages'})}>
 						Add
 					</Button>
 				</div>
@@ -134,7 +142,7 @@ const Index = () => {
 				</div>
 			</Card>
 
-			<Modal title="Add new" id="expenseTypes" style={{height: '30rem'}}>
+			<Modal title="Add new" id="packages" style={{height: '45rem'}}>
 				<Form
 					onSubmit={
 						handleAddSubmit((data) => mutateAsync(data).then(async () => {
@@ -154,20 +162,54 @@ const Index = () => {
 					/>
 
 					<Controller
-						name="value_type"
+						name="measure"
 						control={controlAdd}
 						render={({field: {value, ref, onChange, onBlur}}) => (
 							<Select
 								ref={ref}
 								top={true}
-								id="value_type"
+								id="measure"
 								options={measurementUnitsOptions}
 								onBlur={onBlur}
-								label="Type"
-								error={addErrors?.value_type?.message}
+								label="Measure unit"
+								error={addErrors?.measure?.message}
 								value={getSelectValue(measurementUnitsOptions, value)}
 								defaultValue={getSelectValue(measurementUnitsOptions, value)}
 								handleOnChange={(e) => onChange(e as string)}
+							/>
+						)}
+					/>
+
+					<Controller
+						name="quantity"
+						control={controlAdd}
+						render={({field}) => (
+							<NumberFormattedInput
+								id="quantity"
+								maxLength={3}
+								allowDecimals={false}
+								label="Number of products per package"
+								error={addErrors?.quantity?.message}
+								{...field}
+							/>
+						)}
+					/>
+
+					<Controller
+						name="amount"
+						control={controlAdd}
+						render={({field}) => (
+							<NumberFormattedInput
+								id="amount"
+								maxLength={20}
+								label={
+									watchAdd('measure') ? t(
+										'Quantity of 1 product in the package',
+										{measure: measurementUnitsOptions?.find(i => i?.value == watchAdd('measure'))?.label ?? ''}
+									) : t('Quantity of 1 product in the package(default)')
+								}
+								error={addErrors?.amount?.message}
+								{...field}
 							/>
 						)}
 					/>
@@ -182,7 +224,7 @@ const Index = () => {
 				</Form>
 			</Modal>
 
-			<EditModal isLoading={isDetailLoading && !detail} style={{height: '30rem'}}>
+			<EditModal isLoading={isDetailLoading && !detail} style={{height: '45rem'}}>
 				<Form
 					onSubmit={
 						handleEditSubmit((data) => update(data).then(async () => {
@@ -202,21 +244,53 @@ const Index = () => {
 					/>
 
 					<Controller
-						name="value_type"
+						name="measure"
 						control={controlEdit}
 						render={({field: {value, ref, onChange, onBlur}}) => (
 							<Select
 								ref={ref}
-								disabled={true}
 								top={true}
-								id="value_type"
+								id="measure"
 								options={measurementUnitsOptions}
 								onBlur={onBlur}
-								label="Type"
-								error={editErrors?.value_type?.message}
+								label="Measure unit"
+								error={editErrors?.measure?.message}
 								value={getSelectValue(measurementUnitsOptions, value)}
 								defaultValue={getSelectValue(measurementUnitsOptions, value)}
 								handleOnChange={(e) => onChange(e as string)}
+							/>
+						)}
+					/>
+
+					<Controller
+						name="quantity"
+						control={controlEdit}
+						render={({field}) => (
+							<NumberFormattedInput
+								id="quantity"
+								maxLength={3}
+								label="Number of products per package"
+								error={editErrors?.quantity?.message}
+								{...field}
+							/>
+						)}
+					/>
+
+					<Controller
+						name="amount"
+						control={controlEdit}
+						render={({field}) => (
+							<NumberFormattedInput
+								id="amount"
+								maxLength={20}
+								label={
+									watchEdit('measure') ? t(
+										'Quantity of 1 product in the package',
+										{measure: measurementUnitsOptions?.find(i => i?.value == watchEdit('measure'))?.label ?? ''}
+									) : t('Quantity of 1 product in the package(default)')
+								}
+								error={editErrors?.amount?.message}
+								{...field}
 							/>
 						)}
 					/>
@@ -231,7 +305,7 @@ const Index = () => {
 				</Form>
 			</EditModal>
 
-			<DeleteModal endpoint="/organization/measurement/delete/" onDelete={() => refetch()}/>
+			<DeleteModal endpoint="packages/" onDelete={() => refetch()}/>
 		</>
 	)
 }

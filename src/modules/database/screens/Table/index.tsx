@@ -1,11 +1,9 @@
-import {
-	PageTitle,
-	VerticalTab
-} from 'components'
+import {PageTitle, VerticalTab} from 'components'
 import {databaseTabOptions} from 'helpers/options'
 import {useSearchParams} from 'hooks'
 import Brands from 'modules/database/components/Brands'
 import Countries from 'modules/database/components/Countries'
+import Packages from 'modules/database/components/Packages'
 import ProductTypes from 'modules/database/components/ProductTypes'
 import MeasurementUnits from 'modules/database/components/MeasurementUnits'
 import ExpenseTypes from 'modules/database/components/ExpenseTypes'
@@ -30,7 +28,8 @@ const Index = () => {
 								tab === 'measurementUnits' ? <MeasurementUnits/> :
 									tab === 'expenseTypes' ? <ExpenseTypes/> :
 										tab === 'priceTypes' ? <PriceTypes/> :
-											null
+											tab === 'packages' ? <Packages/> :
+												null
 
 				}
 			</div>

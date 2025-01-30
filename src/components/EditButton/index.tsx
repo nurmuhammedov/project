@@ -1,6 +1,6 @@
-import {Delete} from 'assets/icons'
+import {Edit} from 'assets/icons'
 import {useSearchParams} from 'hooks'
-import styles from './styles.module.scss'
+import styles from '../DeleteButton/styles.module.scss'
 
 
 interface IProperties {
@@ -11,8 +11,8 @@ interface IProperties {
 const Index = ({id, withSlash = false}: IProperties) => {
 	const {addParams} = useSearchParams()
 	return (
-		<div className={styles.root} onClick={() => addParams({modal: 'delete', deleteId: withSlash ? `${id}/` : id})}>
-			<Delete/>
+		<div className={styles.root} onClick={() => addParams({modal: 'edit', updateId: withSlash ? `${id}/` : id})}>
+			<Edit/>
 		</div>
 	)
 }

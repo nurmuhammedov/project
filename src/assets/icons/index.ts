@@ -7,6 +7,7 @@ import Search from './Search'
 import Times from './Times'
 import Plus from './Plus'
 import Logo from './Logo'
+import Edit from './Edit'
 
 
 export * from './button'
@@ -20,5 +21,6 @@ export {
 	Search,
 	Times,
 	Plus,
+	Edit,
 	Logo
 }

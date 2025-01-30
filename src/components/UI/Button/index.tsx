@@ -11,6 +11,7 @@ const Index: React.FC<IButton> = ({
 	                                  children,
 	                                  theme = BUTTON_THEME.PRIMARY,
 	                                  disabled,
+	                                  type = 'button',
 	                                  icon,
 	                                  mini = false,
 	                                  iconPosition = 'left',
@@ -32,6 +33,7 @@ const Index: React.FC<IButton> = ({
 				{[styles[`button--disabled`]]: disabled}
 			)}
 			disabled={disabled}
+			type={type}
 			onClick={() => !!redirect && navigate(redirect)}
 			{...props}
 		>

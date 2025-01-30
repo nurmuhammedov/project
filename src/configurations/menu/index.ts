@@ -37,6 +37,17 @@ export const menu: IMenuItem[] = [
 		}
 	},
 	{
+		id: '/stores',
+		label: 'Stores',
+		href: '/admin/stores',
+		allowedRoles: [
+			ROLE_LIST.ADMIN
+		],
+		order: {
+			[ROLE_LIST.ADMIN]: 1
+		}
+	},
+	{
 		id: '/database',
 		label: 'Database',
 		href: '/admin/database',

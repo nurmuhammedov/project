@@ -20,6 +20,9 @@ function useCustomSearchParams() {
 			})
 		}
 
+		delete newParams['page']
+		delete newParams['limit']
+
 		if (isObject(paramKeyOrObj)) {
 			newParams = {...newParams, ...paramKeyOrObj}
 		}
@@ -32,6 +35,8 @@ function useCustomSearchParams() {
 		paramKeys.forEach((pk) => {
 			delete paramsCopy[pk]
 		})
+		delete paramsCopy['page']
+		delete paramsCopy['limit']
 		setSearchParams(paramsCopy as unknown as URLSearchParams, {replace: true})
 	}
 

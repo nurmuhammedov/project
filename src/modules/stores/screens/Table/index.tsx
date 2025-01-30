@@ -10,16 +10,17 @@ import {
 	HR,
 	Input,
 	Modal,
+	PageTitle,
 	Pagination,
 	ReactTable,
 	Select
 } from 'components'
 import Form from 'components/Form'
 import {FIELD} from 'constants/fields'
-import {measurementUnitsOptions} from 'helpers/options'
-import {measurementUnitsSchema} from 'helpers/yup'
-import {useAdd, useDetail, usePaginatedData, usePagination, useSearchParams, useUpdate} from 'hooks'
-import {IMeasureItemDetail} from 'interfaces/database.interface'
+import {storesTypeOptions} from 'helpers/options'
+import {storeSchema} from 'helpers/yup'
+import {useAdd, useDetail, usePaginatedData, usePagination, useSearchParams, useUpdate} from 'hooks/index'
+import {IStoreItemDetail} from 'interfaces/stores.interface'
 import {useEffect, useMemo} from 'react'
 import {Controller, useForm} from 'react-hook-form'
 import {useTranslation} from 'react-i18next'
@@ -33,12 +34,46 @@ const Index = () => {
 	const {page, pageSize} = usePagination()
 	const {addParams, removeParams, paramsObject: {updateId = undefined}} = useSearchParams()
 
-	const {data, totalPages, isPending: isLoading, refetch} = usePaginatedData<IMeasureItemDetail[]>(
-		'organization/measurement',
+	const {data, totalPages, isPending: isLoading, refetch} = usePaginatedData<IStoreItemDetail[]>(
+		'stores/',
 		{
 			page: page,
 			page_size: pageSize
 		}
+	)
+
+	const columns: Column<IStoreItemDetail>[] = useMemo(() =>
+			[
+				{
+					Header: t('№'),
+					accessor: (_: IStoreItemDetail, index: number) => ((page - 1) * pageSize) + (index + 1),
+					style: {
+						width: '3rem',
+						textAlign: 'center'
+					}
+				},
+				{
+					Header: t('Name'),
+					accessor: (row: IStoreItemDetail) => row.name
+				},
+				{
+					Header: t('Type'),
+					accessor: (row: IStoreItemDetail) => t(storesTypeOptions.find(i => i.value == row.store_type)?.label?.toString() ?? '')
+				},
+				{
+					Header: t('Date added'),
+					accessor: (row: IStoreItemDetail) => formatDate(row.created_at)
+
+				},
+				{
+					Header: t('Actions'),
+					accessor: (row: IStoreItemDetail) => <div className="flex items-start gap-lg">
+						<EditButton id={row.id} withSlash={true}/>
+						<DeleteButton id={row.id} withSlash={true}/>
+					</div>
+				}
+			],
+		[t, page, pageSize]
 	)
 
 	const {
@@ -49,43 +84,10 @@ const Index = () => {
 		formState: {errors: addErrors}
 	} = useForm({
 		mode: 'onTouched',
-		defaultValues: {name: '', value_type: undefined},
-		resolver: yupResolver(measurementUnitsSchema)
+		defaultValues: {name: '', store_type: undefined},
+		resolver: yupResolver(storeSchema)
 	})
 
-	const columns: Column<IMeasureItemDetail>[] = useMemo(() =>
-			[
-				{
-					Header: t('№'),
-					accessor: (_: IMeasureItemDetail, index: number) => ((page - 1) * pageSize) + (index + 1),
-					style: {
-						width: '3rem',
-						textAlign: 'center'
-					}
-				},
-				{
-					Header: t('Name'),
-					accessor: (row: IMeasureItemDetail) => row.name
-				},
-				{
-					Header: t('Type'),
-					accessor: (row: IMeasureItemDetail) => t(measurementUnitsOptions.find(i => i.value == row.value_type)?.label?.toString() ?? '')
-				},
-				{
-					Header: t('Date added'),
-					accessor: (row: IMeasureItemDetail) => formatDate(row.created_at)
-
-				},
-				{
-					Header: t('Actions'),
-					accessor: (row: IMeasureItemDetail) => <div className="flex items-start gap-lg">
-						<EditButton id={row.id}/>
-						<DeleteButton id={row.id}/>
-					</div>
-				}
-			],
-		[t, page, pageSize]
-	)
 
 	const {
 		handleSubmit: handleEditSubmit,
@@ -95,27 +97,38 @@ const Index = () => {
 		formState: {errors: editErrors}
 	} = useForm({
 		mode: 'onTouched',
-		defaultValues: {name: '', value_type: undefined},
-		resolver: yupResolver(measurementUnitsSchema)
+		defaultValues: {name: '', store_type: undefined},
+		resolver: yupResolver(storeSchema)
 	})
 
-	const {mutateAsync, isPending: isAdding} = useAdd('organization/measurement/create')
-	const {mutateAsync: update, isPending: isUpdating} = useUpdate('organization/measurement/update/', updateId)
+	const {mutateAsync, isPending: isAdding} = useAdd('stores/create/')
+	const {mutateAsync: update, isPending: isUpdating} = useUpdate('stores/update/', updateId)
 	const {
 		data: detail,
 		isPending: isDetailLoading
-	} = useDetail<IMeasureItemDetail>('organization/measurement/detail/', updateId)
+	} = useDetail<IStoreItemDetail>('stores/', updateId)
 
 	useEffect(() => {
 		if (detail) {
-			resetEdit({name: detail.name, value_type: detail.value_type})
+			resetEdit({name: detail.name, store_type: detail.store_type})
 		}
 	}, [detail, resetEdit])
 
 	return (
 		<>
+			<PageTitle title="Stores">
+				<div className="flex align-center gap-lg">
+					<Button
+						icon={<Plus/>}
+						onClick={() => addParams({modal: 'store'})}
+					>
+						Add a new store
+					</Button>
+				</div>
+			</PageTitle>
+
 			<Card screen={true} className="span-9 gap-2xl">
-				<div className="flex justify-between items-center">
+				<div className="flex items-start">
 					<Input
 						id="search"
 						icon={<Search/>}
@@ -123,9 +136,6 @@ const Index = () => {
 						radius={true}
 						style={{width: 400}}
 					/>
-					<Button icon={<Plus/>} onClick={() => addParams({modal: 'expenseTypes'})}>
-						Add
-					</Button>
 				</div>
 				<div className="flex flex-col gap-md flex-1">
 					<ReactTable columns={columns} data={data} isLoading={isLoading}/>
@@ -134,7 +144,7 @@ const Index = () => {
 				</div>
 			</Card>
 
-			<Modal title="Add new" id="expenseTypes" style={{height: '30rem'}}>
+			<Modal title="Add new" id="store" style={{height: '37rem'}}>
 				<Form
 					onSubmit={
 						handleAddSubmit((data) => mutateAsync(data).then(async () => {
@@ -154,19 +164,18 @@ const Index = () => {
 					/>
 
 					<Controller
-						name="value_type"
+						name="store_type"
 						control={controlAdd}
 						render={({field: {value, ref, onChange, onBlur}}) => (
 							<Select
 								ref={ref}
-								top={true}
-								id="value_type"
-								options={measurementUnitsOptions}
+								id="store_type"
+								options={storesTypeOptions}
 								onBlur={onBlur}
 								label="Type"
-								error={addErrors?.value_type?.message}
-								value={getSelectValue(measurementUnitsOptions, value)}
-								defaultValue={getSelectValue(measurementUnitsOptions, value)}
+								error={addErrors?.store_type?.message}
+								value={getSelectValue(storesTypeOptions, value)}
+								defaultValue={getSelectValue(storesTypeOptions, value)}
 								handleOnChange={(e) => onChange(e as string)}
 							/>
 						)}
@@ -182,7 +191,7 @@ const Index = () => {
 				</Form>
 			</Modal>
 
-			<EditModal isLoading={isDetailLoading && !detail} style={{height: '30rem'}}>
+			<EditModal isLoading={isDetailLoading && !detail} style={{height: '37rem'}}>
 				<Form
 					onSubmit={
 						handleEditSubmit((data) => update(data).then(async () => {
@@ -202,20 +211,18 @@ const Index = () => {
 					/>
 
 					<Controller
-						name="value_type"
+						name="store_type"
 						control={controlEdit}
 						render={({field: {value, ref, onChange, onBlur}}) => (
 							<Select
 								ref={ref}
-								disabled={true}
-								top={true}
-								id="value_type"
-								options={measurementUnitsOptions}
+								id="store_type"
+								options={storesTypeOptions}
 								onBlur={onBlur}
 								label="Type"
-								error={editErrors?.value_type?.message}
-								value={getSelectValue(measurementUnitsOptions, value)}
-								defaultValue={getSelectValue(measurementUnitsOptions, value)}
+								error={editErrors?.store_type?.message}
+								value={getSelectValue(storesTypeOptions, value)}
+								defaultValue={getSelectValue(storesTypeOptions, value)}
 								handleOnChange={(e) => onChange(e as string)}
 							/>
 						)}
@@ -231,7 +238,7 @@ const Index = () => {
 				</Form>
 			</EditModal>
 
-			<DeleteModal endpoint="/organization/measurement/delete/" onDelete={() => refetch()}/>
+			<DeleteModal endpoint="stores/delete/" onDelete={() => refetch()}/>
 		</>
 	)
 }

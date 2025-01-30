@@ -25,18 +25,18 @@ interface IProperties {
 	title?: string
 	children?: ReactNode
 	onClose?: () => void
-	styles?: CSSProperties
+	style?: CSSProperties
 }
 
 const Modal = (
 	{
 		id,
-		animation = 'zoom',
+		animation = 'flip',
 		queryParam = 'modal',
 		title = '',
 		children,
 		onClose,
-		styles
+		style
 	}: IProperties
 ) => {
 	const {paramsObject, removeParams} = useSearchParams()
@@ -59,7 +59,7 @@ const Modal = (
 					visible={visible}
 					onClose={noop}
 					animation={animation}
-					customStyles={{...customStyles, ...styles}}
+					customStyles={{...customStyles, ...style}}
 					showCloseButton={false}
 					closeMaskOnClick={false}
 				>
@@ -74,7 +74,7 @@ const Modal = (
 									if (onClose) {
 										onClose()
 									} else {
-										removeParams(queryParam, 'page', 'limit')
+										removeParams(queryParam)
 									}
 								}}
 							>

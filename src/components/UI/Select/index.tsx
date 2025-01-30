@@ -85,7 +85,7 @@ const Index = forwardRef<SelectInstance<ISelectOption>, ISelect>((props, ref) =>
 				menuPlacement={props.top ? 'top' : 'bottom'}
 				hideSelectedOptions
 				isDisabled={props.disabled}
-				isSearchable
+				isSearchable={true}
 				isClearable={false}
 				{...props}
 				placeholder={props.placeholder ? t(props.placeholder) : t('Choose')}
