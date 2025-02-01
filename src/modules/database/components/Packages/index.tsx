@@ -171,7 +171,6 @@ const Index = () => {
 						render={({field: {value, ref, onChange, onBlur}}) => (
 							<Select
 								ref={ref}
-								top={true}
 								id="measure"
 								options={measurementUnitsOptions}
 								onBlur={onBlur}
@@ -253,7 +252,6 @@ const Index = () => {
 						render={({field: {value, ref, onChange, onBlur}}) => (
 							<Select
 								ref={ref}
-								top={true}
 								id="measure"
 								options={measurementUnitsOptions}
 								onBlur={onBlur}

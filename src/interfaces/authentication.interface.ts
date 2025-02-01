@@ -1,7 +1,7 @@
 import {ROLE_LIST} from 'constants/roles'
 
 
-type IRole = ROLE_LIST.USER | ROLE_LIST.ADMIN
+type IRole = ROLE_LIST.SELLER | ROLE_LIST.ADMIN
 
 interface ILogin {
 	full_name: string;

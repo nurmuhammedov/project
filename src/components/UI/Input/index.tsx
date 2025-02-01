@@ -74,7 +74,7 @@ const Index = forwardRef<HTMLInputElement | HTMLTextAreaElement, IField>(
 								/>
 							</div>
 						)}
-				{error && <span className={styles['error__message']}>{t(error as string)}</span>}
+				{error && <span className={styles['error__message']}>{t(error as string)}!</span>}
 			</div>
 		)
 	}
