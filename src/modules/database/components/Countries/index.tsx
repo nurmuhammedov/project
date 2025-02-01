@@ -89,7 +89,7 @@ const Countries = () => {
 	return (
 		<>
 			<Card screen={true} className="span-9 gap-2xl">
-				<div className="flex justify-between items-center">
+				<div className="flex justify-between align-center">
 					<Input
 						id="search"
 						icon={<Search/>}

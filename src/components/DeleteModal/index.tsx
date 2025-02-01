@@ -23,7 +23,7 @@ const Index = ({title = 'Should it really be deleted?', endpoint, onDelete}: IPr
 	return (
 		<Modal animation="flip" id="delete" style={{height: '20rem'}} onClose={handleClose}>
 			<h1 className={styles.title}>{t(title)}</h1>
-			<div style={{marginTop: 'auto'}} className="flex items-center gap-lg">
+			<div style={{marginTop: 'auto'}} className="flex align-center gap-lg">
 				{/*<Button style={{flex: 1}} theme={BUTTON_THEME.DANGER} onClick={handleClose}>*/}
 				{/*	Cancel*/}
 				{/*</Button>*/}

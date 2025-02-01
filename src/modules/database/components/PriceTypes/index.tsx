@@ -22,7 +22,7 @@ import {useEffect, useMemo} from 'react'
 import {useForm} from 'react-hook-form'
 import {useTranslation} from 'react-i18next'
 import {Column} from 'react-table'
-import {formatDate} from 'utilities/data'
+import {formatDate} from 'utilities/date'
 
 
 const Index = () => {
@@ -55,17 +55,13 @@ const Index = () => {
 					Header: t('№'),
 					accessor: (_: IDatabaseItemDetail, index: number) => ((page - 1) * pageSize) + (index + 1),
 					style: {
-						width: '3rem',
+						width: '2.8rem',
 						textAlign: 'center'
 					}
 				},
 				{
 					Header: t('Name'),
 					accessor: (row: IDatabaseItemDetail) => row.name
-				},
-				{
-					Header: t('Organization'),
-					accessor: (row: IDatabaseItemDetail) => row?.organization?.name
 				},
 				{
 					Header: t('Date added'),
@@ -110,7 +106,7 @@ const Index = () => {
 	return (
 		<>
 			<Card screen={true} className="span-9 gap-2xl">
-				<div className="flex justify-between items-center">
+				<div className="flex justify-between align-center">
 					<Input
 						id="search"
 						icon={<Search/>}

@@ -1,4 +1,6 @@
 import NumberFormattedInput from './UI/NumberFormattedInput'
+import AdminLayout from './layouts/AdminLayout'
+import DetailButton from './DetailButton'
 import DeleteButton from './DeleteButton'
 import VerticalTab from './VerticalTab'
 import DeleteModal from './DeleteModal'
@@ -9,6 +11,7 @@ import ReactTable from './ReactTable'
 import PageTitle from './PageTitle'
 import EditModal from './EditModal'
 import AlertItem from './AlertItem'
+import PageInfo from './PageInfo'
 import Button from './UI/Button'
 import Select from './UI/Select'
 import Input from './UI/Input'
@@ -23,6 +26,8 @@ import HR from './HR'
 export {
 	NumberFormattedInput,
 	DeleteButton,
+	DetailButton,
+	AdminLayout,
 	VerticalTab,
 	DeleteModal,
 	Pagination,
@@ -32,6 +37,7 @@ export {
 	PageTitle,
 	AlertItem,
 	EditModal,
+	PageInfo,
 	Button,
 	Select,
 	Loader,

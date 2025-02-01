@@ -19,6 +19,7 @@ interface IMeasureItemDetail {
 interface IPackageItemDetail {
 	readonly id: number;
 	name: string;
+	measure_name: string;
 	measure: {
 		readonly id: string;
 		name: string;

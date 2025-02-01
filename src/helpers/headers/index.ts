@@ -1,6 +1,6 @@
 import {TFunction} from 'i18next'
 import {IDatabaseItemDetail} from 'interfaces/database.interface'
-import {formatDate} from 'utilities/data'
+import {formatDate} from 'utilities/date'
 
 
 const databaseTableHeader = (t: TFunction<'translation', undefined>, page: number, pageSize: number) => [

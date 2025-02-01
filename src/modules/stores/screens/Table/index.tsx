@@ -2,9 +2,7 @@ import {yupResolver} from '@hookform/resolvers/yup'
 import {Plus, Search} from 'assets/icons'
 import {
 	Button,
-	Card,
-	DeleteButton,
-	DeleteModal,
+	Card, DetailButton,
 	EditButton,
 	EditModal,
 	HR,
@@ -26,7 +24,7 @@ import {Controller, useForm} from 'react-hook-form'
 import {useTranslation} from 'react-i18next'
 import {Column} from 'react-table'
 import {getSelectValue} from 'utilities/common'
-import {formatDate} from 'utilities/data'
+import {formatDate} from 'utilities/date'
 
 
 const Index = () => {
@@ -68,8 +66,8 @@ const Index = () => {
 				{
 					Header: t('Actions'),
 					accessor: (row: IStoreItemDetail) => <div className="flex items-start gap-lg">
-						<EditButton id={row.id} withSlash={true}/>
-						<DeleteButton id={row.id} withSlash={true}/>
+						<EditButton id={row.id}/>
+						<DetailButton id={row.id}/>
 					</div>
 				}
 			],
@@ -237,8 +235,6 @@ const Index = () => {
 					</Button>
 				</Form>
 			</EditModal>
-
-			<DeleteModal endpoint="stores/delete/" onDelete={() => refetch()}/>
 		</>
 	)
 }

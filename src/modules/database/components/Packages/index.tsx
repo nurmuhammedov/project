@@ -25,7 +25,7 @@ import {Controller, useForm} from 'react-hook-form'
 import {useTranslation} from 'react-i18next'
 import {Column} from 'react-table'
 import {getSelectValue} from 'utilities/common'
-import {formatDate} from 'utilities/data'
+import {formatDate} from 'utilities/date'
 
 
 const Index = () => {
@@ -72,6 +72,10 @@ const Index = () => {
 				{
 					Header: t('Number of products per package'),
 					accessor: (row: IPackageItemDetail) => row.quantity
+				},
+				{
+					Header: t('Quantity of 1 product in the package(default)'),
+					accessor: (row: IPackageItemDetail) => `${row.amount} ${row.measure_name}`
 				},
 				{
 					Header: t('Date added'),
@@ -123,7 +127,7 @@ const Index = () => {
 	return (
 		<>
 			<Card screen={true} className="span-9 gap-2xl">
-				<div className="flex justify-between items-center">
+				<div className="flex justify-between align-center">
 					<Input
 						id="search"
 						icon={<Search/>}

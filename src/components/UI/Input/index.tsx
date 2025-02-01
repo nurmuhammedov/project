@@ -1,9 +1,9 @@
-import {FIELD} from 'constants/fields'
 import {IField} from 'interfaces/form.interface'
-import React, {forwardRef} from 'react'
-import classNames from 'classnames'
-import styles from './styles.module.scss'
 import {useTranslation} from 'react-i18next'
+import styles from './styles.module.scss'
+import React, {forwardRef} from 'react'
+import {FIELD} from 'constants/fields'
+import classNames from 'classnames'
 
 
 const Index = forwardRef<HTMLInputElement | HTMLTextAreaElement, IField>(

@@ -11,8 +11,7 @@ import PriceTypes from 'modules/database/components/PriceTypes'
 
 
 const Index = () => {
-	const {paramsObject} = useSearchParams()
-	const tab = paramsObject['tab'] || databaseTabOptions[0]?.value
+	const {paramsObject: {tab = databaseTabOptions[0]?.value}} = useSearchParams()
 
 	return (
 		<>

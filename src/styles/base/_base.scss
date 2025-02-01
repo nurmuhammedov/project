@@ -61,3 +61,8 @@ ol {
   border-radius: 1rem !important;
   background: var(--white) !important;
 }
+
+button:focus-visible, a:focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 2px var(--teal) !important;
+}

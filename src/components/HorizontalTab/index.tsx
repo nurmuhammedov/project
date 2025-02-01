@@ -1,8 +1,7 @@
-import {SelectIcon} from 'assets/icons'
-import Card from 'components/Card'
+import {Product} from 'assets/icons'
 import {ISelectOption} from 'interfaces/form.interface'
 import styles from './styles.module.scss'
-import {FC} from 'react'
+import {CSSProperties, FC} from 'react'
 import {useSearchParams} from 'hooks'
 import classNames from 'classnames'
 import {useTranslation} from 'react-i18next'
@@ -12,9 +11,10 @@ interface IProperties {
 	fallbackValue: string | number | boolean
 	tabs: ISelectOption[]
 	query?: string
+	style?: CSSProperties
 }
 
-const Index: FC<IProperties> = ({tabs, fallbackValue, query = 'tab'}) => {
+const Index: FC<IProperties> = ({tabs, fallbackValue, query = 'tab', style}) => {
 	const {paramsObject, addParams} = useSearchParams()
 	const status = paramsObject[query] || fallbackValue
 	const {t} = useTranslation()
@@ -25,7 +25,7 @@ const Index: FC<IProperties> = ({tabs, fallbackValue, query = 'tab'}) => {
 	}
 
 	return (
-		<Card className={styles.root}>
+		<div className={styles.root} style={style}>
 			{
 				tabs?.map(item => {
 					return (
@@ -35,12 +35,14 @@ const Index: FC<IProperties> = ({tabs, fallbackValue, query = 'tab'}) => {
 							onClick={() => handleTabChange(item.value)}
 						>
 							{t(item.label as string)}
-							<SelectIcon/>
+							<div className={styles['icon-wrapper']}>
+								{item?.icon ?? <Product/>}
+							</div>
 						</button>
 					)
 				})
 			}
-		</Card>
+		</div>
 	)
 }
 

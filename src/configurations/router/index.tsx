@@ -1,14 +1,15 @@
-import {App} from 'components'
 import {createBrowserRouter, Navigate} from 'react-router-dom'
-import AdminLayout from 'components/layouts/AdminLayout'
+import {AdminLayout, App} from 'components'
 
 // Screens
 import {
 	ProductsTable,
 	DatabaseTable,
 	ClientsTable,
+	StoresTable,
+	StoreDetail,
 	Login,
-	Home, StoresTable
+	Home
 } from 'modules'
 
 
@@ -47,6 +48,10 @@ export const router = createBrowserRouter([
 							{
 								index: true,
 								element: <StoresTable/>
+							},
+							{
+								path: 'detail/:id',
+								element: <StoreDetail/>
 							}
 						]
 					}

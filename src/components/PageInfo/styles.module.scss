@@ -1,0 +1,48 @@
+.root {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+
+  .icon-wrapper {
+    width: 5rem;
+    height: 5rem;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 1.15rem;
+    border: 1.5px solid var(--light-blue);
+    background: var(--light-blue);
+
+    svg {
+      width: 2.5rem !important;
+      max-width: 2.5rem !important;
+    }
+  }
+
+  .title-wrapper {
+    display: flex;
+    flex-direction: column;
+
+    .title {
+      color: var(--white);
+      font-family: Manrope, Arial, Helvetica, sans-serif;
+      font-size: 2rem;
+      font-style: normal;
+      font-weight: 700;
+      line-height: 150%; /* 3rem */
+      letter-spacing: -0.06rem;
+    }
+
+    .subTitle {
+      color: var(--light-gray-2);
+      font-family: Manrope, Arial, Helvetica, sans-serif;
+      font-size: 1.125rem;
+      font-style: normal;
+      font-weight: 600;
+      line-height: 150%; /* 1.6875rem */
+      letter-spacing: -0.0225rem;
+    }
+  }
+
+}

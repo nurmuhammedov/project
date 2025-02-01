@@ -22,7 +22,7 @@ import {useEffect, useMemo} from 'react'
 import {useForm} from 'react-hook-form'
 import {useTranslation} from 'react-i18next'
 import {Column} from 'react-table'
-import {formatDate} from 'utilities/data'
+import {formatDate} from 'utilities/date'
 
 
 const Index = () => {
@@ -103,7 +103,7 @@ const Index = () => {
 	return (
 		<>
 			<Card screen={true} className="span-9 gap-2xl">
-				<div className="flex justify-between items-center">
+				<div className="flex justify-between align-center">
 					<Input
 						id="search"
 						icon={<Search/>}

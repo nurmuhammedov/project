@@ -45,7 +45,7 @@ const Modal = (
 
 	useEffect(() => {
 		const body = document.querySelector('body') as HTMLBodyElement
-		if (!id) {
+		if (!visible) {
 			body.style.overflow = 'auto'
 		} else {
 			body.style.overflow = 'hidden'
@@ -54,7 +54,7 @@ const Modal = (
 
 	return (
 		createPortal(
-			<FocusLock>
+			<FocusLock autoFocus={true} disabled={!visible}>
 				<MD
 					visible={visible}
 					onClose={noop}

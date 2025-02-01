@@ -1,6 +1,9 @@
 .root {
   padding: 0.2rem 0.3rem;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /*# sourceMappingURL=styles.module.css.map */
