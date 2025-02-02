@@ -1,5 +1,6 @@
 import NumberFormattedInput from './UI/NumberFormattedInput'
 import AdminLayout from './layouts/AdminLayout'
+import ProtectedRoute from './ProtectedRoute'
 import DetailButton from './DetailButton'
 import DeleteButton from './DeleteButton'
 import VerticalTab from './VerticalTab'
@@ -25,6 +26,7 @@ import HR from './HR'
 
 export {
 	NumberFormattedInput,
+	ProtectedRoute,
 	DeleteButton,
 	DetailButton,
 	AdminLayout,

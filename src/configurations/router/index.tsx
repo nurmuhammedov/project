@@ -1,5 +1,5 @@
-import {createBrowserRouter, Navigate} from 'react-router-dom'
-import {AdminLayout, App} from 'components'
+import {createBrowserRouter} from 'react-router-dom'
+import {AdminLayout, App, ProtectedRoute} from 'components'
 
 // Screens
 import {
@@ -18,13 +18,13 @@ export const router = createBrowserRouter([
 		path: '/',
 		element: <App/>,
 		children: [
-			{
-				index: true,
-				element: <Navigate to="/admin/home"/>
-			},
+			// {
+			// 	index: true,
+			// 	element: <Navigate to="/admin/home"/>
+			// },
 			{
 				path: 'admin',
-				element: <AdminLayout/>,
+				element: <ProtectedRoute><AdminLayout/></ProtectedRoute>,
 				children: [
 					{
 						path: 'home',
@@ -65,9 +65,9 @@ export const router = createBrowserRouter([
 		element: <Login/>,
 		errorElement: <h1>Error</h1>
 	},
-	{
-		path: '*',
-		element: <Navigate to="/login"/>,
-		errorElement: <h1>Error</h1>
-	}
+	// {
+	// 	path: '*',
+	// 	element: <Navigate to="/"/>,
+	// 	errorElement: <h1>Error</h1>
+	// }
 ])

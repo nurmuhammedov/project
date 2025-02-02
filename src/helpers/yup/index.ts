@@ -30,9 +30,6 @@ const confirmPasswordSchema = yup
 	.oneOf([yup.ref('password'), undefined], 'Passwords did not match')
 	.required('This field is required')
 
-// Export schemas
-// export { usernameSchema, passwordSchema, confirmPasswordSchema };
-
 
 // AUTHENTICATION
 const loginSchema = yup.object().shape({

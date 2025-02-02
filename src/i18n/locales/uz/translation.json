@@ -89,7 +89,7 @@
   "The information entered is invalid": "Kiritilgan maʼlumot yaroqli emas",
   "You cannot leave a space in the login": "Loginda bo‘sh joyni qoldirish mumkin emas",
   "You cannot leave a space in the password": "Parolda bo‘sh joyni qoldirish mumkin emas",
-  "The login can only contain letters, numbers, and underscores": "Login faqat harflar, raqamlar va pastki chiziqdan iborat bo‘lishi mumkin",
+  "The login can only contain letters, numbers, and underscores": "Login faqat lotin harflari (a-z va A-Z), raqamlar (0-9) va pastki chiziqdan iborat bo‘lishi mumkin",
   "Login cannot start with a number": "Loginni raqam bilan boshlash mumkin emas",
   "Login cannot begin or end with an underscore": "Loginni pastki chiziq bilan boshlash yoki yakunlash mumkin emas",
   "It is not possible to type consecutive underscores in a login": "Loginda ketma-ket pastki chiziqni yozish mumkin emas",

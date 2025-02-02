@@ -37,9 +37,11 @@ const Index = () => {
 				>
 					<div className={styles['status-wrapper']}>
 						<div className={styles.status}><Status/></div>
-						<div className={styles.name}>{user?.fullName ?? 'Admin'}</div>
+						<div className={styles.name}>{user?.fullName ?? t('Employee')}</div>
 					</div>
-					<div className={classNames(styles.icon, {[styles['active-icon']]: accountIsOpen})}><SelectIcon/></div>
+					<div className={classNames(styles.icon, {[styles['active-icon']]: accountIsOpen})}>
+						<SelectIcon/>
+					</div>
 				</div>
 				<div className={classNames(styles.account, {[styles['active-account']]: accountIsOpen})}>
 					<div
