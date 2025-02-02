@@ -1,3 +1,10 @@
-export {default as Success} from './Success'
-export {default as Alert} from './Alert'
-export {default as Error} from './Error'
+import Success from './Success'
+import Alert from './Alert'
+import Error from './Error'
+
+
+export {
+	Success,
+	Error,
+	Alert
+}

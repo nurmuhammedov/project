@@ -1,10 +1,10 @@
-import {useQuery} from '@tanstack/react-query'
 import {ISearchParams} from 'interfaces/params.interface'
-import {useTranslation} from 'react-i18next'
 import {CommonService} from 'services/common.service'
+import {useQuery} from '@tanstack/react-query'
+import {useTranslation} from 'react-i18next'
 
 
-const usePaginatedData = <T>(
+const useData = <T>(
 	endpoint: string,
 	enabled: boolean = true,
 	params?: ISearchParams
@@ -18,4 +18,4 @@ const usePaginatedData = <T>(
 	})
 }
 
-export default usePaginatedData
+export default useData

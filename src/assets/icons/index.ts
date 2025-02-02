@@ -6,9 +6,11 @@ import Status from './Status'
 import Logout from './Logout'
 import Switch from './Switch'
 import Detail from './Detail'
+import Income from './Income'
 import Search from './Search'
 import Times from './Times'
 import Store from './Store'
+import Cart from './Cart'
 import Plus from './Plus'
 import Logo from './Logo'
 import Edit from './Edit'
@@ -16,8 +18,8 @@ import Box from './Box'
 import Eye from './Eye'
 
 
-export * from './button'
 export * from './alert'
+
 export {
 	SelectIcon,
 	Currency,
@@ -26,10 +28,12 @@ export {
 	Detail,
 	Delete,
 	Logout,
+	Income,
 	Switch,
 	Search,
 	Store,
 	Times,
+	Cart,
 	Plus,
 	Edit,
 	Logo,

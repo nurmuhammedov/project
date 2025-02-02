@@ -1,4 +1,4 @@
-import {Loader} from 'components/index'
+import {Loader} from 'components'
 import {CSSProperties} from 'react'
 import classes from './styles.module.scss'
 import {useTable, TableOptions, ColumnInstance, HeaderGroup, Column} from 'react-table'

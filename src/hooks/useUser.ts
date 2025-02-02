@@ -1,5 +1,5 @@
-import {useQuery} from '@tanstack/react-query'
 import {AuthenticationService} from 'services/authentication.service'
+import {useQuery} from '@tanstack/react-query'
 import {buildUser} from 'utilities/authentication'
 
 

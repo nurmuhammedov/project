@@ -4,8 +4,8 @@ import {useContext} from 'react'
 
 export default function useAppContext() {
 	const context = useContext(AppContext)
-	if (context === undefined) {
-		throw new Error('Hook used out of the AppContextProvider')
+	if (!context) {
+		throw new Error('useContext must be used within ContextProvider')
 	}
 	return context
 }

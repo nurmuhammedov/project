@@ -12,9 +12,9 @@ import {
 	Modal,
 	Pagination,
 	ReactTable,
-	Select
+	Select,
+	Form
 } from 'components'
-import Form from 'components/Form'
 import {FIELD} from 'constants/fields'
 import {measurementUnitsOptions} from 'helpers/options'
 import {measurementUnitsSchema} from 'helpers/yup'

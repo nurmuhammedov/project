@@ -11,9 +11,9 @@ import {
 	Input,
 	Modal,
 	Pagination,
-	ReactTable
+	ReactTable,
+	Form
 } from 'components'
-import Form from 'components/Form'
 import {FIELD} from 'constants/fields'
 import {databaseTableHeader} from 'helpers/headers'
 import {databaseSchema} from 'helpers/yup'

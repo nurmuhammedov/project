@@ -9,11 +9,11 @@ export const AuthenticationService = {
 		return response.data
 	},
 
-	async me() {
-		return await interceptor.get<ILogin>('accounts/me/')
+	me() {
+		return interceptor.get<ILogin>('accounts/me/')
 	},
 
-	async logout() {
-		return await interceptor.get('accounts/logout/')
+	logout() {
+		return interceptor.get('accounts/logout/')
 	}
 }

@@ -4,7 +4,7 @@ import {showMessage} from 'utilities/alert'
 import {noopAsync} from 'utilities/common'
 
 
-const useDynamicDeleteMutation = (
+const useDelete = (
 	endpoint: string,
 	id?: string | number | boolean | null,
 	successMessage: string = 'Deleted successfully',
@@ -16,8 +16,8 @@ const useDynamicDeleteMutation = (
 				return CommonService.deleteData(endpoint, id?.toString())
 			} else {
 				showMessage('ID is required to perform delete operation', 'error')
+				return noopAsync()
 			}
-			return noopAsync()
 		},
 		onSuccess: () => showMessage(successMessage, 'success'),
 		onError: () => {
@@ -28,4 +28,4 @@ const useDynamicDeleteMutation = (
 	})
 }
 
-export default useDynamicDeleteMutation
+export default useDelete

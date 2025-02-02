@@ -1,5 +1,4 @@
-/* Manrope */
-
+/* ManRope */
 @font-face {
     font-family: 'Manrope';
     src: url('./Manrope/Manrope-Regular.ttf') format('truetype');
@@ -29,7 +28,6 @@
 }
 
 /* GText */
-
 @font-face {
     font-family: 'Golos';
     src: url('./Golos/GolosText-Regular.ttf') format('truetype');

@@ -82,7 +82,7 @@ const Index = () => {
 				<div className="flex flex-col gap-md flex-1">
 					<ReactTable columns={columns} data={[]} isLoading={false}/>
 					<HR/>
-					<Pagination totalPages={0}/>
+					<Pagination totalPages={1}/>
 				</div>
 			</Card>
 		</>

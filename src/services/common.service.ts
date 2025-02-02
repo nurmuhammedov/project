@@ -15,12 +15,12 @@ export const CommonService = {
 	},
 
 	async updateData<T, TResponse>(endpoint: string, data: T, id: string) {
-		const res = await interceptor.put<TResponse>(endpoint + (id ?? ''), data)
+		const res = await interceptor.put<TResponse>(endpoint + id, data)
 		return res.data
 	},
 
 	async partialUpdateData<T, TResponse>(endpoint: string, data: T, id: string) {
-		const res = await interceptor.patch<TResponse>(endpoint + (id ?? ''), data)
+		const res = await interceptor.patch<TResponse>(endpoint + id, data)
 		return res.data
 	},
 

@@ -1,5 +1,5 @@
 import {SelectIcon} from 'assets/icons'
-import Card from 'components/Card'
+import {Card} from 'components'
 import {ISelectOption} from 'interfaces/form.interface'
 import styles from './styles.module.scss'
 import {FC} from 'react'

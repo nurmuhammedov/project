@@ -19,7 +19,7 @@ function usePagination({page = 'page', pageSize = 'pageSize'}: IProperties = {})
 		}
 	}
 
-	const onPageSizeChange = (selectedValue: number | undefined | null | string): void => {
+	const onPageSizeChange = (selectedValue?: string | number | null): void => {
 		if (selectedValue === 5 || !selectedValue) {
 			removeParams(pageSize, page)
 		} else {
@@ -28,10 +28,10 @@ function usePagination({page = 'page', pageSize = 'pageSize'}: IProperties = {})
 	}
 
 	return {
-		page: currentPage,
-		pageSize: currentPageSize,
 		onPageChange,
-		onPageSizeChange
+		onPageSizeChange,
+		page: currentPage,
+		pageSize: currentPageSize
 	}
 }
 

@@ -12,9 +12,9 @@ import {
 	Modal, NumberFormattedInput,
 	Pagination,
 	ReactTable,
-	Select
+	Select,
+	Form
 } from 'components'
-import Form from 'components/Form'
 import {FIELD} from 'constants/fields'
 import {PackagesSchema} from 'helpers/yup'
 import {useAdd, useData, useDetail, usePaginatedData, usePagination, useSearchParams, useUpdate} from 'hooks'

@@ -1,6 +1,5 @@
 import {Box, Cart, Currency, Status, Store} from 'assets/icons'
-import {Button, Loader, PageInfo, Select} from 'components'
-import HorizontalTab from 'components/HorizontalTab'
+import {Button, Loader, PageInfo, Select, HorizontalTab} from 'components'
 import {BUTTON_THEME} from 'constants/fields'
 import {useDetail, useSearchParams} from 'hooks'
 import {ISelectOption} from 'interfaces/form.interface'

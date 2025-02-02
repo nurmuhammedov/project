@@ -1,9 +1,9 @@
-import {useMutation} from '@tanstack/react-query'
 import {CommonService} from 'services/common.service'
+import {useMutation} from '@tanstack/react-query'
 import {showMessage} from 'utilities/alert'
 
 
-const useDynamicUpdateMutation = <TVariables, TData, TError>(
+const useUpdate = <TVariables, TData, TError>(
 	endpoint: string,
 	id?: string | number | boolean | null,
 	method: 'put' | 'patch' = 'put',
@@ -13,9 +13,8 @@ const useDynamicUpdateMutation = <TVariables, TData, TError>(
 	return useMutation<TData, TError, TVariables>({
 		mutationFn: async (data: TVariables) => {
 			if (!id && id !== 0) {
-				const errorMsg = `ID required: The operation cannot be completed because a valid ID was not provided. Please ensure you pass a valid ID when updating data at endpoint: "${endpoint}".`
-				showMessage(errorMsg, 'error')
-				return Promise.reject(new Error(errorMsg))
+				showMessage(`The operation cannot be completed because a valid ID was not provided. Please ensure you pass a valid ID when updating data at endpoint: ${endpoint}`, 'error')
+				return Promise.reject()
 			}
 
 			return method === 'put'
@@ -29,4 +28,4 @@ const useDynamicUpdateMutation = <TVariables, TData, TError>(
 	})
 }
 
-export default useDynamicUpdateMutation
+export default useUpdate
