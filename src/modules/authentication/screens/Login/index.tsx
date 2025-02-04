@@ -21,8 +21,8 @@ const Index = () => {
 	} = useForm({
 		mode: 'onTouched',
 		defaultValues: {
-			username: 'admin2',
-			password: '123'
+			username: 'admin',
+			password: '9995101a'
 		},
 		resolver: yupResolver(loginSchema)
 	})

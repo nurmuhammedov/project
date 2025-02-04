@@ -20,7 +20,7 @@ const Index: FC<IProperties> = ({tabs, fallbackValue, query = 'tab', style}) => 
 	const {t} = useTranslation()
 
 
-	const handleTabChange = (value: string | number) => {
+	const handleTabChange = (value: string | number | boolean) => {
 		addParams({[query]: String(value)}, 'updateId', 'deleteId', 'modal')
 	}
 
@@ -30,7 +30,7 @@ const Index: FC<IProperties> = ({tabs, fallbackValue, query = 'tab', style}) => 
 				tabs?.map(item => {
 					return (
 						<button
-							key={item.value}
+							key={item.value?.toString()}
 							className={classNames(styles.tab, {[styles.active]: item.value === status})}
 							onClick={() => handleTabChange(item.value)}
 						>

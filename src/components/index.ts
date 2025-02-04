@@ -13,6 +13,7 @@ import PageInfo from './PageInfo'
 import Router from './Router'
 import Loader from './Loader'
 import Alert from './Alert'
+import Badge from './Badge'
 import Card from './Card'
 import Form from './Form'
 import HR from './HR'
@@ -37,6 +38,7 @@ export {
 	Router,
 	Loader,
 	Alert,
+	Badge,
 	Form,
 	Card,
 	HR

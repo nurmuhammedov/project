@@ -1,16 +1,17 @@
+import {useAppContext} from 'hooks'
 import {AuthenticationService} from 'services/authentication.service'
-import {useMutation, useQueryClient} from '@tanstack/react-query'
+import {useMutation} from '@tanstack/react-query'
 import {useNavigate} from 'react-router-dom'
 
 
 export default function useLogout() {
 	const navigate = useNavigate()
-	const queryClient = useQueryClient()
+	const {setUser} = useAppContext()
 	const {mutate: handleLogout, isPending} = useMutation({
 		mutationFn: AuthenticationService.logout,
 		onSuccess: () => {
+			setUser(null)
 			navigate('/login', {replace: true})
-			queryClient.clear()
 		}
 	})
 

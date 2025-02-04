@@ -30,9 +30,15 @@ interface IButton extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 // Select Option Interface
 interface ISelectOption {
-	value: string | number;
-	label: string | number;
+	value: string | number | boolean;
+	label: string | number | boolean;
 	icon?: React.ReactNode;
+}
+
+// Option Interface
+interface IOption {
+	id: number | string;
+	name: string | number
 }
 
 // Select Interface
@@ -54,4 +60,4 @@ interface IFIle {
 	file: string;
 }
 
-export type {IButton, IField, ISelectOption, ISelect, IFIle}
+export type {IButton, IField, ISelectOption, ISelect, IFIle, IOption}

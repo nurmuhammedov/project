@@ -9,10 +9,6 @@ export const AuthenticationService = {
 		return response.data
 	},
 
-	me() {
-		return interceptor.get<ILogin>('accounts/me/')
-	},
-
 	logout() {
 		return interceptor.get('accounts/logout/')
 	}

@@ -33,18 +33,8 @@ const confirmPasswordSchema = yup
 
 // AUTHENTICATION
 const loginSchema = yup.object().shape({
-	username: yup
-		.string()
-		.trim()
-		.required('This field is required')
-		.min(6, 'Login must be at least 5 characters long')
-		.max(20, 'Login must not exceed 20 characters'),
-	password: yup
-		.string()
-		.trim()
-		.required('This field is required')
-		.min(3, 'Password must be at least 8 characters long')
-		.max(30, 'Password must not exceed 30 characters')
+	username: usernameSchema,
+	password: passwordSchema
 })
 
 // DATABASE
@@ -91,9 +81,35 @@ const employeeEditSchema = yup.object().shape({
 })
 
 
+// CLIENTS
+const clientSchema = yup.object().shape({
+	full_name: yup.string().trim().required('This field is required'),
+	code: yup.string().trim().required('This field is required'),
+	phone_number: yup.string().trim().required('This field is required').length(17, 'The information entered is invalid'),
+	address: yup.number().required('This field is required'),
+	currency: yup.number().required('This field is required'),
+	address_detail: yup.string().nullable(),
+	store: yup.number().required('This field is required'),
+	price_type: yup.number().required('This field is required')
+})
+
+// PRODUCTS
+const productSchema = yup.object().shape({
+	name: yup.string().trim().required('This field is required'),
+	is_serial: yup.boolean().required('This field is required'),
+	type: yup.number().required('This field is required'),
+	package: yup.number().nullable(),
+	country: yup.number().nullable(),
+	barcodes: yup.string().nullable(),
+	brand: yup.number().required('This field is required'),
+	measure: yup.number().required('This field is required')
+})
+
 export {
 	storeSchema,
 	loginSchema,
+	clientSchema,
+	productSchema,
 	databaseSchema,
 	PackagesSchema,
 	employeeSchema,

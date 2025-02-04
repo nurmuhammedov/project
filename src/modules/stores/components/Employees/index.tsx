@@ -126,7 +126,7 @@ const Index = () => {
 				<Pagination totalPages={totalPages}/>
 			</Card>
 
-			<Modal title="Add a new employee" id="employee" style={{height: '55rem', width: '60rem'}}>
+			<Modal title="Add a new employee" id="employee" style={{height: '60rem', width: '60rem'}}>
 				<Form onSubmit={
 					handleAddSubmit(
 						(data) => {
@@ -186,7 +186,7 @@ const Index = () => {
 						error={addErrors.confirmPassword?.message}
 						{...registerAdd('confirmPassword')}
 					/>
-					<Button type={FIELD.SUBMIT} disabled={isAdding}>Save</Button>
+					<Button style={{marginTop: 'auto'}} type={FIELD.SUBMIT} disabled={isAdding}>Save</Button>
 				</Form>
 			</Modal>
 

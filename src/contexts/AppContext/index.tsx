@@ -1,27 +1,40 @@
-import {PropsWithChildren, createContext} from 'react'
+import {interceptor} from 'libraries'
+import {PropsWithChildren, createContext, useState, useEffect} from 'react'
 import {IUser} from 'interfaces/authentication.interface'
-import {useUser} from 'hooks'
 import {Loader} from 'components'
+import {buildUser} from 'utilities/authentication'
+import {noop} from 'utilities/common'
 
 
 interface IAppContext {
-	user: IUser | null
+	user: IUser | null,
+	setUser: (user: IUser | null) => void,
+	setIsLoading: (isLoading: boolean) => void,
 }
 
-const AppContext = createContext<IAppContext | null>(null)
+const AppContext = createContext<IAppContext>({user: null, setUser: noop, setIsLoading: noop})
 
 function AppContextProvider({children}: PropsWithChildren) {
-	const {user, isPending} = useUser()
+	const [user, setUser] = useState<IUser | null>(null)
+	const [isLoading, setIsLoading] = useState<boolean>(true)
 
-	console.log(isPending, user)
+	useEffect(() => {
+		interceptor
+			.get('accounts/me/')
+			.then(res => {
+				setUser(buildUser(res.data))
+			})
+			.finally(() => {
+				setTimeout(() => setIsLoading(false), 1250)
+			})
+	}, [])
 
-
-	if (isPending) {
+	if (isLoading) {
 		return <Loader screen background/>
 	}
 
 	return (
-		<AppContext.Provider value={{user}}>
+		<AppContext.Provider value={{user, setUser, setIsLoading}}>
 			{children}
 		</AppContext.Provider>
 	)
