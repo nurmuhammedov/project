@@ -159,10 +159,10 @@ const Index = () => {
 				code: detail.code,
 				phone_number: detail.phone_number,
 				address: detail.address,
-				currency: detail.currency.id as number,
+				currency: detail.currency?.id as number,
 				address_detail: detail.address_detail,
-				store: detail.store.id as number,
-				price_type: detail.price_type.id as number
+				store: detail.store?.id as number,
+				price_type: detail.price_type?.id as number
 			})
 		}
 	}, [detail])
@@ -192,34 +192,40 @@ const Index = () => {
 						})
 					)}
 				>
-					<Input
-						id="full_name"
-						label="Full name"
-						error={addErrors.full_name?.message}
-						{...registerAdd('full_name')}
-					/>
-
-					<Input
-						id="code"
-						label="Client code"
-						error={addErrors.code?.message}
-						{...registerAdd('code')}
-					/>
-
-					<Controller
-						name="phone_number"
-						control={controlAdd}
-						render={({field}) => (
-							<MaskInput
-								id="phone_number"
-								label="Phone number"
-								error={addErrors.phone_number?.message}
-								{...field}
-							/>
-						)}
-					/>
 
 					<div className="grid gap-lg">
+						<div className="span-12">
+							<Input
+								id="full_name"
+								label="Full name"
+								error={addErrors.full_name?.message}
+								{...registerAdd('full_name')}
+							/>
+						</div>
+
+						<div className="span-6">
+							<Input
+								id="code"
+								label="Client code"
+								error={addErrors.code?.message}
+								{...registerAdd('code')}
+							/>
+						</div>
+
+						<div className="span-6">
+							<Controller
+								name="phone_number"
+								control={controlAdd}
+								render={({field}) => (
+									<MaskInput
+										id="phone_number"
+										label="Phone number"
+										error={addErrors.phone_number?.message}
+										{...field}
+									/>
+								)}
+							/>
+						</div>
 
 						<div className="span-6">
 							<Controller
@@ -228,7 +234,6 @@ const Index = () => {
 								render={({field: {value, ref, onChange, onBlur}}) => (
 									<Select
 										ref={ref}
-										top={true}
 										id="address"
 										label="Region"
 										options={regionsOptions}
@@ -243,11 +248,22 @@ const Index = () => {
 						</div>
 
 						<div className="span-6">
-							<Input
-								id="address_detail"
-								label="Address"
-								error={addErrors.address_detail?.message}
-								{...registerAdd('address_detail')}
+							<Controller
+								name="store"
+								control={controlAdd}
+								render={({field: {value, ref, onChange, onBlur}}) => (
+									<Select
+										ref={ref}
+										id="store"
+										label="Store"
+										options={getSelectOptions(stores)}
+										onBlur={onBlur}
+										error={addErrors.store?.message}
+										value={getSelectValue(getSelectOptions(stores), value)}
+										defaultValue={getSelectValue(getSelectOptions(stores), value)}
+										handleOnChange={(e) => onChange(e as string)}
+									/>
+								)}
 							/>
 						</div>
 
@@ -292,27 +308,15 @@ const Index = () => {
 								)}
 							/>
 						</div>
-
-					</div>
-
-					<Controller
-						name="store"
-						control={controlAdd}
-						render={({field: {value, ref, onChange, onBlur}}) => (
-							<Select
-								ref={ref}
-								top={true}
-								id="store"
-								label="Store"
-								options={getSelectOptions(stores)}
-								onBlur={onBlur}
-								error={addErrors.store?.message}
-								value={getSelectValue(getSelectOptions(stores), value)}
-								defaultValue={getSelectValue(getSelectOptions(stores), value)}
-								handleOnChange={(e) => onChange(e as string)}
+						<div className="span-12">
+							<Input
+								id="address_detail"
+								label="Address"
+								error={addErrors.address_detail?.message}
+								{...registerAdd('address_detail')}
 							/>
-						)}
-					/>
+						</div>
+					</div>
 
 					<Button style={{marginTop: 'auto'}} type={FIELD.SUBMIT} disabled={isAdding}>
 						Save

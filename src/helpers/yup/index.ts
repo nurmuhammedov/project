@@ -105,6 +105,7 @@ const productSchema = yup.object().shape({
 	measure: yup.number().required('This field is required')
 })
 
+
 export {
 	storeSchema,
 	loginSchema,

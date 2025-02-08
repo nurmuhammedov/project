@@ -55,6 +55,7 @@ const Index = () => {
 		},
 		resolver: yupResolver(employeeSchema)
 	})
+
 	const columns: Column<IEmployeeDetail>[] = useMemo(() =>
 			[
 				{
