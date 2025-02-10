@@ -13,7 +13,7 @@ interface IProductItemDetail {
 	name: string;
 	code: number;
 	is_serial: boolean;
-	barcodes?: string[] | null;
+	barcodes: string[];
 }
 
 export type {

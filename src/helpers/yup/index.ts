@@ -100,11 +100,13 @@ const productSchema = yup.object().shape({
 	type: yup.number().required('This field is required'),
 	package: yup.number().nullable(),
 	country: yup.number().nullable(),
-	barcodes: yup.string().nullable(),
+	barcodes: yup
+		.array()
+		.of(yup.string().trim().required('This field is required'))
+		.nullable(),
 	brand: yup.number().required('This field is required'),
 	measure: yup.number().required('This field is required')
 })
-
 
 export {
 	storeSchema,

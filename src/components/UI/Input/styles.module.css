@@ -103,4 +103,21 @@ textarea {
   left: auto;
 }
 
+.delete .input-wrapper {
+  position: relative;
+  padding-right: 3.5rem !important;
+}
+.delete .input-wrapper .delete-wrapper {
+  user-select: none;
+  padding: 0.4rem;
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  right: 0.7rem;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
 /*# sourceMappingURL=styles.module.css.map */

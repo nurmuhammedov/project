@@ -1,43 +1,50 @@
+import {Controller, useForm, useFieldArray} from 'react-hook-form'
+import {IProductItemDetail} from 'interfaces/products.interface'
+import {ISelectOption} from 'interfaces/form.interface'
+import {BUTTON_THEME, FIELD} from 'constants/fields'
 import {yupResolver} from '@hookform/resolvers/yup'
-import {Search} from 'assets/icons'
+import {getSelectValue} from 'utilities/common'
+import {seriesOptions} from 'helpers/options'
+import {useTranslation} from 'react-i18next'
+import {Plus, Search} from 'assets/icons'
+import {productSchema} from 'helpers/yup'
+import {useEffect, useMemo} from 'react'
+import {Column} from 'react-table'
+
 import {
-	Button,
-	Card,
-	EditButton,
-	EditModal,
 	HR,
+	Card,
+	Form,
 	Input,
 	Modal,
-	Pagination,
+	Select,
+	Button,
+	EditModal,
 	ReactTable,
-	Form,
-	Select, DeleteButton, DeleteModal
+	EditButton,
+	Pagination,
+	DeleteModal,
+	DeleteButton
 } from 'components'
-import {FIELD} from 'constants/fields'
-import {seriesOptions} from 'helpers/options'
+
 import {
 	useAdd,
 	useData,
+	useUpdate,
 	useDetail,
-	usePaginatedData,
 	usePagination,
 	useSearchParams,
-	useUpdate
+	usePaginatedData
 } from 'hooks'
-import {IProductItemDetail} from 'interfaces/products.interface'
-import {ISelectOption} from 'interfaces/form.interface'
-import {useEffect, useMemo} from 'react'
-import {Controller, useForm} from 'react-hook-form'
-import {useTranslation} from 'react-i18next'
-import {Column} from 'react-table'
-import {productSchema} from 'helpers/yup'
-import {getSelectValue} from 'utilities/common'
 
 
 const Products = () => {
 	const {t} = useTranslation()
 	const {page, pageSize} = usePagination()
-	const {removeParams, paramsObject: {updateId = undefined, modal = undefined}} = useSearchParams()
+	const {
+		removeParams,
+		paramsObject: {updateId = undefined, modal = undefined}
+	} = useSearchParams()
 	const {data: types = []} = useData<ISelectOption[]>('product-types/select', modal === 'product' || modal === 'edit')
 	const {data: packages = []} = useData<ISelectOption[]>('packages/select', modal === 'product' || modal === 'edit')
 	const {data: countries = []} = useData<ISelectOption[]>('countries/select', modal === 'product' || modal === 'edit')
@@ -54,13 +61,14 @@ const Products = () => {
 		register: registerAdd,
 		reset: resetAdd,
 		control: controlAdd,
+		watch: watchAdd,
 		formState: {errors: addErrors}
 	} = useForm({
 		mode: 'onTouched',
 		defaultValues: {
 			name: '',
 			is_serial: false,
-			barcodes: '',
+			barcodes: [],
 			type: undefined,
 			package: undefined,
 			country: undefined,
@@ -68,6 +76,15 @@ const Products = () => {
 			measure: undefined
 		},
 		resolver: yupResolver(productSchema)
+	})
+
+	const {
+		fields: addBarcodeFields,
+		append: addBarcodeAppend,
+		remove: addBarcodeRemove
+	} = useFieldArray<any>({
+		control: controlAdd,
+		name: 'barcodes'
 	})
 
 	const columns: Column<IProductItemDetail>[] = useMemo(
@@ -100,13 +117,9 @@ const Products = () => {
 				Header: t('Measure unit'),
 				accessor: (row: IProductItemDetail) => row.measure?.name
 			},
-			// {
-			// 	Header: t('Barcode'),
-			// 	accessor: (row: IProductItemDetail) => row.code
-			// },
 			{
 				Header: t('Series'),
-				accessor: (row: IProductItemDetail) => row.is_serial ? t('With a series') : t('Without a series')
+				accessor: (row: IProductItemDetail) => (row.is_serial ? t('With a series') : t('Without a series'))
 			},
 			{
 				Header: t('Actions'),
@@ -126,13 +139,14 @@ const Products = () => {
 		register: registerEdit,
 		reset: resetEdit,
 		control: controlEdit,
+		watch: watchEdit,
 		formState: {errors: editErrors}
 	} = useForm({
 		mode: 'onTouched',
 		defaultValues: {
 			name: '',
 			is_serial: false,
-			barcodes: '',
+			barcodes: [],
 			type: undefined,
 			package: undefined,
 			country: undefined,
@@ -140,6 +154,15 @@ const Products = () => {
 			measure: undefined
 		},
 		resolver: yupResolver(productSchema)
+	})
+
+	const {
+		fields: editBarcodeFields,
+		append: editBarcodeAppend,
+		remove: editBarcodeRemove
+	} = useFieldArray<any>({
+		control: controlEdit,
+		name: 'barcodes'
 	})
 
 	const {mutateAsync, isPending: isAdding} = useAdd('products')
@@ -151,7 +174,7 @@ const Products = () => {
 			resetEdit({
 				name: detail.name,
 				is_serial: detail.is_serial,
-				barcodes: detail.barcodes as unknown as string,
+				barcodes: detail.barcodes || [''],
 				type: detail.type?.id as number,
 				package: detail.package?.id as number,
 				country: detail.country?.id as number,
@@ -159,7 +182,7 @@ const Products = () => {
 				measure: detail.measure?.id as number
 			})
 		}
-	}, [detail])
+	}, [detail, resetEdit])
 
 	return (
 		<>
@@ -312,12 +335,29 @@ const Products = () => {
 						)}
 					/>
 
-					<Input
-						id="barcodes"
-						label="Barcode"
-						error={addErrors.barcodes?.message}
-						{...registerAdd('barcodes')}
-					/>
+					{
+						addBarcodeFields?.map((_field, index) => (
+							<Input
+								id={`barcodes.${index}`}
+								label={`Barcode`}
+								handleDelete={() => addBarcodeRemove(index)}
+								error={addErrors.barcodes?.[index]?.message}
+								{...registerAdd(`barcodes.${index}`)}
+							/>
+						))
+					}
+
+					<div>
+						<Button
+							theme={BUTTON_THEME.OUTLINE}
+							type="button"
+							disabled={watchAdd('barcodes')?.length !== 0 && watchAdd('barcodes')?.[(watchAdd('barcodes')?.length ?? 1) - 1]?.trim() === ''}
+							icon={<Plus/>}
+							onClick={() => addBarcodeAppend('')}
+						>
+							Add barcode
+						</Button>
+					</div>
 
 					<Button style={{marginTop: 'auto'}} type={FIELD.SUBMIT} disabled={isAdding}>
 						Save
@@ -325,14 +365,15 @@ const Products = () => {
 				</Form>
 			</Modal>
 
-			<EditModal isLoading={isDetailLoading && !detail} style={{height: '60rem', width: '60rem'}}>
+			<EditModal isLoading={isDetailLoading || !detail} style={{height: '60rem', width: '60rem'}}>
 				<Form
 					onSubmit={handleEditSubmit((data) =>
-						update(data).then(async () => {
-							resetEdit()
-							removeParams('modal', 'updateId')
-							await refetch()
-						})
+						update(data)
+							.then(async () => {
+								resetEdit()
+								removeParams('modal', 'updateId')
+								await refetch()
+							})
 					)}
 				>
 					<Input
@@ -344,7 +385,6 @@ const Products = () => {
 
 					<div className="grid gap-lg">
 						<div className="span-6">
-
 							<Controller
 								name="type"
 								control={controlEdit}
@@ -441,7 +481,6 @@ const Products = () => {
 						)}
 					/>
 
-
 					<Controller
 						name="is_serial"
 						control={controlEdit}
@@ -450,7 +489,7 @@ const Products = () => {
 								ref={ref}
 								top={true}
 								id="is_serial"
-								label="Is Serial"
+								label="Series?"
 								onBlur={onBlur}
 								error={editErrors.is_serial?.message}
 								options={seriesOptions}
@@ -461,18 +500,36 @@ const Products = () => {
 						)}
 					/>
 
-					<Input
-						id="barcodes"
-						label="Barcode"
-						error={editErrors.barcodes?.message}
-						{...registerEdit('barcodes')}
-					/>
-
+					{
+						editBarcodeFields?.map((_field, index) => {
+							return (
+								<Input
+									id={`barcodes.${index}`}
+									label={`Barcode`}
+									handleDelete={() => editBarcodeRemove(index)}
+									error={editErrors.barcodes?.[index]?.message}
+									{...registerEdit(`barcodes.${index}`)}
+								/>
+							)
+						})
+					}
+					<div>
+						<Button
+							type="button"
+							onClick={() => editBarcodeAppend('')}
+							disabled={watchEdit('barcodes')?.length !== 0 && watchEdit('barcodes')?.[watchEdit('barcodes')?.length ?? 1 - 1]?.trim() === ''}
+							theme={BUTTON_THEME.OUTLINE}
+							icon={<Plus/>}
+						>
+							Add barcode
+						</Button>
+					</div>
 					<Button style={{marginTop: 'auto'}} type={FIELD.SUBMIT} disabled={isUpdating}>
 						Edit
 					</Button>
 				</Form>
 			</EditModal>
+
 			<DeleteModal endpoint="products/" onDelete={refetch}/>
 		</>
 	)

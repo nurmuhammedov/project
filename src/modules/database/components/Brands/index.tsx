@@ -14,10 +14,10 @@ import {
 	ReactTable,
 	Form
 } from 'components'
+import {useAdd, useDetail, usePaginatedData, usePagination, useSearchParams, useUpdate} from 'hooks'
 import {FIELD} from 'constants/fields'
 import {databaseTableHeader} from 'helpers/headers'
 import {databaseSchema} from 'helpers/yup'
-import {useAdd, useDetail, usePaginatedData, usePagination, useSearchParams, useUpdate} from 'hooks'
 import {IDatabaseItemDetail} from 'interfaces/database.interface'
 import {useEffect, useMemo} from 'react'
 import {useForm} from 'react-hook-form'

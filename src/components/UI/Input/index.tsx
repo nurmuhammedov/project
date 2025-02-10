@@ -1,3 +1,4 @@
+import {Delete} from 'assets/icons'
 import {IField} from 'interfaces/form.interface'
 import {useTranslation} from 'react-i18next'
 import styles from './styles.module.scss'
@@ -14,6 +15,7 @@ const Index = forwardRef<HTMLInputElement | HTMLTextAreaElement, IField>(
 			type = FIELD.TEXT,
 			textarea = false,
 			radius = false,
+			handleDelete,
 			handleIcon,
 			children,
 			label,
@@ -30,6 +32,7 @@ const Index = forwardRef<HTMLInputElement | HTMLTextAreaElement, IField>(
 			<div className={classNames(styles.root, {
 				[styles.error]: error,
 				[styles.icon]: icon,
+				[styles.delete]: handleDelete,
 				[styles.radius]: radius
 			})}>
 				{
@@ -72,6 +75,13 @@ const Index = forwardRef<HTMLInputElement | HTMLTextAreaElement, IField>(
 									placeholder={props.placeholder ? t(props.placeholder as string) : t('Enter value')}
 									autoComplete={autocomplete ? 'on' : 'off'}
 								/>
+
+								{
+									handleDelete &&
+									<div className={styles['delete-wrapper']} onClick={() => handleDelete?.()}>
+										<Delete/>
+									</div>
+								}
 							</div>
 						)}
 				{error && <span className={styles['error__message']}>{t(error as string)}!</span>}

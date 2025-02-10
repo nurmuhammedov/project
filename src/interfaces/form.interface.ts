@@ -15,6 +15,7 @@ interface IFieldProperties {
 	icon?: React.ReactNode;
 	iconPosition?: 'right' | 'left';
 	handleIcon?: () => void;
+	handleDelete?: () => void;
 }
 
 type IField = InputHTMLAttributes<HTMLInputElement> & TextareaHTMLAttributes<HTMLTextAreaElement> & IFieldProperties;

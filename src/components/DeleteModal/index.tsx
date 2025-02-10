@@ -31,7 +31,7 @@ const Index = ({title = 'Should it really be deleted?', endpoint, onDelete}: IPr
 					style={{flex: 1}}
 					disabled={isPending}
 					onClick={() => mutateAsync().then(() => {
-						removeParams('modal', 'deleteId')
+						removeParams('modal', 'deleteId', 'page', 'limit')
 						onDelete?.()
 					})}
 				>
