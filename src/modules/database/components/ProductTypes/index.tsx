@@ -12,17 +12,19 @@ import {
 	Modal,
 	Pagination,
 	ReactTable,
-	Form
+	Form, Select
 } from 'components'
 import {FIELD} from 'constants/fields'
-import {databaseSchema} from 'helpers/yup'
+import {productTypesSchema} from 'helpers/yup'
 import {useAdd, useDetail, usePaginatedData, usePagination, useSearchParams, useUpdate} from 'hooks'
 import {IDatabaseItemDetail} from 'interfaces/database.interface'
 import {useEffect, useMemo} from 'react'
-import {useForm} from 'react-hook-form'
+import {Controller, useForm} from 'react-hook-form'
 import {useTranslation} from 'react-i18next'
 import {Column} from 'react-table'
 import {formatDate} from 'utilities/date'
+import {seriesOptions} from 'helpers/options'
+import {getSelectValue} from 'utilities/common'
 
 
 const Index = () => {
@@ -42,11 +44,12 @@ const Index = () => {
 		handleSubmit: handleAddSubmit,
 		register: registerAdd,
 		reset: resetAdd,
+		control: controlAdd,
 		formState: {errors: addErrors}
 	} = useForm({
 		mode: 'onTouched',
-		defaultValues: {name: ''},
-		resolver: yupResolver(databaseSchema)
+		defaultValues: {name: '', expiry: false},
+		resolver: yupResolver(productTypesSchema)
 	})
 
 	const columns: Column<IDatabaseItemDetail>[] = useMemo(() =>
@@ -69,6 +72,11 @@ const Index = () => {
 
 				},
 				{
+					Header: t('Expiry deadline'),
+					accessor: (row: IDatabaseItemDetail) => row.expiry ? t('Exist') : t('No')
+
+				},
+				{
 					Header: t('Actions'),
 					accessor: (row: IDatabaseItemDetail) => <div className="flex items-start gap-lg">
 						<EditButton id={row.id}/>
@@ -83,22 +91,27 @@ const Index = () => {
 		handleSubmit: handleEditSubmit,
 		register: registerEdit,
 		reset: resetEdit,
+		control: controlEdit,
 		formState: {errors: editErrors}
 	} = useForm({
 		mode: 'onTouched',
-		defaultValues: {name: ''},
-		resolver: yupResolver(databaseSchema)
+		defaultValues: {name: '', expiry: false},
+		resolver: yupResolver(productTypesSchema)
 	})
 
 	const {mutateAsync, isPending: isAdding} = useAdd('product-types')
 	const {mutateAsync: update, isPending: isUpdating} = useUpdate('product-types/', updateId)
-	const {data: detail, isPending: isDetailLoading} = useDetail<IDatabaseItemDetail>('product-types/', updateId)
+	const {
+		data: detail,
+		isPending: isDetailLoading,
+		isFetching
+	} = useDetail<IDatabaseItemDetail>('product-types/', updateId)
 
 	useEffect(() => {
-		if (detail) {
-			resetEdit({name: detail.name})
+		if (detail && !isDetailLoading) {
+			resetEdit({name: detail.name, expiry: detail?.expiry})
 		}
-	}, [detail, resetEdit])
+	}, [detail])
 
 	return (
 		<>
@@ -122,7 +135,7 @@ const Index = () => {
 				</div>
 			</Card>
 
-			<Modal title="Add new" id="productTypes" style={{height: '19rem'}}>
+			<Modal title="Add new" id="productTypes" style={{height: '30rem'}}>
 				<Form
 					onSubmit={
 						handleAddSubmit((data) => mutateAsync(data).then(async () => {
@@ -140,6 +153,26 @@ const Index = () => {
 						error={addErrors?.name?.message}
 						{...registerAdd('name')}
 					/>
+
+					<Controller
+						name="expiry"
+						control={controlAdd}
+						render={({field: {value, ref, onChange, onBlur}}) => (
+							<Select
+								ref={ref}
+								top={true}
+								id="expiry"
+								label="Is there expiry date?"
+								onBlur={onBlur}
+								error={addErrors.expiry?.message}
+								options={seriesOptions}
+								value={getSelectValue(seriesOptions, value)}
+								defaultValue={getSelectValue(seriesOptions, value)}
+								handleOnChange={(e) => onChange(e as string)}
+							/>
+						)}
+					/>
+
 					<Button
 						style={{marginTop: 'auto'}}
 						type={FIELD.SUBMIT}
@@ -150,7 +183,7 @@ const Index = () => {
 				</Form>
 			</Modal>
 
-			<EditModal isLoading={isDetailLoading && !detail} style={{height: '19rem'}}>
+			<EditModal isLoading={isFetching || !detail} style={{height: '30rem'}}>
 				<Form
 					onSubmit={
 						handleEditSubmit((data) => update(data).then(async () => {
@@ -168,6 +201,26 @@ const Index = () => {
 						error={editErrors?.name?.message}
 						{...registerEdit('name')}
 					/>
+
+					<Controller
+						name="expiry"
+						control={controlEdit}
+						render={({field: {value, ref, onChange, onBlur}}) => (
+							<Select
+								ref={ref}
+								top={true}
+								id="expiry"
+								label="Is there expiry date?"
+								onBlur={onBlur}
+								error={editErrors.expiry?.message}
+								options={seriesOptions}
+								value={getSelectValue(seriesOptions, value)}
+								defaultValue={getSelectValue(seriesOptions, value)}
+								handleOnChange={(e) => onChange(e as string)}
+							/>
+						)}
+					/>
+
 					<Button
 						style={{marginTop: 'auto'}}
 						type={FIELD.SUBMIT}

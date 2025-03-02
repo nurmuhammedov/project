@@ -34,7 +34,15 @@ const Index: FC<IProperties> = ({tabs, fallbackValue, query = 'tab'}) => {
 							className={classNames(styles.tab, {[styles.active]: item.value === status})}
 							onClick={() => handleTabChange(item.value)}
 						>
-							{t(item.label as string)}
+							<div className="flex align-center justify-start gap-lg">
+								{
+									item?.icon &&
+									<div className={styles['icon-wrapper']}>
+										{item?.icon}
+									</div>
+								}
+								{t(item.label as string)}
+							</div>
 							<SelectIcon/>
 						</button>
 					)

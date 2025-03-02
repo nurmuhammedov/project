@@ -1,4 +1,5 @@
 import HorizontalTab from './HorizontalTab'
+import TemporaryItem from './TemporaryItem'
 import DetailButton from './DetailButton'
 import DeleteButton from './DeleteButton'
 import VerticalTab from './VerticalTab'
@@ -6,12 +7,15 @@ import DeleteModal from './DeleteModal'
 import Pagination from './Pagination'
 import EditButton from './EditButton'
 import ReactTable from './ReactTable'
+import CardTitle from './CardTitle'
 import PageTitle from './PageTitle'
 import AlertItem from './AlertItem'
 import EditModal from './EditModal'
 import PageInfo from './PageInfo'
+import CardTab from './CardTab'
 import Router from './Router'
 import Loader from './Loader'
+import Title from './Title'
 import Alert from './Alert'
 import Badge from './Badge'
 import Card from './Card'
@@ -24,6 +28,7 @@ export * from './layouts'
 
 export {
 	HorizontalTab,
+	TemporaryItem,
 	DeleteButton,
 	DetailButton,
 	VerticalTab,
@@ -32,11 +37,14 @@ export {
 	ReactTable,
 	EditButton,
 	PageTitle,
+	CardTitle,
 	AlertItem,
 	EditModal,
 	PageInfo,
+	CardTab,
 	Router,
 	Loader,
+	Title,
 	Alert,
 	Badge,
 	Form,

@@ -9,14 +9,15 @@ import {
 	EditModal,
 	HR,
 	Input,
-	Modal, NumberFormattedInput,
+	Modal,
+	NumberFormattedInput,
 	Pagination,
 	ReactTable,
 	Select,
 	Form
 } from 'components'
 import {FIELD} from 'constants/fields'
-import {PackagesSchema} from 'helpers/yup'
+import {packagesSchema} from 'helpers/yup'
 import {useAdd, useData, useDetail, usePaginatedData, usePagination, useSearchParams, useUpdate} from 'hooks'
 import {IPackageItemDetail} from 'interfaces/database.interface'
 import {ISelectOption} from 'interfaces/form.interface'
@@ -24,7 +25,7 @@ import {useEffect, useMemo} from 'react'
 import {Controller, useForm} from 'react-hook-form'
 import {useTranslation} from 'react-i18next'
 import {Column} from 'react-table'
-import {getSelectValue} from 'utilities/common'
+import {decimalToInteger, decimalToNumber, decimalToPrice, getSelectValue} from 'utilities/common'
 import {formatDate} from 'utilities/date'
 
 
@@ -48,11 +49,12 @@ const Index = () => {
 		reset: resetAdd,
 		control: controlAdd,
 		watch: watchAdd,
+		setValue: setValueAdd,
 		formState: {errors: addErrors}
 	} = useForm({
 		mode: 'onTouched',
-		defaultValues: {name: '', measure: undefined, quantity: '', amount: ''},
-		resolver: yupResolver(PackagesSchema)
+		defaultValues: {name: '', measure: undefined, quantity: ''},
+		resolver: yupResolver(packagesSchema)
 	})
 
 	const columns: Column<IPackageItemDetail>[] = useMemo(() =>
@@ -67,19 +69,19 @@ const Index = () => {
 				},
 				{
 					Header: t('Name'),
-					accessor: (row: IPackageItemDetail) => row.name
+					accessor: (row: IPackageItemDetail) => row?.name
 				},
 				{
-					Header: t('Number of products per package'),
-					accessor: (row: IPackageItemDetail) => row.quantity
+					Header: t('Products per package', {label: '', measure: ''}),
+					accessor: (row: IPackageItemDetail) => `${row?.measure?.value_type == 'int' ? decimalToInteger(row?.quantity) : decimalToPrice(row?.quantity)}` + ` ` + `${row?.measure?.name || ''}`
 				},
-				{
-					Header: t('Quantity of 1 product in the package(default)'),
-					accessor: (row: IPackageItemDetail) => `${row.amount} ${row.measure_name}`
-				},
+				// {
+				// 	Header: t('Quantity of 1 product in the package(default)'),
+				// 	accessor: (row: IPackageItemDetail) => `${row.amount} ${row.measure_name}`
+				// },
 				{
 					Header: t('Date added'),
-					accessor: (row: IPackageItemDetail) => formatDate(row.created_at)
+					accessor: (row: IPackageItemDetail) => formatDate(row?.created_at)
 
 				},
 				{
@@ -99,30 +101,32 @@ const Index = () => {
 		reset: resetEdit,
 		control: controlEdit,
 		watch: watchEdit,
+		setValue: setValueEdit,
 		formState: {errors: editErrors}
 	} = useForm({
 		mode: 'onTouched',
-		defaultValues: {name: '', measure: undefined, quantity: '', amount: ''},
-		resolver: yupResolver(PackagesSchema)
+		defaultValues: {name: '', measure: undefined, quantity: ''},
+		resolver: yupResolver(packagesSchema)
 	})
 
 	const {mutateAsync, isPending: isAdding} = useAdd('packages')
 	const {mutateAsync: update, isPending: isUpdating} = useUpdate('packages/', updateId)
 	const {
 		data: detail,
-		isPending: isDetailLoading
+		isPending: isDetailLoading,
+		isFetching
 	} = useDetail<IPackageItemDetail>('packages/', updateId)
 
 	useEffect(() => {
-		if (detail) {
+		if (detail && !isDetailLoading) {
 			resetEdit({
 				name: detail.name,
-				measure: detail.measure.id,
-				amount: detail.amount,
-				quantity: detail?.quantity
+				measure: detail.measure.id as unknown as string,
+				// amount: detail.amount,
+				quantity: detail.measure.value_type == 'int' ? decimalToNumber(detail?.quantity) : detail?.quantity
 			})
 		}
-	}, [detail, resetEdit])
+	}, [detail])
 
 	return (
 		<>
@@ -178,7 +182,10 @@ const Index = () => {
 								error={addErrors?.measure?.message}
 								value={getSelectValue(measurementUnitsOptions, value)}
 								defaultValue={getSelectValue(measurementUnitsOptions, value)}
-								handleOnChange={(e) => onChange(e as string)}
+								handleOnChange={(e) => {
+									setValueAdd('quantity', '')
+									onChange(e as string)
+								}}
 							/>
 						)}
 					/>
@@ -189,33 +196,36 @@ const Index = () => {
 						render={({field}) => (
 							<NumberFormattedInput
 								id="quantity"
-								maxLength={3}
-								allowDecimals={false}
-								label="Number of products per package"
+								maxLength={measurementUnitsOptions?.find(i => i?.value == watchAdd('measure'))?.value_type == 'float' ? 6 : 3}
+								allowDecimals={measurementUnitsOptions?.find(i => i?.value == watchAdd('measure'))?.value_type == 'float'}
+								label={t('Products per package', {
+									label: measurementUnitsOptions?.find(i => i?.value == watchAdd('measure'))?.value_type == 'int' ? t('Count')?.toLowerCase() : measurementUnitsOptions?.find(i => i?.value == watchAdd('measure'))?.value_type == 'float' ? t('Quantity')?.toLowerCase() : '',
+									measure: measurementUnitsOptions?.find(i => i?.value == watchAdd('measure'))?.label?.toString()?.toLowerCase() ? `(${measurementUnitsOptions?.find(i => i?.value == watchAdd('measure'))?.label?.toString()?.toLowerCase()})` : ''
+								})}
 								error={addErrors?.quantity?.message}
 								{...field}
 							/>
 						)}
 					/>
 
-					<Controller
-						name="amount"
-						control={controlAdd}
-						render={({field}) => (
-							<NumberFormattedInput
-								id="amount"
-								maxLength={20}
-								label={
-									watchAdd('measure') ? t(
-										'Quantity of 1 product in the package',
-										{measure: measurementUnitsOptions?.find(i => i?.value == watchAdd('measure'))?.label ?? ''}
-									) : t('Quantity of 1 product in the package(default)')
-								}
-								error={addErrors?.amount?.message}
-								{...field}
-							/>
-						)}
-					/>
+					{/*<Controller*/}
+					{/*	name="amount"*/}
+					{/*	control={controlAdd}*/}
+					{/*	render={({field}) => (*/}
+					{/*		<NumberFormattedInput*/}
+					{/*			id="amount"*/}
+					{/*			maxLength={20}*/}
+					{/*			label={*/}
+					{/*				watchAdd('measure') ? t(*/}
+					{/*					'Quantity of 1 product in the package',*/}
+					{/*					{measure: measurementUnitsOptions?.find(i => i?.value == watchAdd('measure'))?.label ?? ''}*/}
+					{/*				) : t('Quantity of 1 product in the package(default)')*/}
+					{/*			}*/}
+					{/*			error={addErrors?.amount?.message}*/}
+					{/*			{...field}*/}
+					{/*		/>*/}
+					{/*	)}*/}
+					{/*/>*/}
 
 					<Button
 						style={{marginTop: 'auto'}}
@@ -227,7 +237,7 @@ const Index = () => {
 				</Form>
 			</Modal>
 
-			<EditModal isLoading={isDetailLoading && !detail} style={{height: '45rem'}}>
+			<EditModal isLoading={isFetching || !detail} style={{height: '45rem'}}>
 				<Form
 					onSubmit={
 						handleEditSubmit((data) => update(data).then(async () => {
@@ -259,7 +269,10 @@ const Index = () => {
 								error={editErrors?.measure?.message}
 								value={getSelectValue(measurementUnitsOptions, value)}
 								defaultValue={getSelectValue(measurementUnitsOptions, value)}
-								handleOnChange={(e) => onChange(e as string)}
+								handleOnChange={(e) => {
+									setValueEdit('quantity', '')
+									onChange(e as string)
+								}}
 							/>
 						)}
 					/>
@@ -270,32 +283,36 @@ const Index = () => {
 						render={({field}) => (
 							<NumberFormattedInput
 								id="quantity"
-								maxLength={3}
-								label="Number of products per package"
+								maxLength={measurementUnitsOptions?.find(i => i?.value == watchEdit('measure'))?.value_type == 'float' ? 6 : 3}
+								allowDecimals={measurementUnitsOptions?.find(i => i?.value == watchEdit('measure'))?.value_type == 'float'}
+								label={t('Products per package', {
+									label: measurementUnitsOptions?.find(i => i?.value == watchEdit('measure'))?.value_type == 'int' ? t('Count')?.toLowerCase() : measurementUnitsOptions?.find(i => i?.value == watchEdit('measure'))?.value_type == 'float' ? t('Quantity')?.toLowerCase() : '',
+									measure: measurementUnitsOptions?.find(i => i?.value == watchEdit('measure'))?.label?.toString()?.toLowerCase() ? `(${measurementUnitsOptions?.find(i => i?.value == watchEdit('measure'))?.label?.toString()?.toLowerCase()})` : ''
+								})}
 								error={editErrors?.quantity?.message}
 								{...field}
 							/>
 						)}
 					/>
 
-					<Controller
-						name="amount"
-						control={controlEdit}
-						render={({field}) => (
-							<NumberFormattedInput
-								id="amount"
-								maxLength={20}
-								label={
-									watchEdit('measure') ? t(
-										'Quantity of 1 product in the package',
-										{measure: measurementUnitsOptions?.find(i => i?.value == watchEdit('measure'))?.label ?? ''}
-									) : t('Quantity of 1 product in the package(default)')
-								}
-								error={editErrors?.amount?.message}
-								{...field}
-							/>
-						)}
-					/>
+					{/*<Controller*/}
+					{/*	name="amount"*/}
+					{/*	control={controlEdit}*/}
+					{/*	render={({field}) => (*/}
+					{/*		<NumberFormattedInput*/}
+					{/*			id="amount"*/}
+					{/*			maxLength={20}*/}
+					{/*			label={*/}
+					{/*				watchEdit('measure') ? t(*/}
+					{/*					'Quantity of 1 product in the package',*/}
+					{/*					{measure: measurementUnitsOptions?.find(i => i?.value == watchEdit('measure'))?.label ?? ''}*/}
+					{/*				) : t('Quantity of 1 product in the package(default)')*/}
+					{/*			}*/}
+					{/*			error={editErrors?.amount?.message}*/}
+					{/*			{...field}*/}
+					{/*		/>*/}
+					{/*	)}*/}
+					{/*/>*/}
 
 					<Button
 						style={{marginTop: 'auto'}}

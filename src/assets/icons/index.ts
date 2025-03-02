@@ -8,10 +8,12 @@ import Switch from './Switch'
 import Detail from './Detail'
 import Income from './Income'
 import Search from './Search'
+import Profit from './Profit'
 import Times from './Times'
 import Store from './Store'
 import Cart from './Cart'
 import Plus from './Plus'
+import Loss from './Loss'
 import Logo from './Logo'
 import Edit from './Edit'
 import Box from './Box'
@@ -30,9 +32,11 @@ export {
 	Logout,
 	Income,
 	Switch,
+	Profit,
 	Search,
 	Store,
 	Times,
+	Loss,
 	Cart,
 	Plus,
 	Edit,

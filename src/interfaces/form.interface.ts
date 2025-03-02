@@ -34,12 +34,7 @@ interface ISelectOption {
 	value: string | number | boolean;
 	label: string | number | boolean;
 	icon?: React.ReactNode;
-}
-
-// Option Interface
-interface IOption {
-	id: number | string;
-	name: string | number
+	value_type?: 'int' | 'float';
 }
 
 // Select Interface
@@ -55,10 +50,10 @@ interface ISelect extends SelectProps<ISelectOption> {
 	top?: boolean;
 }
 
-interface IFIle {
-	name: string;
-	id: string | number;
-	file: string;
-}
+// interface IFIle {
+// 	name: string;
+// 	id: string | number;
+// 	file: string;
+// }
 
-export type {IButton, IField, ISelectOption, ISelect, IFIle, IOption}
+export type {IButton, IField, ISelectOption, ISelect}

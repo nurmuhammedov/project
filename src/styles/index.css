@@ -28,19 +28,23 @@
   flex-direction: column !important;
 }
 
-.items-start {
-  justify-content: flex-start !important;
+.align-start {
+  align-items: flex-start !important;
 }
 
 .align-center {
   align-items: center !important;
 }
 
+.align-end {
+  align-items: flex-end !important;
+}
+
 .justify-start {
   justify-content: flex-start !important;
 }
 
-.items-center {
+.items-center, .justify-center {
   justify-content: center !important;
 }
 
@@ -456,6 +460,11 @@ template {
 /* HTML */
 html {
   box-sizing: border-box;
+}
+
+/* BODY */
+body {
+  min-width: 1400px;
 }
 
 /* Images */

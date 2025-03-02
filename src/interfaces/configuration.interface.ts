@@ -20,7 +20,14 @@ interface IListResponse<T> {
 	results: T
 }
 
+interface IIDName {
+	readonly id: number;
+	name: string;
+	label: string;
+}
+
 export type {
+	IIDName,
 	IMenuItem,
 	IListResponse
 }

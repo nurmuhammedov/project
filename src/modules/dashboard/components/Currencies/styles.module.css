@@ -1,0 +1,40 @@
+.root .currencies-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.root .currencies-wrapper .wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.root .currencies-wrapper .wrapper .name {
+  color: var(--dark-slate);
+  font-family: Manrope, Arial, Helvetica, sans-serif;
+  font-size: 1rem;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 150%; /* 1.5rem */
+  letter-spacing: -0.02rem;
+}
+.root .currencies-wrapper .wrapper .currencies {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  justify-content: flex-end;
+}
+.root .currencies-wrapper .wrapper .currencies p, .root .currencies-wrapper .wrapper .currencies span {
+  color: var(--dark-slate);
+  font-family: Manrope, Arial, Helvetica, sans-serif;
+  font-size: 1rem;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 150%; /* 1.5rem */
+  letter-spacing: -0.02rem;
+}
+.root .currencies-wrapper .wrapper .currencies span {
+  color: var(--light-gray-2);
+}
+
+/*# sourceMappingURL=styles.module.css.map */

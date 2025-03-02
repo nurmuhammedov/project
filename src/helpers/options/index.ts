@@ -70,20 +70,38 @@ const regionsOptions: ISelectOption[] = [
 
 // DATABASE
 const databaseTabOptions: ISelectOption[] = [
+	{label: 'Currencies', value: 'currencies'},
 	{label: 'Countries', value: 'countries'},
-	{label: 'Product Type', value: 'productType'},
+	{label: 'Product types', value: 'productTypes'},
 	{label: 'Brands', value: 'brands'},
-	{label: 'Measurement Units', value: 'measurementUnits'},
-	{label: 'Expense Types', value: 'expenseTypes'},
-	{label: 'Price Types', value: 'priceTypes'},
+	{label: 'Measurement units', value: 'measurementUnits'},
+	{label: 'Expense types', value: 'expenseTypes'},
+	{label: 'Price types', value: 'priceTypes'},
 	{label: 'Packages', value: 'packages'}
 ]
 
+// PRODUCTS
+const productExchangeTabOptions = [
+	{
+		label: 'Making income',
+		value: 'purchase'
+	},
+	{
+		label: 'Sale',
+		value: 'sale'
+	}
+]
 
 const measurementUnitsOptions: ISelectOption[] = [
 	{label: 'Integer number', value: 'int'},
 	{label: 'Float number', value: 'float'}
 ]
+
+const seriesOptions: ISelectOption[] = [
+	{label: 'Yes', value: true},
+	{label: 'No', value: false}
+]
+
 
 // STORES
 const storesTypeOptions: ISelectOption[] = [
@@ -92,10 +110,11 @@ const storesTypeOptions: ISelectOption[] = [
 	{label: 'Money, Product', value: 'both'}
 ]
 
-// PRODUCTS
-const seriesOptions: ISelectOption[] = [
-	{label: 'Yes', value: true},
-	{label: 'No', value: false}
+// CURRENCY
+const currencyExchangeOptions: ISelectOption[] = [
+	{label: 'Making income', value: 'income'},
+	{label: 'Make loss', value: 'loss'},
+	{label: 'Expense', value: 'expense'}
 ]
 
 
@@ -105,5 +124,7 @@ export {
 	storesTypeOptions,
 	paginationOptions,
 	databaseTabOptions,
-	measurementUnitsOptions
+	measurementUnitsOptions,
+	currencyExchangeOptions,
+	productExchangeTabOptions
 }

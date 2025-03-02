@@ -1,4 +1,16 @@
-import {ClientsTable, DatabaseTable, Home, Login, ProductsTable, StoreDetail, StoresTable} from 'modules'
+import {
+	ClientDetail,
+	ClientsTable,
+	CurrencyExchange,
+	DailyCurrency,
+	DatabaseTable,
+	Home,
+	Login,
+	ProductExchange,
+	ProductsTable,
+	StoreDetail,
+	StoresTable
+} from 'modules'
 import {Navigate, Outlet, useRoutes} from 'react-router-dom'
 import {routeByRole} from 'utilities/authentication'
 import {ROLE_LIST} from 'constants/roles'
@@ -27,15 +39,38 @@ function useAppRoutes() {
 								element: <Navigate to={routeByRole(user?.role)} replace/>
 							},
 							{
-								path: 'home', element: <Home/>
-							},
-							{
-								path: 'clients',
-								element: <ClientsTable/>
+								path: 'home',
+								children: [
+									{
+										index: true,
+										element: <Home/>
+									},
+									{
+										path: 'product-exchange',
+										element: <ProductExchange/>
+									},
+									{
+										path: 'daily-currency',
+										element: <DailyCurrency/>
+									},
+									{
+										path: 'currency-exchange',
+										element: <CurrencyExchange/>
+									}
+								]
 							},
 							{
 								path: 'products',
-								element: <ProductsTable/>
+								children: [
+									{
+										index: true,
+										element: <ProductsTable/>
+									},
+									{
+										path: 'exchange',
+										element: <ProductExchange/>
+									}
+								]
 							},
 							{
 								path: 'database',
@@ -51,6 +86,62 @@ function useAppRoutes() {
 									{
 										path: 'detail/:id',
 										element: <StoreDetail/>
+									}
+								]
+							},
+							{
+								path: 'clients',
+								children: [
+									{
+										index: true,
+										element: <ClientsTable/>
+									},
+									{
+										path: 'detail/:id',
+										children: [
+											{
+												index: true,
+												element: <ClientDetail/>
+											},
+											{
+												path: 'product-exchange',
+												element: <ProductExchange/>
+											},
+											{
+												path: 'currency-exchange',
+												element: <CurrencyExchange/>
+											},
+											{
+												path: ':productId',
+												children: [
+													{
+														index: true,
+														element: <Navigate to={routeByRole(user?.role)} replace/>
+													},
+													{
+														path: 'product-exchange',
+														element: <ProductExchange detail={true}/>
+													},
+													{
+														path: 'currency-exchange',
+														element: <CurrencyExchange detail={true}/>
+													}
+												]
+											},
+											{
+												path: ':currencyId',
+												children: [
+													{
+														index: true,
+														element: <Navigate to={routeByRole(user?.role)} replace/>
+													},
+													{
+														path: 'currency-exchange',
+														element: <CurrencyExchange detail={true}/>
+													}
+												]
+											}
+										]
 									}
 								]
 							}

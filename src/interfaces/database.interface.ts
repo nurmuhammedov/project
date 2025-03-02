@@ -1,11 +1,12 @@
+import {IIDName} from 'interfaces/configuration.interface'
+
+
 interface IDatabaseItemDetail {
 	readonly id: number;
 	name: string;
-	organization?: {
-		readonly id: number;
-		name: string;
-	};
+	organization?: IIDName;
 	created_at: string;
+	expiry: boolean;
 }
 
 
@@ -20,17 +21,23 @@ interface IPackageItemDetail {
 	readonly id: number;
 	name: string;
 	measure_name: string;
-	measure: {
-		readonly id: string;
-		name: string;
-	}
+	measure: IMeasureItemDetail
 	amount: string;
 	quantity: string;
 	created_at: string;
 }
 
+interface ICurrencyItemDetail {
+	id: number;
+	name: string;
+	label: string;
+	created_at: string;
+}
+
+
 export type  {
 	IDatabaseItemDetail,
 	IMeasureItemDetail,
-	IPackageItemDetail
+	IPackageItemDetail,
+	ICurrencyItemDetail
 }

@@ -1,0 +1,60 @@
+.root {
+
+  .title {
+    color: var(--light-gray-2);
+    letter-spacing: -0.015rem;
+    font-size: 1rem;
+    font-family: Manrope, Arial, Helvetica, sans-serif;
+    font-style: normal;
+    margin-bottom: .75rem;
+    font-weight: 500;
+    line-height: 160%; /* 1.2rem */
+  }
+
+  .not-found {
+    font-family: Manrope, Arial, Helvetica, sans-serif;
+    font-size: 1rem;
+    color: var(--dark-slate);
+    font-style: normal;
+    font-weight: 500;
+    line-height: 160%; /* 1.2rem */
+    letter-spacing: -0.015rem;
+    margin-bottom: .75rem;
+    text-align: center;
+  }
+
+  .footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+
+    .price-wrapper {
+      flex: 1 0 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: row;
+      gap: 1rem;
+
+      .price, .total-price {
+        display: flex;
+        gap: .5rem;
+
+        span {
+          color: var(--dark-slate) !important;
+        }
+
+        p, span {
+          color: var(--light-gray-2);
+          font-family: Manrope, Arial, Helvetica, sans-serif;
+          font-size: 1.125rem;
+          font-style: normal;
+          font-weight: 500;
+          line-height: 150%; /* 1.6875rem */
+          letter-spacing: -0.03375rem;
+        }
+      }
+    }
+  }
+}

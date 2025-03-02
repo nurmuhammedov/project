@@ -82,9 +82,9 @@ const Products = () => {
 		fields: addBarcodeFields,
 		append: addBarcodeAppend,
 		remove: addBarcodeRemove
-	} = useFieldArray<any>({
+	} = useFieldArray({
 		control: controlAdd,
-		name: 'barcodes'
+		name: 'barcodes' as never
 	})
 
 	const columns: Column<IProductItemDetail>[] = useMemo(
@@ -160,29 +160,30 @@ const Products = () => {
 		fields: editBarcodeFields,
 		append: editBarcodeAppend,
 		remove: editBarcodeRemove
-	} = useFieldArray<any>({
+	} = useFieldArray({
 		control: controlEdit,
-		name: 'barcodes'
+		name: 'barcodes' as never
 	})
 
 	const {mutateAsync, isPending: isAdding} = useAdd('products')
 	const {mutateAsync: update, isPending: isUpdating} = useUpdate('products/', updateId)
-	const {data: detail, isPending: isDetailLoading} = useDetail<IProductItemDetail>('products/', updateId)
+	const {data: detail, isPending: isDetailLoading, isFetching} = useDetail<IProductItemDetail>('products/', updateId)
 
 	useEffect(() => {
-		if (detail) {
+		if (detail && !isDetailLoading) {
 			resetEdit({
 				name: detail.name,
 				is_serial: detail.is_serial,
-				barcodes: detail.barcodes || [''],
+				barcodes: detail.barcodes || [],
 				type: detail.type?.id as number,
-				package: detail.package?.id as number,
-				country: detail.country?.id as number,
-				brand: detail.brand?.id as number,
+				package: detail.package?.id as number || null,
+				country: detail.country?.id as number || undefined,
+				brand: detail.brand?.id as number || undefined,
 				measure: detail.measure?.id as number
 			})
 		}
-	}, [detail, resetEdit])
+	}, [detail])
+
 
 	return (
 		<>
@@ -306,6 +307,7 @@ const Products = () => {
 								top={true}
 								id="package"
 								label="Package"
+								isClearable={true}
 								options={packages}
 								onBlur={onBlur}
 								error={addErrors.package?.message}
@@ -365,7 +367,7 @@ const Products = () => {
 				</Form>
 			</Modal>
 
-			<EditModal isLoading={isDetailLoading || !detail} style={{height: '60rem', width: '60rem'}}>
+			<EditModal isLoading={isFetching || !detail} style={{height: '60rem', width: '60rem'}}>
 				<Form
 					onSubmit={handleEditSubmit((data) =>
 						update(data)
@@ -472,6 +474,7 @@ const Products = () => {
 								id="package"
 								label="Package"
 								options={packages}
+								isClearable={true}
 								onBlur={onBlur}
 								error={editErrors.package?.message}
 								value={getSelectValue(packages, value)}
@@ -517,7 +520,7 @@ const Products = () => {
 						<Button
 							type="button"
 							onClick={() => editBarcodeAppend('')}
-							disabled={watchEdit('barcodes')?.length !== 0 && watchEdit('barcodes')?.[watchEdit('barcodes')?.length ?? 1 - 1]?.trim() === ''}
+							disabled={watchEdit('barcodes')?.length !== 0 && watchEdit('barcodes')?.[(watchEdit('barcodes')?.length ?? 1) - 1]?.trim() === ''}
 							theme={BUTTON_THEME.OUTLINE}
 							icon={<Plus/>}
 						>

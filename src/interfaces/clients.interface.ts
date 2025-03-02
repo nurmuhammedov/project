@@ -1,4 +1,4 @@
-import {IOption} from 'interfaces/form.interface'
+import {IIDName} from 'interfaces/configuration.interface'
 
 
 interface IClientItemDetail {
@@ -7,12 +7,13 @@ interface IClientItemDetail {
 	code: string;
 	phone_number: string;
 	address: number;
-	price_type: IOption;
-	currency: IOption;
-	store: IOption;
+	price_type: IIDName;
+	currency: IIDName;
+	store: IIDName;
 	address_detail: string;
 	readonly image: string;
 	balance: number;
+	customer_balance: { currency: IIDName; amount: string | number }[]
 }
 
 

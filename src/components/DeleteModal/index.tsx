@@ -8,16 +8,17 @@ import styles from './styles.module.scss'
 interface IProperties {
 	endpoint: string
 	title?: string
+	removedParams?: string[]
 	onDelete?: () => void
 }
 
-const Index = ({title = 'Should it really be deleted?', endpoint, onDelete}: IProperties) => {
+const Index = ({title = 'Should it really be deleted?', endpoint, onDelete, removedParams = []}: IProperties) => {
 	const {t} = useTranslation()
 	const {paramsObject, removeParams} = useSearchParams()
 	const {mutateAsync, isPending} = useDelete(endpoint, paramsObject['deleteId'])
 
 	const handleClose = () => {
-		removeParams('modal', 'deleteId')
+		removeParams('modal', 'deleteId', ...removedParams)
 	}
 
 	return (
@@ -31,7 +32,7 @@ const Index = ({title = 'Should it really be deleted?', endpoint, onDelete}: IPr
 					style={{flex: 1}}
 					disabled={isPending}
 					onClick={() => mutateAsync().then(() => {
-						removeParams('modal', 'deleteId', 'page', 'limit')
+						removeParams('modal', 'deleteId', 'page', 'limit', ...removedParams)
 						onDelete?.()
 					})}
 				>

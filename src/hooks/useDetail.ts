@@ -23,7 +23,8 @@ const useDetail = <T>(
 
 			return CommonService.getDetail<T>(endpoint, id.toString(), params)
 		},
-		enabled: enabled && !!id
+		enabled: enabled && !!id,
+		staleTime: 0
 	})
 
 	const {data = undefined} = queryMethods || {}

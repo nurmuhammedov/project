@@ -94,14 +94,15 @@ const Index = () => {
 	const {mutateAsync: update, isPending: isUpdating} = useUpdate('organization/price-type/update/', updateId)
 	const {
 		data: detail,
-		isPending: isDetailLoading
+		isPending: isDetailLoading,
+		isFetching
 	} = useDetail<IDatabaseItemDetail>('organization/price-type/detail/', updateId)
 
 	useEffect(() => {
-		if (detail) {
+		if (detail && !isDetailLoading) {
 			resetEdit({name: detail.name})
 		}
-	}, [detail, resetEdit])
+	}, [detail])
 
 	return (
 		<>
@@ -114,6 +115,7 @@ const Index = () => {
 						radius={true}
 						style={{width: 400}}
 					/>
+
 					<Button icon={<Plus/>} onClick={() => addParams({modal: 'priceTypes'})}>
 						Add
 					</Button>
@@ -143,6 +145,7 @@ const Index = () => {
 						error={addErrors?.name?.message}
 						{...registerAdd('name')}
 					/>
+
 					<Button
 						style={{marginTop: 'auto'}}
 						type={FIELD.SUBMIT}
@@ -153,7 +156,7 @@ const Index = () => {
 				</Form>
 			</Modal>
 
-			<EditModal isLoading={isDetailLoading && !detail} style={{height: '19.5rem'}}>
+			<EditModal isLoading={isFetching || !detail} style={{height: '19.5rem'}}>
 				<Form
 					onSubmit={
 						handleEditSubmit((data) => update(data).then(async () => {

@@ -4,13 +4,14 @@ import styles from '../DeleteButton/styles.module.scss'
 
 
 interface IProperties {
-	id: string | number
+	id: string | number,
+	url?: string
 }
 
-const Index = ({id}: IProperties) => {
+const Index = ({id, url = ''}: IProperties) => {
 	const navigate = useNavigate()
 	return (
-		<div className={styles.root} onClick={() => navigate(`detail/${id}`)}>
+		<div className={styles.root} onClick={() => navigate(url ? url : `detail/${id}`)}>
 			<Detail/>
 		</div>
 	)

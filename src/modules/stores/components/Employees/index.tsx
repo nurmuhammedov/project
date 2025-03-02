@@ -107,10 +107,10 @@ const Index = () => {
 
 	const {mutateAsync, isPending: isAdding} = useAdd('employee/create/')
 	const {mutateAsync: update, isPending: isUpdating} = useUpdate('employee/update/', updateId, 'patch')
-	const {data: detail, isPending: isDetailLoading} = useDetail<IEmployeeDetail>('employee/detail/', updateId)
+	const {data: detail, isPending: isDetailLoading, isFetching} = useDetail<IEmployeeDetail>('employee/detail/', updateId)
 
 	useEffect(() => {
-		if (detail) {
+		if (detail && !isDetailLoading) {
 			resetEdit({username: detail.username, full_name: detail.full_name, phone: detail.phone})
 		}
 	}, [detail])
@@ -191,7 +191,7 @@ const Index = () => {
 				</Form>
 			</Modal>
 
-			<EditModal isLoading={isDetailLoading && !detail} style={{height: '45rem', width: '60rem'}}>
+			<EditModal isLoading={isFetching || !detail} style={{height: '45rem', width: '60rem'}}>
 				<Form
 					onSubmit={
 						handleEditSubmit(

@@ -1,7 +1,11 @@
-import {FC} from 'react'
+import {CSSProperties, FC} from 'react'
 import styles from './styles.module.scss'
 
 
-const Index: FC = () => <div className={styles.root}></div>
+interface IProperties {
+	style?: CSSProperties
+}
+
+const Index: FC<IProperties> = ({style}) => <div className={styles.root} style={style}></div>
 
 export default Index

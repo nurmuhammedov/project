@@ -18,6 +18,7 @@ interface IProps {
 	value?: string | number
 	disabled?: boolean
 	onChange?: (event: string) => void;
+	handleDelete?: () => void;
 	onBlur?: (event: FocusEvent<HTMLInputElement>) => void;
 }
 
@@ -32,6 +33,7 @@ const Index = forwardRef<HTMLInputElement, IProps>(({
 	                                                    maxLength = 20,
 	                                                    groupSeparator = ' ',
 	                                                    value,
+	                                                    handleDelete,
 	                                                    disabled,
 	                                                    onChange,
 	                                                    ...props
@@ -45,6 +47,7 @@ const Index = forwardRef<HTMLInputElement, IProps>(({
 			error={error}
 			value={value}
 			disabled={disabled}
+			handleDelete={handleDelete}
 			{...props}
 		>
 			<CurrencyInput

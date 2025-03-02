@@ -120,4 +120,21 @@ textarea {
   cursor: pointer;
 }
 
+.delete-children {
+  position: relative;
+  padding-right: 3.5rem !important;
+}
+.delete-children .delete-wrapper {
+  user-select: none;
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  padding: 0.4rem;
+  align-items: center;
+  right: 0.7rem;
+  top: 0;
+  transform: translateY(2rem);
+  cursor: pointer;
+}
+
 /*# sourceMappingURL=styles.module.css.map */

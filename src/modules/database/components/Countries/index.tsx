@@ -78,13 +78,13 @@ const Countries = () => {
 
 	const {mutateAsync, isPending: isAdding} = useAdd('countries')
 	const {mutateAsync: update, isPending: isUpdating} = useUpdate('countries/', updateId)
-	const {data: detail, isPending: isDetailLoading} = useDetail<IDatabaseItemDetail>('countries/', updateId)
+	const {data: detail, isPending: isDetailLoading, isFetching} = useDetail<IDatabaseItemDetail>('countries/', updateId)
 
 	useEffect(() => {
-		if (detail) {
+		if (detail && !isDetailLoading) {
 			resetEdit({name: detail.name})
 		}
-	}, [detail, resetEdit])
+	}, [detail])
 
 	return (
 		<>
@@ -130,7 +130,7 @@ const Countries = () => {
 				</Form>
 			</Modal>
 
-			<EditModal isLoading={isDetailLoading && !detail} style={{height: '20rem'}}>
+			<EditModal isLoading={isFetching || !detail} style={{height: '20rem'}}>
 				<Form
 					onSubmit={handleEditSubmit((data) => update(data).then(async () => {
 						resetEdit()

@@ -33,6 +33,7 @@ const Index = forwardRef<HTMLInputElement | HTMLTextAreaElement, IField>(
 				[styles.error]: error,
 				[styles.icon]: icon,
 				[styles.delete]: handleDelete,
+				[styles['delete-children']]: !!children && handleDelete,
 				[styles.radius]: radius
 			})}>
 				{
@@ -43,7 +44,15 @@ const Index = forwardRef<HTMLInputElement | HTMLTextAreaElement, IField>(
 					)
 				}
 				{
-					children ? children :
+					children ? <>
+							{children}
+							{
+								handleDelete &&
+								<div className={styles['delete-wrapper']} onClick={() => handleDelete?.()}>
+									<Delete/>
+								</div>
+							}
+						</> :
 						textarea ? (
 							<textarea
 								rows={5}

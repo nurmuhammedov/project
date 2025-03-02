@@ -8,6 +8,7 @@ import ProductTypes from 'modules/database/components/ProductTypes'
 import MeasurementUnits from 'modules/database/components/MeasurementUnits'
 import ExpenseTypes from 'modules/database/components/ExpenseTypes'
 import PriceTypes from 'modules/database/components/PriceTypes'
+import Currencies from 'modules/database/components/Currencies'
 
 
 const Index = () => {
@@ -23,11 +24,12 @@ const Index = () => {
 				{
 					tab === 'brands' ? <Brands/> :
 						tab === 'countries' ? <Countries/> :
-							tab === 'productType' ? <ProductTypes/> :
+							tab === 'productTypes' ? <ProductTypes/> :
 								tab === 'measurementUnits' ? <MeasurementUnits/> :
 									tab === 'expenseTypes' ? <ExpenseTypes/> :
 										tab === 'priceTypes' ? <PriceTypes/> :
 											tab === 'packages' ? <Packages/> :
+											tab === 'currencies' ? <Currencies/> :
 												null
 
 				}

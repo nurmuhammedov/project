@@ -12,7 +12,7 @@ import {
 	Pagination,
 	ReactTable,
 	Form,
-	Select, PageTitle, Badge
+	Select, PageTitle, Badge, DetailButton
 } from 'components'
 import {FIELD} from 'constants/fields'
 import {regionsOptions} from 'helpers/options'
@@ -25,7 +25,6 @@ import {
 	useUpdate
 } from 'hooks'
 import {IClientItemDetail} from 'interfaces/clients.interface'
-import {IOption} from 'interfaces/form.interface'
 import {useEffect, useMemo} from 'react'
 import {Controller, useForm} from 'react-hook-form'
 import {useTranslation} from 'react-i18next'
@@ -33,6 +32,8 @@ import {Column} from 'react-table'
 import {clientSchema} from 'helpers/yup'
 import {getSelectValue} from 'utilities/common'
 import {getSelectOptions} from 'utilities/select'
+import {IIDName} from 'interfaces/configuration.interface'
+import {formatCurrencyData} from 'utilities/date'
 
 
 const Index = () => {
@@ -43,9 +44,9 @@ const Index = () => {
 		removeParams,
 		paramsObject: {updateId = undefined, modal = undefined}
 	} = useSearchParams()
-	const {data: currencies = []} = useData<IOption[]>('currency/select/', modal === 'client' || modal === 'edit')
-	const {data: stores = []} = useData<IOption[]>('stores/select/', modal === 'client' || modal === 'edit')
-	const {data: priceTypes = []} = useData<IOption[]>('/organization/price-type/select/', modal === 'client' || modal === 'edit')
+	const {data: currencies = []} = useData<IIDName[]>('currency/select/', modal === 'client' || modal === 'edit')
+	const {data: stores = []} = useData<IIDName[]>('stores/select/', modal === 'client' || modal === 'edit')
+	const {data: priceTypes = []} = useData<IIDName[]>('/organization/price-type/select/', modal === 'client' || modal === 'edit')
 
 	const {data, totalPages, isPending: isLoading, refetch} = usePaginatedData<IClientItemDetail[]>(
 		`customer/`,
@@ -101,7 +102,8 @@ const Index = () => {
 			},
 			{
 				Header: t('Balance'),
-				accessor: (row: IClientItemDetail) => row.balance
+				accessor: (row: IClientItemDetail) =>
+					<div dangerouslySetInnerHTML={{__html: formatCurrencyData(row?.customer_balance)}}></div>
 			},
 			{
 				Header: t('Price type'),
@@ -120,6 +122,7 @@ const Index = () => {
 				accessor: (row: IClientItemDetail) => (
 					<div className="flex items-start gap-lg">
 						<EditButton id={row.id}/>
+						<DetailButton id={row.id}/>
 					</div>
 				)
 			}
@@ -150,10 +153,14 @@ const Index = () => {
 
 	const {mutateAsync, isPending: isAdding} = useAdd('customer/create/')
 	const {mutateAsync: update, isPending: isUpdating} = useUpdate('customer/update/', updateId)
-	const {data: detail, isPending: isDetailLoading} = useDetail<IClientItemDetail>('customer/detail/', updateId)
+	const {
+		data: detail,
+		isPending: isDetailLoading,
+		isFetching
+	} = useDetail<IClientItemDetail>('customer/detail/', updateId)
 
 	useEffect(() => {
-		if (detail) {
+		if (detail && !isDetailLoading) {
 			resetEdit({
 				full_name: detail.full_name,
 				code: detail.code,
@@ -324,7 +331,7 @@ const Index = () => {
 				</Form>
 			</Modal>
 
-			<EditModal isLoading={isDetailLoading && !detail} style={{height: '60rem', width: '60rem'}}>
+			<EditModal isLoading={isFetching || !detail} style={{height: '60rem', width: '60rem'}}>
 				<Form
 					onSubmit={handleEditSubmit((data) =>
 						update(data).then(async () => {

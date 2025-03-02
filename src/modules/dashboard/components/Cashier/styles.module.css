@@ -1,0 +1,16 @@
+.root .currencies-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.root .currencies-wrapper .currencies {
+  color: var(--dark-slate);
+  font-family: Manrope, Arial, Helvetica, sans-serif;
+  font-size: 2.25rem;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 150%; /* 3.375rem */
+  letter-spacing: -0.0675rem;
+}
+
+/*# sourceMappingURL=styles.module.css.map */

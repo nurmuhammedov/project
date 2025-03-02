@@ -3,7 +3,8 @@ import {Button, HorizontalTab, PageTitle} from 'components'
 import {BUTTON_THEME} from 'constants/fields'
 import {useSearchParams} from 'hooks'
 import {ISelectOption} from 'interfaces/form.interface'
-import ProductWarehouse from 'modules/products/components/ProductWarehouse'
+import ProductWarehouse from 'modules/products/components/Warehouse'
+import {useNavigate} from 'react-router-dom'
 
 
 const tabOptions: ISelectOption[] = [
@@ -21,6 +22,7 @@ const tabOptions: ISelectOption[] = [
 
 const Index = () => {
 	const {paramsObject: {tab = tabOptions[0]?.value}, addParams} = useSearchParams()
+	const navigate = useNavigate()
 
 	return (
 		<>
@@ -29,12 +31,14 @@ const Index = () => {
 					<Button
 						theme={BUTTON_THEME.DANGER_OUTLINE}
 						icon={<Cart/>}
+						onClick={() => navigate('exchange?tab=sale')}
 					>
-						Making trade
+						Sale
 					</Button>
 					<Button
 						theme={BUTTON_THEME.DANGER_OUTLINE}
 						icon={<Income/>}
+						onClick={() => navigate('exchange')}
 					>
 						Making income
 					</Button>

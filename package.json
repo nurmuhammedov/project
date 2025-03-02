@@ -1,11 +1,33 @@
 {
-  "name": "project",
+  "name": "erp",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "An Enterprise Resource Planning (ERP) system designed to integrate and streamline core business processes",
+  "main": "src/electron/main.js",
+  "author": "Topcoder",
   "type": "module",
+  "build": {
+    "appId": "jr.technocorp.uz",
+    "productName": "ERP",
+    "executableName": "ERP",
+    "win": {
+      "target": "nsis"
+    },
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ]
+    },
+    "linux": {
+      "target": "AppImage"
+    }
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "electron start": "concurrently \"vite\" \"src/electron .\"",
+    "electron build": "vite build && electron-builder",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -31,12 +53,17 @@
     "yup": "^1.6.1"
   },
   "devDependencies": {
+    "@electron/remote": "^2.1.2",
     "@eslint/js": "^9.17.0",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "@types/react-input-mask": "^3.0.6",
     "@types/react-table": "^7.7.20",
     "@vitejs/plugin-react": "^4.3.4",
+    "app-builder-bin": "^5.0.0-alpha.10",
+    "concurrently": "^9.1.2",
+    "electron": "^34.2.0",
+    "electron-builder": "^23.6.0",
     "eslint": "^9.17.0",
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.16",

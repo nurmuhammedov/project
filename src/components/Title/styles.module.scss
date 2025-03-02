@@ -1,0 +1,32 @@
+.root {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+
+  .icon {
+    padding: 0.4rem;
+    cursor: pointer;
+
+    svg {
+      transform: rotate(90deg);
+      max-width: 1.5rem !important;
+      max-height: 1.5rem !important;
+
+      path {
+        stroke: var(--dark-slate) !important;
+      }
+    }
+  }
+
+  .title {
+    color: var(--dark-slate);
+    font-family: Manrope, Arial, Helvetica, sans-serif;
+    font-size: 2rem;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 150%; /* 3rem */
+    letter-spacing: -0.04rem;
+  }
+}

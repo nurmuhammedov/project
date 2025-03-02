@@ -3,6 +3,19 @@
   gap: 1rem;
   align-items: center;
 }
+.root .user-wrapper {
+  border-radius: 6.25rem;
+  background: rgba(244, 244, 247, 0.1);
+  display: flex;
+  width: 5rem;
+  height: 5rem;
+  justify-content: center;
+  align-items: center;
+}
+.root .user-wrapper svg {
+  width: 2rem !important;
+  min-width: 2rem !important;
+}
 .root .icon-wrapper {
   width: 5rem;
   height: 5rem;
