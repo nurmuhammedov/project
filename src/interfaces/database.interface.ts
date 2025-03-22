@@ -1,15 +1,3 @@
-import {IIDName} from 'interfaces/configuration.interface'
-
-
-interface IDatabaseItemDetail {
-	readonly id: number;
-	name: string;
-	organization?: IIDName;
-	created_at: string;
-	expiry: boolean;
-}
-
-
 interface IMeasureItemDetail {
 	readonly id: number;
 	name: string;
@@ -27,17 +15,8 @@ interface IPackageItemDetail {
 	created_at: string;
 }
 
-interface ICurrencyItemDetail {
-	id: number;
-	name: string;
-	label: string;
-	created_at: string;
-}
-
 
 export type  {
-	IDatabaseItemDetail,
 	IMeasureItemDetail,
-	IPackageItemDetail,
-	ICurrencyItemDetail
+	IPackageItemDetail
 }

@@ -3,13 +3,13 @@ enum ROLE_LIST {
 	SELLER = 'seller'
 }
 
-// const ROLE_LABEL: Record<ROLE_LIST, string> = {
-// 	[ROLE_LIST.SELLER]: 'Seller',
-// 	[ROLE_LIST.ADMIN]: 'Admin'
-// }
+const ROLE_LABEL: Record<ROLE_LIST, string> = {
+	[ROLE_LIST.SELLER]: 'Seller',
+	[ROLE_LIST.ADMIN]: 'Admin'
+}
 
 
 export {
-	ROLE_LIST
-	// ROLE_LABEL
+	ROLE_LIST,
+	ROLE_LABEL
 }

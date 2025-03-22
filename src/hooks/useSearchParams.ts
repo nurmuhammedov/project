@@ -1,7 +1,7 @@
 import {ISearchParams} from 'interfaces/params.interface'
+import {convertParamsToObject} from 'utilities/params'
 import {useSearchParams} from 'react-router-dom'
 import {isObject} from 'utilities/common'
-import {convertParamsToObject} from 'utilities/params'
 
 
 function useCustomSearchParams() {

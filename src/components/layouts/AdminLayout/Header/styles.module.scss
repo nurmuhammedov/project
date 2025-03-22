@@ -13,11 +13,11 @@
     justify-content: flex-start;
 
     span {
-      font-family: Manrope, Arial, Helvetica, sans-serif;
+      font-family: Golos, Arial, Helvetica, sans-serif;
       font-size: 1.75rem;
       font-style: normal;
       color: var(--white);
-      font-weight: 500;
+      font-weight: 400;
       line-height: normal;
     }
   }
@@ -56,18 +56,16 @@
           justify-content: center;
           border-radius: 50%;
           background-color: var(--light-white-opacity);
-
         }
 
         .name {
           color: var(--white);
           text-align: center;
-          font-family: Manrope, Arial, Helvetica, sans-serif;
+          font-family: Golos, Arial, Helvetica, sans-serif;
           font-size: 1rem;
           font-style: normal;
-          font-weight: 500;
-          line-height: 150%; /* 1.5rem */
-          //letter-spacing: -0.02rem;
+          font-weight: 400;
+          line-height: 150%;
         }
       }
 
@@ -122,7 +120,7 @@
         span {
           color: var(--red);
           text-align: center;
-          font-family: Manrope, Arial, Helvetica, sans-serif;
+          font-family: Golos, Arial, Helvetica, sans-serif;
           font-size: 1rem;
           font-style: normal;
           font-weight: 400;

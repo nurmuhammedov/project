@@ -6,12 +6,11 @@
   align-items: center;
   color: var(--slate-gray);
   text-align: center;
-  font-family: Manrope, Arial, Helvetica, sans-serif;
+  font-family: Golos, Arial, Helvetica, sans-serif;
   font-size: 1rem;
   font-style: normal;
-  font-weight: 600;
-  line-height: 150%; /* 1.3125rem */
-  letter-spacing: -0.0175rem;
+  font-weight: 500;
+  line-height: 150%;
   border-radius: 0.25rem;
   background: var(--light-blue);
 }

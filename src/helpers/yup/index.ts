@@ -1,7 +1,7 @@
 import * as yup from 'yup'
 
 // Login validation
-const usernameSchema = yup
+export const usernameSchema = yup
 	.string()
 	.trim()
 	.required('This field is required')
@@ -14,7 +14,7 @@ const usernameSchema = yup
 	.matches(/^(?!.*_{2})/, 'It is not possible to type consecutive underscores in a login')
 
 // Password validation
-const passwordSchema = yup
+export const passwordSchema = yup
 	.string()
 	.trim()
 	.required('This field is required')
@@ -24,14 +24,14 @@ const passwordSchema = yup
 	.matches(/^[a-zA-Z0-9!@#$%^&*()]+$/, 'Password can only contain letters, numbers, and special characters (!@#$%^&*)')
 
 // Confirm password validation
-const confirmPasswordSchema = yup
+export const confirmPasswordSchema = yup
 	.string()
 	.trim()
 	.oneOf([yup.ref('password'), undefined], 'Passwords did not match')
 	.required('This field is required')
 
 // Date
-const date = yup
+export const date = yup
 	.string()
 	.required('This field is required')
 	.length(10, 'The information entered is invalid')
@@ -58,60 +58,6 @@ const isNotFutureDate = date.test('isNotFutureDate', 'Date must be less than tod
 	const today = new Date()
 	today.setHours(0, 0, 0, 0)
 	return inputDate <= today
-})
-
-// AUTHENTICATION
-const loginSchema = yup.object().shape({
-	username: usernameSchema,
-	password: passwordSchema
-})
-
-// DATABASE
-const databaseSchema = yup.object().shape({
-	name: yup.string().trim().required('This field is required')
-})
-
-const productTypesSchema = yup.object().shape({
-	name: yup.string().trim().required('This field is required'),
-	expiry: yup.boolean().required('This field is required')
-})
-
-const measurementUnitsSchema = yup.object().shape({
-	name: yup.string().trim().required('This field is required'),
-	value_type: yup.string().trim().required('This field is required')
-})
-
-const packagesSchema = yup.object().shape({
-	name: yup.string().trim().required('This field is required'),
-	measure: yup.string().trim().required('This field is required'),
-	// amount: yup.string().trim().required('This field is required'),
-	quantity: yup.string().trim().required('This field is required')
-})
-
-// STORES
-const storeSchema = yup.object().shape({
-	name: yup.string().trim().required('This field is required'),
-	store_type: yup.string().trim().required('This field is required')
-})
-
-const employeeSchema = yup.object().shape({
-	full_name: yup.string().trim().required('This field is required'),
-	phone: yup.string().trim().required('This field is required').length(17, 'The information entered is invalid'),
-	email: yup
-		.string()
-		.trim()
-		.nullable()
-		.transform((value) => (!value ? null : value))
-		.matches(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i, 'The information entered is invalid'),
-	username: usernameSchema,
-	password: passwordSchema,
-	confirmPassword: confirmPasswordSchema
-})
-
-const employeeEditSchema = yup.object().shape({
-	full_name: yup.string().trim().required('This field is required'),
-	phone: yup.string().trim().required('This field is required').length(17, 'The information entered is invalid'),
-	username: usernameSchema
 })
 
 
@@ -183,7 +129,7 @@ const temporarySaleItemSchema = yup.object().shape({
 	is_booked: yup.boolean().required('This field is required'),
 	serial_numbers: yup.array().required('This field is required'),
 	product: yup.number().required('This field is required'),
-	store: yup.number().transform(v => v ? v : undefined).required('This field is required'),
+	store: yup.number().transform(v => v ? v : undefined).required('This field is required')
 	// expiry_date: date
 })
 
@@ -208,20 +154,12 @@ const saleItemSchema = yup.object().shape({
 })
 
 export {
-	storeSchema,
-	loginSchema,
 	clientSchema,
 	productSchema,
-	databaseSchema,
-	packagesSchema,
-	employeeSchema,
 	saleItemSchema,
-	productTypesSchema,
-	employeeEditSchema,
 	purchaseItemSchema,
 	dailyCurrencySchema,
 	temporaryItemSchema,
 	currencyExchangeSchema,
-	temporarySaleItemSchema,
-	measurementUnitsSchema
+	temporarySaleItemSchema
 }

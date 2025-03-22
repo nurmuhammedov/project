@@ -45,22 +45,20 @@
 
     .title {
       color: var(--white);
-      font-family: Manrope, Arial, Helvetica, sans-serif;
+      font-family: Golos, Arial, Helvetica, sans-serif;
       font-size: 2rem;
       font-style: normal;
-      font-weight: 700;
-      line-height: 150%; /* 3rem */
-      letter-spacing: -0.06rem;
+      font-weight: 600;
+      line-height: 150%;
     }
 
     .subTitle {
       color: var(--light-gray-2);
-      font-family: Manrope, Arial, Helvetica, sans-serif;
+      font-family: Golos, Arial, Helvetica, sans-serif;
       font-size: 1.125rem;
       font-style: normal;
-      font-weight: 600;
-      line-height: 150%; /* 1.6875rem */
-      letter-spacing: -0.0225rem;
+      font-weight: 500;
+      line-height: 150%;
     }
   }
 

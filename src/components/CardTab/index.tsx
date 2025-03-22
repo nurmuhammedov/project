@@ -1,9 +1,9 @@
 import {ISelectOption} from 'interfaces/form.interface'
 import {useTranslation} from 'react-i18next'
 import styles from './styles.module.scss'
+import {CSSProperties, FC} from 'react'
 import {useSearchParams} from 'hooks'
 import classNames from 'classnames'
-import {CSSProperties, FC} from 'react'
 
 
 interface IProperties {

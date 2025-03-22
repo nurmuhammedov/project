@@ -15,12 +15,11 @@
   text-align: start;
   border: none;
   color: var(--slate-gray);
-  font-family: Manrope, Arial, Helvetica, sans-serif;
+  font-family: Golos, Arial, Helvetica, sans-serif;
   font-size: 1rem;
   font-style: normal;
-  font-weight: 600;
-  line-height: 150%; /* 1.5rem */
-  letter-spacing: -0.02rem;
+  font-weight: 500;
+  line-height: 150%;
 }
 .root table tbody {
   transition: color 0.15s ease-in-out;
@@ -29,12 +28,11 @@
   padding: 1.25rem 0.75rem;
   max-width: 15rem;
   color: var(--dark-slate);
-  font-family: Manrope, Arial, Helvetica, sans-serif;
+  font-family: Golos, Arial, Helvetica, sans-serif;
   font-size: 1.125rem;
   font-style: normal;
-  font-weight: 600;
-  line-height: 150%; /* 1.6875rem */
-  letter-spacing: -0.0225rem;
+  font-weight: 500;
+  line-height: 150%;
 }
 .root table tbody tr:hover {
   background: var(--light-gray-1);

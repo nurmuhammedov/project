@@ -1,21 +1,21 @@
-import {
-	ClientDetail,
-	ClientsTable,
-	CurrencyExchange,
-	DailyCurrency,
-	DatabaseTable,
-	Home,
-	Login,
-	ProductExchange,
-	ProductsTable,
-	StoreDetail,
-	StoresTable
-} from 'modules'
 import {Navigate, Outlet, useRoutes} from 'react-router-dom'
 import {routeByRole} from 'utilities/authentication'
 import {ROLE_LIST} from 'constants/roles'
 import {AdminLayout} from 'components'
 import {useAppContext} from 'hooks'
+import {
+	CurrencyExchange,
+	ProductExchange,
+	ProductsTable,
+	DatabaseTable,
+	DailyCurrency,
+	ClientDetail,
+	ClientsTable,
+	StoreDetail,
+	StoresTable,
+	Login,
+	Home
+} from 'modules'
 
 
 function useAppRoutes() {

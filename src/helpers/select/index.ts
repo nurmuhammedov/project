@@ -14,9 +14,9 @@ const getSelectStyles = (error?: boolean, top?: boolean) => ({
 		backgroundColor: 'var(--white)',
 		padding: '1rem 1.25rem',
 		borderRadius: '0.9375rem',
-		fontFamily: 'Manrope, Arial, Helvetica, sans-serif',
+		fontFamily: 'Golos, Arial, Helvetica, sans-serif',
 		fontStyle: 'normal',
-		fontWeight: '500',
+		fontWeight: '400',
 		fontSize: '1rem',
 		lineHeight: '150%',
 		cursor: 'pointer',
@@ -40,9 +40,9 @@ const getSelectStyles = (error?: boolean, top?: boolean) => ({
 		display: 'flex',
 		alignItems: 'center',
 		borderRadius: '0.9375rem',
-		fontFamily: 'Manrope, Arial, Helvetica, sans-serif',
+		fontFamily: 'Golos, Arial, Helvetica, sans-serif',
 		fontStyle: 'normal',
-		fontWeight: '500'
+		fontWeight: '400'
 	}),
 	'singleValue': (base: CSSObjectWithLabel) => ({
 		...base,
@@ -98,9 +98,9 @@ const getSelectStyles = (error?: boolean, top?: boolean) => ({
 	'option': (base: CSSObjectWithLabel, state: OptionProps) => ({
 		...base,
 		padding: '1rem 1.25rem',
-		fontFamily: 'Manrope, Arial, Helvetica, sans-serif',
+		fontFamily: 'Golos, Arial, Helvetica, sans-serif',
 		fontStyle: 'normal',
-		fontWeight: '500',
+		fontWeight: '400',
 		fontSize: '1rem',
 		lineHeight: '150%',
 		gap: '0.5rem',
@@ -123,9 +123,9 @@ const getSelectStyles = (error?: boolean, top?: boolean) => ({
 	'noOptionsMessage': (base: CSSObjectWithLabel) => ({
 		...base,
 		padding: '.8rem 1rem',
-		fontFamily: 'Manrope, Arial, Helvetica, sans-serif',
+		fontFamily: 'Golos, Arial, Helvetica, sans-serif',
 		fontStyle: 'normal',
-		fontWeight: '500',
+		fontWeight: '400',
 		fontSize: '1rem',
 		lineHeight: '150%',
 		color: 'var(--dark-slate)',

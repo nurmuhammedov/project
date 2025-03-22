@@ -1,8 +1,6 @@
 enum FIELD {
 	TEXT = 'text',
-	TEXTAREA = 'textarea',
 	BUTTON = 'button',
-	NUMBER = 'number',
 	PASSWORD = 'password',
 	SUBMIT = 'submit',
 }

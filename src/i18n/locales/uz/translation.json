@@ -1,5 +1,4 @@
 {
-  "Oops! An error occurred. Please try again later": "Xatolik yuz berdi. Iltimos, keyinroq yana urinib ko‘ring",
   "Internal server error": "Serverda nomaʼlum xatolik yuz berdi. Xatolik haqida bizga xabar bering, biz uni bartaraf etamiz",
   "uzb": "Ўзбекча",
   "uz": "O‘zbekcha",
@@ -50,6 +49,7 @@
   "Brand": "Brend",
   "Add": "Qo‘shish",
   "Name": "Nomi",
+  "First name": "Ism",
   "Date added": "Qo‘shilgan sanasi",
   "Actions": "Amallar",
   "Saved successfully": "Muvaffaqiyatli saqlandi",
@@ -77,6 +77,8 @@
   "Store": "Do‘kon",
   "Add a new store": "Yangi do‘kon qo‘shish",
   "Money": "Pul",
+  "Item": "Dona",
+  "item": "dona",
   "Product": "Mahsulot",
   "Money, Product": "Pul, Mahsulot",
   "Currency exchange": "Valyuta ayirboshlash",
@@ -157,6 +159,9 @@
   "Exist": "Bor",
   "Package quantity": "Qadoq soni",
   "Count": "Soni",
+  "Role": "Rol",
+  "Seller": "Sotuvchi",
+  "Last name": "Familiya",
   "Add series": "Seria qo‘shish",
   "item per package": "har bir qadoqda {{count}} {{measure}}dan",
   "Noting found": "Hech narsa topilmadi",
@@ -170,5 +175,6 @@
   "Exchange rate": "Valyutalar kursi",
   "Previous currency": "Eski kurs",
   "New currency": "Yangi kurs",
+  "Invalid username or password": "Login yoki parol xato",
   "Update currency": "Kursni yangilash"
 }

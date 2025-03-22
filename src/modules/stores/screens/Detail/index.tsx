@@ -1,15 +1,14 @@
 import {Box, Cart, Currency, Status, Store} from 'assets/icons'
-import {Button, Loader, PageInfo, Select, HorizontalTab} from 'components'
+import {Button, Loader, PageInfo, HorizontalTab} from 'components'
 import {BUTTON_THEME} from 'constants/fields'
 import {useDetail, useSearchParams} from 'hooks'
 import {ISelectOption} from 'interfaces/form.interface'
-import {getSelectValue} from 'utilities/common'
+import {storeTypes} from 'modules/stores/helpers/options'
 import SalesHistory from 'modules/stores/components/SalesHistory'
 import Warehouse from 'modules/stores/components/Warehouse'
 import Employees from 'modules/stores/components/Employees'
-import {IStoreItemDetail} from 'interfaces/stores.interface'
+import {IStoreDetail} from 'modules/stores/interfaces'
 import {useParams} from 'react-router-dom'
-import {storesTypeOptions} from 'helpers/options'
 import {useTranslation} from 'react-i18next'
 
 
@@ -35,7 +34,7 @@ const Index = () => {
 	const {id = undefined} = useParams()
 	const {t} = useTranslation()
 	const {paramsObject: {tab = tabOptions[0]?.value}} = useSearchParams()
-	const {data: detail, isPending: isDetailLoading} = useDetail<IStoreItemDetail>('stores/', id)
+	const {data: detail, isPending: isDetailLoading} = useDetail<IStoreDetail>('stores/', id)
 
 
 	if (isDetailLoading) {
@@ -47,7 +46,7 @@ const Index = () => {
 			<div className="flex align-center justify-between gap-lg">
 				<PageInfo
 					title={detail?.name}
-					subTitle={t(storesTypeOptions.find(i => i.value == detail?.store_type)?.label?.toString() ?? '')}
+					subTitle={t(storeTypes.find(i => i.value == detail?.exchange_type)?.label?.toString() ?? '')}
 					icon={<Store/>}
 				/>
 				<div className="flex align-center gap-lg">
@@ -60,28 +59,6 @@ const Index = () => {
 				</div>
 			</div>
 
-			<div className="flex align-center" style={{marginTop: '2.25rem', gap: '2.25rem'}}>
-				<div className="flex-1">
-					<Select
-						id="clients"
-						options={[]}
-						label="Clients"
-						value={getSelectValue([], undefined)}
-						defaultValue={getSelectValue([], undefined)}
-						handleOnChange={(e) => console.log(e as string)}
-					/>
-				</div>
-				<div className="flex-1">
-					<Select
-						id="priceType"
-						options={[]}
-						label="Price type"
-						value={getSelectValue([], undefined)}
-						defaultValue={getSelectValue([], undefined)}
-						handleOnChange={(e) => console.log(e as string)}
-					/>
-				</div>
-			</div>
 			<HorizontalTab
 				tabs={tabOptions}
 				fallbackValue={tabOptions[0]?.value}

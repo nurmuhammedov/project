@@ -16,12 +16,11 @@
 }
 .root ul li a {
   color: var(--dark-slate);
-  font-family: Manrope, Arial, Helvetica, sans-serif;
-  font-size: 0.875rem;
+  font-family: Golos, Arial, Helvetica, sans-serif;
+  font-size: 1rem;
   font-style: normal;
-  font-weight: 600;
-  line-height: 150%; /* 1.3125rem */
-  letter-spacing: -0.0175rem;
+  font-weight: 500;
+  line-height: 150%;
   cursor: pointer;
   padding: 0.3rem 0.7rem;
   text-align: center;
@@ -48,7 +47,6 @@
   justify-content: center;
   align-items: center;
   cursor: not-allowed;
-  pointer-events: none;
 }
 .root ul li[class="previous disabled"] a svg path,
 .root ul li[class="next disabled"] a svg path {

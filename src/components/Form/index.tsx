@@ -1,6 +1,6 @@
-import classNames from 'classnames'
-import styles from './styles.module.scss'
 import {CSSProperties, FC, HTMLAttributes, ReactNode} from 'react'
+import styles from './styles.module.scss'
+import classNames from 'classnames'
 
 
 interface IProperties extends HTMLAttributes<HTMLFormElement> {

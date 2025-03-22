@@ -1,38 +1,40 @@
-import {yupResolver} from '@hookform/resolvers/yup'
-import {Plus, Search} from 'assets/icons'
-import {
-	Button,
-	Card,
-	DeleteButton,
-	DeleteModal,
-	EditButton,
-	EditModal,
-	HR,
-	Input,
-	Modal,
-	Pagination,
-	ReactTable,
-	Form
-} from 'components'
+import {Column} from 'react-table'
 import {FIELD} from 'constants/fields'
-import {useAdd, useDetail, usePaginatedData, usePagination, useSearchParams, useUpdate} from 'hooks'
 import {useForm} from 'react-hook-form'
 import {useEffect, useMemo} from 'react'
-import {Column} from 'react-table'
 import {formatDate} from 'utilities/date'
-import * as yup from 'yup'
-import {ICurrencyItemDetail} from 'interfaces/database.interface'
+import {Plus, Search} from 'assets/icons'
 import {useTranslation} from 'react-i18next'
+import {yupResolver} from '@hookform/resolvers/yup'
+import {currencySchema} from 'modules/database/helpers/yup'
+import {ICurrencyDetail} from 'modules/database/interfaces'
+import {useAdd, useDetail, usePaginatedData, usePagination, useSearchParams, useUpdate} from 'hooks'
+import {
+	HR,
+	Card,
+	Form,
+	Input,
+	Modal,
+	Button,
+	EditModal,
+	Pagination,
+	ReactTable,
+	EditButton,
+	DeleteModal,
+	DeleteButton
+} from 'components'
+import {InferType} from 'yup'
 
 
-const currencySchema = yup.object().shape({
-	name: yup.string().trim().required('This field is required'),
-	label: yup.string().trim().required('This field is required')
-})
+const DEFAULT_FORM_VALUES = {
+	name: '',
+	code: ''
+}
 
-const Index = () => {
+const Currencies = () => {
 	const {page, pageSize} = usePagination()
 	const {t} = useTranslation()
+
 	const {
 		paramsObject: {updateId = undefined},
 		addParams,
@@ -44,22 +46,47 @@ const Index = () => {
 		totalPages,
 		isPending: isLoading,
 		refetch
-	} = usePaginatedData<ICurrencyItemDetail[]>('currency/', {
-		page: page,
+	} = usePaginatedData<ICurrencyDetail[]>('currencies', {
+		page,
 		page_size: pageSize
 	})
 
-	const {mutateAsync, isPending: isAdding} = useAdd('/currency/create/')
+	const {mutateAsync: addCurrency, isPending: isAdding} = useAdd('currencies')
+	const {mutateAsync: updateCurrency, isPending: isUpdating} = useUpdate('currencies/', updateId)
 
-	const {data: detail, isPending: isDetailLoading, isFetching} = useDetail<ICurrencyItemDetail>('/currency/', updateId)
+	const {
+		data: detail,
+		isPending: isDetailLoading,
+		isFetching
+	} = useDetail<ICurrencyDetail>('currencies/', updateId)
 
-	const {mutateAsync: update, isPending: isUpdating} = useUpdate('/currency/update/', updateId)
+	const {
+		handleSubmit: handleAddSubmit,
+		register: registerAdd,
+		reset: resetAdd,
+		formState: {errors: addErrors}
+	} = useForm<InferType<typeof currencySchema>>({
+		mode: 'onTouched',
+		defaultValues: DEFAULT_FORM_VALUES,
+		resolver: yupResolver(currencySchema)
+	})
 
-	const columns: Column<ICurrencyItemDetail>[] = useMemo(
+	const {
+		handleSubmit: handleEditSubmit,
+		register: registerEdit,
+		reset: resetEdit,
+		formState: {errors: editErrors}
+	} = useForm<InferType<typeof currencySchema>>({
+		mode: 'onTouched',
+		defaultValues: DEFAULT_FORM_VALUES,
+		resolver: yupResolver(currencySchema)
+	})
+
+	const columns: Column<ICurrencyDetail>[] = useMemo(
 		() => [
 			{
 				Header: '№',
-				accessor: (_: ICurrencyItemDetail, index: number) => (page - 1) * pageSize + (index + 1),
+				accessor: (_: ICurrencyDetail, index: number) => (page - 1) * pageSize + (index + 1),
 				style: {
 					width: '3rem',
 					textAlign: 'center'
@@ -67,19 +94,19 @@ const Index = () => {
 			},
 			{
 				Header: t('Name'),
-				accessor: (row: ICurrencyItemDetail) => row.name
+				accessor: 'name'
 			},
 			{
 				Header: t('Label'),
-				accessor: (row: ICurrencyItemDetail) => row.label
+				accessor: 'code'
 			},
 			{
 				Header: t('Date added'),
-				accessor: (row: ICurrencyItemDetail) => formatDate(row.created_at)
+				accessor: row => formatDate(row.created_at)
 			},
 			{
 				Header: t('Actions'),
-				accessor: (row: ICurrencyItemDetail) => (
+				accessor: row => (
 					<div className="flex items-start gap-lg">
 						<EditButton id={row.id}/>
 						<DeleteButton id={row.id}/>
@@ -89,35 +116,6 @@ const Index = () => {
 		],
 		[page, pageSize]
 	)
-
-	const {
-		handleSubmit: handleAddSubmit,
-		register: registerAdd,
-		reset: resetAdd,
-		formState: {errors: addErrors}
-	} = useForm({
-		mode: 'onTouched',
-		defaultValues: {
-			name: '',
-			label: ''
-		},
-		resolver: yupResolver(currencySchema)
-	})
-
-	const {
-		handleSubmit: handleEditSubmit,
-		register: registerEdit,
-		reset: resetEdit,
-		formState: {errors: editErrors}
-	} = useForm({
-		mode: 'onTouched',
-		defaultValues: {
-			name: '',
-			label: ''
-		},
-		resolver: yupResolver(currencySchema)
-	})
-
 
 	useEffect(() => {
 		if (detail && !isDetailLoading) {
@@ -150,10 +148,10 @@ const Index = () => {
 
 			<Modal title="Add new" id="currencies" style={{height: '30rem'}}>
 				<Form
-					onSubmit={handleAddSubmit((formData) =>
-						mutateAsync(formData).then(async () => {
-							resetAdd()
+					onSubmit={handleAddSubmit((formData: InferType<typeof currencySchema>) =>
+						addCurrency(formData).then(async () => {
 							removeParams('modal')
+							resetAdd(DEFAULT_FORM_VALUES)
 							await refetch()
 						})
 					)}
@@ -170,8 +168,8 @@ const Index = () => {
 						id="label"
 						type={FIELD.TEXT}
 						label="Label"
-						error={addErrors?.label?.message}
-						{...registerAdd('label')}
+						error={addErrors?.code?.message}
+						{...registerAdd('code')}
 					/>
 					<Button style={{marginTop: 'auto'}} type={FIELD.SUBMIT} disabled={isAdding}>
 						Save
@@ -181,10 +179,10 @@ const Index = () => {
 
 			<EditModal isLoading={isFetching || !detail} style={{height: '30rem'}}>
 				<Form
-					onSubmit={handleEditSubmit((formData) =>
-						update(formData).then(async () => {
-							resetEdit()
+					onSubmit={handleEditSubmit((formData: InferType<typeof currencySchema>) =>
+						updateCurrency(formData).then(async () => {
 							removeParams('modal', 'updateId')
+							resetEdit(DEFAULT_FORM_VALUES)
 							await refetch()
 						})
 					)}
@@ -201,8 +199,8 @@ const Index = () => {
 						id="label"
 						type={FIELD.TEXT}
 						label="Label"
-						error={editErrors?.label?.message}
-						{...registerEdit('label')}
+						error={editErrors?.code?.message}
+						{...registerEdit('code')}
 					/>
 					<Button style={{marginTop: 'auto'}} type={FIELD.SUBMIT} disabled={isUpdating}>
 						Edit
@@ -210,9 +208,9 @@ const Index = () => {
 				</Form>
 			</EditModal>
 
-			<DeleteModal endpoint="/currency/delete/" onDelete={() => refetch()}/>
+			<DeleteModal endpoint="currencies/" onDelete={() => refetch()}/>
 		</>
 	)
 }
 
-export default Index
+export default Currencies

@@ -27,36 +27,31 @@
 
         span {
           color: var(--white);
-          font-family: Manrope, Arial, Helvetica, sans-serif;
+          font-family: Golos, Arial, Helvetica, sans-serif;
           font-size: 1.75rem;
           font-style: normal;
-          //text-align: center;
-          font-weight: 500;
+          font-weight: 400;
           line-height: normal;
         }
       }
 
       .slogan {
         color: var(--white);
-        font-family: Manrope, Arial, Helvetica, sans-serif;
+        font-family: Golos, Arial, Helvetica, sans-serif;
         font-size: 2.5rem;
         font-style: normal;
-        font-weight: 700;
+        font-weight: 600;
         line-height: 150%; /* 3.75rem */
-        //letter-spacing: -0.075rem;
-        //text-align: center;
         margin-bottom: 1rem;
       }
 
       .tagline {
         color: var(--light-gray-3, #DCE4E8);
-        font-family: Manrope, Arial, Helvetica, sans-serif;
+        font-family: Golos, Arial, Helvetica, sans-serif;
         font-size: 1.25rem;
         font-style: normal;
-        //text-align: center;
-        font-weight: 500;
+        font-weight: 400;
         line-height: 150%; /* 1.875rem */
-        //letter-spacing: -0.02rem;
       }
     }
   }
@@ -80,12 +75,11 @@
 
       h1 {
         color: var(--dark-slate);
-        font-family: Manrope, Arial, Helvetica, sans-serif;
+        font-family: Golos, Arial, Helvetica, sans-serif;
         font-size: 2rem;
         font-style: normal;
-        font-weight: 700;
+        font-weight: 500;
         line-height: 150%; /* 3rem */
-        //letter-spacing: -0.06rem;
         text-align: center;
       }
 

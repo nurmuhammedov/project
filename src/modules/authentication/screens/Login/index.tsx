@@ -1,3 +1,4 @@
+import {loginSchema} from 'modules/authentication/helpers/yup'
 import {useLogin} from 'modules/authentication/hooks'
 import {ILoginForm} from 'interfaces/yup.interface'
 import {yupResolver} from '@hookform/resolvers/yup'
@@ -5,7 +6,6 @@ import {useTranslation} from 'react-i18next'
 import styles from './styles.module.scss'
 import {Button, Input} from 'components'
 import {useForm} from 'react-hook-form'
-import {loginSchema} from 'helpers/yup'
 import {FIELD} from 'constants/fields'
 import {Logo} from 'assets/icons'
 
@@ -22,7 +22,7 @@ const Index = () => {
 		mode: 'onTouched',
 		defaultValues: {
 			username: 'admin',
-			password: '9995101a'
+			password: 'pass0101'
 		},
 		resolver: yupResolver(loginSchema)
 	})

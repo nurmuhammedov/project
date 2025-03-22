@@ -1,5 +1,5 @@
-import {useMutation} from '@tanstack/react-query'
 import {CommonService} from 'services/common.service'
+import {useMutation} from '@tanstack/react-query'
 import {showMessage} from 'utilities/alert'
 import {noopAsync} from 'utilities/common'
 
@@ -7,8 +7,7 @@ import {noopAsync} from 'utilities/common'
 const useDelete = (
 	endpoint: string,
 	id?: string | number | boolean | null,
-	successMessage: string = 'Deleted successfully',
-	errorMessage?: string
+	successMessage: string = 'Deleted successfully'
 ) => {
 	return useMutation({
 		mutationFn: () => {
@@ -19,12 +18,7 @@ const useDelete = (
 				return noopAsync()
 			}
 		},
-		onSuccess: () => showMessage(successMessage, 'success'),
-		onError: () => {
-			if (errorMessage) {
-				showMessage(errorMessage, 'error')
-			}
-		}
+		onSuccess: () => showMessage(successMessage, 'success')
 	})
 }
 

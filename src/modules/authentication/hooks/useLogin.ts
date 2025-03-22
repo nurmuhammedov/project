@@ -22,7 +22,8 @@ export function useLogin() {
 
 	const {isPending, mutate: login} = useMutation({
 		mutationFn: (credentials: ILoginForm) => AuthenticationService.login(credentials),
-		onSuccess: handleLogin
+		onSuccess: handleLogin,
+		onError: () => showMessage('Invalid username or password', 'error')
 	})
 
 	return {login, isPending}

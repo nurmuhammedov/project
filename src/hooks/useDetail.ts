@@ -1,6 +1,6 @@
-import {useQuery} from '@tanstack/react-query'
 import {ISearchParams} from 'interfaces/params.interface'
 import {CommonService} from 'services/common.service'
+import {useQuery} from '@tanstack/react-query'
 import {useTranslation} from 'react-i18next'
 import {showMessage} from 'utilities/alert'
 

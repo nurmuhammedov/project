@@ -1,90 +1,120 @@
-import {yupResolver} from '@hookform/resolvers/yup'
+import {Column} from 'react-table'
+import {FIELD} from 'constants/fields'
+import {useForm} from 'react-hook-form'
+import {useEffect, useMemo} from 'react'
+import {formatDate} from 'utilities/date'
 import {Plus, Search} from 'assets/icons'
+import {useTranslation} from 'react-i18next'
+import {yupResolver} from '@hookform/resolvers/yup'
+import {expenseTypeSchema} from 'modules/database/helpers/yup'
+import {IExpenseTypeDetail} from 'modules/database/interfaces'
+import {useAdd, useDetail, usePaginatedData, usePagination, useSearchParams, useUpdate} from 'hooks'
 import {
-	Button,
-	Card,
-	DeleteButton,
-	DeleteModal,
-	EditButton,
-	EditModal,
 	HR,
+	Card,
+	Form,
 	Input,
 	Modal,
+	Button,
+	EditModal,
 	Pagination,
 	ReactTable,
-	Form
+	EditButton,
+	DeleteModal,
+	DeleteButton
 } from 'components'
-import {FIELD} from 'constants/fields'
-import {databaseTableHeader} from 'helpers/headers'
-import {databaseSchema} from 'helpers/yup'
-import {useAdd, useDetail, usePaginatedData, usePagination, useSearchParams, useUpdate} from 'hooks'
-import {IDatabaseItemDetail} from 'interfaces/database.interface'
-import {useEffect, useMemo} from 'react'
-import {useForm} from 'react-hook-form'
-import {useTranslation} from 'react-i18next'
-import {Column} from 'react-table'
+import {InferType} from 'yup'
 
 
-const Index = () => {
-	const {t} = useTranslation()
+const DEFAULT_FORM_VALUES = {
+	name: ''
+}
+
+const ExpenseTypes = () => {
 	const {page, pageSize} = usePagination()
-	const {addParams, removeParams, paramsObject: {updateId = undefined}} = useSearchParams()
+	const {t} = useTranslation()
 
-	const {data, totalPages, isPending: isLoading, refetch} = usePaginatedData<IDatabaseItemDetail[]>(
-		'organization/cost-type/',
-		{
-			page: page,
-			page_size: pageSize
-		}
-	)
+	const {
+		paramsObject: {updateId = undefined},
+		addParams,
+		removeParams
+	} = useSearchParams()
+
+	const {
+		data,
+		totalPages,
+		isPending: isLoading,
+		refetch
+	} = usePaginatedData<IExpenseTypeDetail[]>('cost-types', {
+		page,
+		page_size: pageSize
+	})
+
+	const {mutateAsync: addExpenseType, isPending: isAdding} = useAdd('cost-types')
+	const {mutateAsync: updateExpenseType, isPending: isUpdating} = useUpdate('cost-types/', updateId)
+
+	const {
+		data: detail,
+		isPending: isDetailLoading,
+		isFetching
+	} = useDetail<IExpenseTypeDetail>('cost-types/', updateId)
 
 	const {
 		handleSubmit: handleAddSubmit,
 		register: registerAdd,
 		reset: resetAdd,
 		formState: {errors: addErrors}
-	} = useForm({
+	} = useForm<InferType<typeof expenseTypeSchema>>({
 		mode: 'onTouched',
-		defaultValues: {name: ''},
-		resolver: yupResolver(databaseSchema)
+		defaultValues: DEFAULT_FORM_VALUES,
+		resolver: yupResolver(expenseTypeSchema)
 	})
-
-	const columns: Column<IDatabaseItemDetail>[] = useMemo(() =>
-			[
-				...databaseTableHeader(t, page, pageSize),
-				{
-					Header: t('Actions'),
-					accessor: (row: IDatabaseItemDetail) => <div className="flex items-start gap-lg">
-						<EditButton id={row.id}/>
-						<DeleteButton id={row.id}/>
-					</div>
-				}
-			],
-		[t, page, pageSize]
-	)
 
 	const {
 		handleSubmit: handleEditSubmit,
 		register: registerEdit,
 		reset: resetEdit,
 		formState: {errors: editErrors}
-	} = useForm({
+	} = useForm<InferType<typeof expenseTypeSchema>>({
 		mode: 'onTouched',
-		defaultValues: {name: ''},
-		resolver: yupResolver(databaseSchema)
+		defaultValues: DEFAULT_FORM_VALUES,
+		resolver: yupResolver(expenseTypeSchema)
 	})
 
-	const {mutateAsync, isPending: isAdding} = useAdd('organization/cost-type/create/')
-	const {mutateAsync: update, isPending: isUpdating} = useUpdate('organization/cost-type/update/', updateId)
-	const {
-		data: detail,
-		isPending: isDetailLoading,
-		isFetching
-	} = useDetail<IDatabaseItemDetail>('organization/cost-type/detail/', updateId)
+	const columns: Column<IExpenseTypeDetail>[] = useMemo(
+		() => [
+			{
+				Header: '№',
+				accessor: (_: IExpenseTypeDetail, index: number) => (page - 1) * pageSize + (index + 1),
+				style: {
+					width: '3rem',
+					textAlign: 'center'
+				}
+			},
+			{
+				Header: t('Name'),
+				accessor: 'name'
+			},
+			{
+				Header: t('Date added'),
+				accessor: row => formatDate(row.created_at)
+			},
+			{
+				Header: t('Actions'),
+				accessor: row => (
+					<div className="flex items-start gap-lg">
+						<EditButton id={row.id}/>
+						<DeleteButton id={row.id}/>
+					</div>
+				)
+			}
+		],
+		[page, pageSize]
+	)
 
 	useEffect(() => {
 		if (detail && !isDetailLoading) {
-			resetEdit({name: detail.name})
+			resetEdit(detail)
 		}
 	}, [detail])
 
@@ -96,13 +126,14 @@ const Index = () => {
 						id="search"
 						icon={<Search/>}
 						placeholder="Search"
-						radius={true}
+						radius
 						style={{width: 400}}
 					/>
-					<Button icon={<Plus/>} onClick={() => addParams({modal: 'expenseTypes'})}>
+					<Button icon={<Plus/>} onClick={() => addParams({modal: 'expenses'})}>
 						Add
 					</Button>
 				</div>
+
 				<div className="flex flex-col gap-md flex-1">
 					<ReactTable columns={columns} data={data} isLoading={isLoading}/>
 					<HR/>
@@ -110,65 +141,55 @@ const Index = () => {
 				</div>
 			</Card>
 
-			<Modal title="Add new" id="expenseTypes" style={{height: '20rem'}}>
+			<Modal title="Add new Expense" id="expenses" style={{height: '20rem'}}>
 				<Form
-					onSubmit={
-						handleAddSubmit((data) => mutateAsync(data).then(async () => {
-							resetAdd()
+					onSubmit={handleAddSubmit((formData: InferType<typeof expenseTypeSchema>) =>
+						addExpenseType(formData).then(async () => {
 							removeParams('modal')
+							resetAdd(DEFAULT_FORM_VALUES)
 							await refetch()
-						}))
-					}
+						})
+					)}
 				>
 					<Input
 						id="name"
 						type={FIELD.TEXT}
 						label="Name"
-						placeholder="Enter name"
 						error={addErrors?.name?.message}
 						{...registerAdd('name')}
 					/>
-					<Button
-						style={{marginTop: 'auto'}}
-						type={FIELD.SUBMIT}
-						disabled={isAdding}
-					>
+					<Button style={{marginTop: 'auto'}} type={FIELD.SUBMIT} disabled={isAdding}>
 						Save
 					</Button>
 				</Form>
 			</Modal>
 
-			<EditModal isLoading={isFetching || !detail} style={{height: '20.5rem'}}>
+			<EditModal isLoading={isFetching || !detail} style={{height: '20rem'}}>
 				<Form
-					onSubmit={
-						handleEditSubmit((data) => update(data).then(async () => {
-							resetEdit()
+					onSubmit={handleEditSubmit((formData: InferType<typeof expenseTypeSchema>) =>
+						updateExpenseType(formData).then(async () => {
 							removeParams('modal', 'updateId')
+							resetEdit(DEFAULT_FORM_VALUES)
 							await refetch()
-						}))
-					}
+						})
+					)}
 				>
 					<Input
 						id="name"
 						type={FIELD.TEXT}
 						label="Name"
-						placeholder="Enter name"
 						error={editErrors?.name?.message}
 						{...registerEdit('name')}
 					/>
-					<Button
-						style={{marginTop: 'auto'}}
-						type={FIELD.SUBMIT}
-						disabled={isUpdating}
-					>
+					<Button style={{marginTop: 'auto'}} type={FIELD.SUBMIT} disabled={isUpdating}>
 						Edit
 					</Button>
 				</Form>
 			</EditModal>
 
-			<DeleteModal endpoint="organization/cost-type/delete/" onDelete={() => refetch()}/>
+			<DeleteModal endpoint="cost-types/" onDelete={() => refetch()}/>
 		</>
 	)
 }
 
-export default Index
+export default ExpenseTypes

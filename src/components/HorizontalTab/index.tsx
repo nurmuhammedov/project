@@ -1,10 +1,10 @@
-import {Product} from 'assets/icons'
 import {ISelectOption} from 'interfaces/form.interface'
+import {useTranslation} from 'react-i18next'
 import styles from './styles.module.scss'
 import {CSSProperties, FC} from 'react'
 import {useSearchParams} from 'hooks'
+import {Product} from 'assets/icons'
 import classNames from 'classnames'
-import {useTranslation} from 'react-i18next'
 
 
 interface IProperties {

@@ -1,7 +1,7 @@
-import styles from './styles.module.scss'
-import {FC, ReactNode} from 'react'
-import {SelectIcon} from 'assets/icons'
 import {useTranslation} from 'react-i18next'
+import styles from './styles.module.scss'
+import {SelectIcon} from 'assets/icons'
+import {FC, ReactNode} from 'react'
 
 
 interface IProperties {

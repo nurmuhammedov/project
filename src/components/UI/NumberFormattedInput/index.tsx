@@ -1,9 +1,9 @@
 import styles from 'components/UI/Input/styles.module.css'
-import {Input} from 'components'
-import {FIELD} from 'constants/fields'
 import CurrencyInput from 'react-currency-input-field'
 import {useTranslation} from 'react-i18next'
 import {FocusEvent, forwardRef} from 'react'
+import {FIELD} from 'constants/fields'
+import {Input} from 'components'
 
 
 interface IProps {

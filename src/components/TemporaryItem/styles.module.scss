@@ -29,12 +29,11 @@
       color: var(--dark-slate);
       text-overflow: ellipsis;
       white-space: nowrap;
-      font-family: Manrope, Arial, Helvetica, sans-serif;
+      font-family: Golos, Arial, Helvetica, sans-serif;
       font-size: 1rem;
       font-style: normal;
-      font-weight: 500;
-      line-height: 150%; /* 1.3125rem */
-      letter-spacing: -0.0175rem;
+      font-weight: 400;
+      line-height: 150%;
       text-align: end;
     }
 
@@ -43,12 +42,11 @@
       color: var(--slate-gray);
       text-overflow: ellipsis;
       white-space: nowrap;
-      font-family: Manrope, Arial, Helvetica, sans-serif;
+      font-family: Golos, Arial, Helvetica, sans-serif;
       font-size: 1rem;
       font-style: normal;
-      font-weight: 500;
-      line-height: 150%; /* 1.3125rem */
-      letter-spacing: -0.0175rem;
+      font-weight: 400;
+      line-height: 150%;
       text-align: end;
     }
 
@@ -59,9 +57,9 @@
   padding-right: 3.5rem !important;
 
   .detail-wrapper {
-    user-select: none;
     position: absolute;
     display: flex;
+    user-select: none;
     padding: .4rem;
     justify-content: center;
     align-items: center;

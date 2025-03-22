@@ -7,8 +7,7 @@ const useUpdate = <TVariables, TData, TError>(
 	endpoint: string,
 	id?: string | number | boolean | null,
 	method: 'put' | 'patch' = 'put',
-	successMessage: string = 'Updated successfully',
-	errorMessage?: string
+	successMessage: string = 'Updated successfully'
 ) => {
 	return useMutation<TData, TError, TVariables>({
 		mutationFn: async (data: TVariables) => {
@@ -21,10 +20,7 @@ const useUpdate = <TVariables, TData, TError>(
 				? CommonService.updateData<TVariables, TData>(endpoint, data, id.toString())
 				: CommonService.partialUpdateData<TVariables, TData>(endpoint, data, id.toString())
 		},
-		onSuccess: () => showMessage(successMessage, 'success'),
-		onError: () => {
-			showMessage(errorMessage, 'error')
-		}
+		onSuccess: () => showMessage(successMessage, 'success')
 	})
 }
 

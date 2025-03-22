@@ -1,5 +1,5 @@
-import {CSSProperties, FC} from 'react'
 import styles from './styles.module.scss'
+import {CSSProperties, FC} from 'react'
 
 
 interface IProperties {

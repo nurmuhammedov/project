@@ -22,8 +22,7 @@ instance.interceptors.request.use(
 instance.interceptors.response.use(
 	response => response,
 	error => {
-		if (error?.response?.status <= 499 && error?.response?.status !== 401) {
-			// showMessage('Oops! An error occurred. Please try again later', 'error', 10000)
+		if (error?.response?.status <= 499 && error?.response?.status !== 401 && error?.response?.status !== 404) {
 			showErrorMessage(error)
 		} else if (error?.response?.status >= 500) {
 			showMessage('Internal server error', 'error', 15000)

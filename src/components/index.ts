@@ -11,6 +11,7 @@ import CardTitle from './CardTitle'
 import PageTitle from './PageTitle'
 import AlertItem from './AlertItem'
 import EditModal from './EditModal'
+import Chechbox from './Chechbox'
 import PageInfo from './PageInfo'
 import CardTab from './CardTab'
 import Router from './Router'
@@ -39,6 +40,7 @@ export {
 	PageTitle,
 	CardTitle,
 	AlertItem,
+	Chechbox,
 	EditModal,
 	PageInfo,
 	CardTab,

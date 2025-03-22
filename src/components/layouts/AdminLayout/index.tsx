@@ -1,7 +1,7 @@
-import styles from './styles.module.scss'
 import {Outlet, useLocation} from 'react-router-dom'
-import Header from './Header'
 import {FC, useEffect, useState} from 'react'
+import styles from './styles.module.scss'
+import Header from './Header'
 
 
 interface IProperties {

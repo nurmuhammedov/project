@@ -1,7 +1,7 @@
-import {Loader, Modal} from 'components'
-import {useSearchParams} from 'hooks'
 import {CSSProperties, ReactNode} from 'react'
 import classes from './styles.module.scss'
+import {Loader, Modal} from 'components'
+import {useSearchParams} from 'hooks'
 
 
 interface IUpdateModalProps {

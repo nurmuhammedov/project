@@ -1,9 +1,9 @@
-import {interceptor} from 'libraries'
 import {PropsWithChildren, createContext, useState, useEffect} from 'react'
 import {IUser} from 'interfaces/authentication.interface'
-import {Loader} from 'components'
 import {buildUser} from 'utilities/authentication'
 import {noop} from 'utilities/common'
+import {interceptor} from 'libraries'
+import {Loader} from 'components'
 
 
 interface IAppContext {
@@ -20,7 +20,7 @@ function AppContextProvider({children}: PropsWithChildren) {
 
 	useEffect(() => {
 		interceptor
-			.get('accounts/me/')
+			.get('users/me')
 			.then(res => {
 				setUser(buildUser(res.data))
 			})
