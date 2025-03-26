@@ -9,6 +9,7 @@ import Detail from './Detail'
 import Income from './Income'
 import Search from './Search'
 import Profit from './Profit'
+import Loader from './Loader'
 import Times from './Times'
 import Store from './Store'
 import Cart from './Cart'
@@ -25,6 +26,7 @@ export * from './alert'
 export {
 	SelectIcon,
 	Currency,
+	Loader,
 	Product,
 	Status,
 	Detail,

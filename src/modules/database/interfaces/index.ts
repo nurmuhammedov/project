@@ -2,6 +2,7 @@ export interface ICurrencyDetail {
 	id: number;
 	name: string;
 	code: string;
+	is_main: boolean;
 	created_at: string;
 }
 

@@ -143,6 +143,20 @@ textarea {
   }
 }
 
+
+.disabled {
+  user-select: none;
+
+  .input,
+  textarea {
+    background: var(--light-gray-1);
+
+    &::placeholder {
+      color: var(--light-gray-1);
+    }
+  }
+}
+
 .delete-children {
   position: relative;
   padding-right: 3.5rem !important;

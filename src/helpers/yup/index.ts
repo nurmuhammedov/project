@@ -60,19 +60,6 @@ const isNotFutureDate = date.test('isNotFutureDate', 'Date must be less than tod
 	return inputDate <= today
 })
 
-
-// CLIENTS
-const clientSchema = yup.object().shape({
-	full_name: yup.string().trim().required('This field is required'),
-	code: yup.string().trim().required('This field is required'),
-	phone_number: yup.string().trim().required('This field is required').length(17, 'The information entered is invalid'),
-	address: yup.number().required('This field is required'),
-	currency: yup.number().required('This field is required'),
-	address_detail: yup.string().nullable(),
-	store: yup.number().required('This field is required'),
-	price_type: yup.number().required('This field is required')
-})
-
 // CURRENCIES
 const dailyCurrencySchema = yup.object().shape({
 	summa: yup.string().trim().required('This field is required'),
@@ -154,7 +141,6 @@ const saleItemSchema = yup.object().shape({
 })
 
 export {
-	clientSchema,
 	productSchema,
 	saleItemSchema,
 	purchaseItemSchema,

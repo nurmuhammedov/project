@@ -1,7 +1,9 @@
 import {Column} from 'react-table'
+import {interceptor} from 'libraries'
 import {FIELD} from 'constants/fields'
 import {useForm} from 'react-hook-form'
-import {useEffect, useMemo} from 'react'
+import {useEffect, useMemo, useState} from 'react'
+import {showMessage} from 'utilities/alert'
 import {formatDate} from 'utilities/date'
 import {Plus, Search} from 'assets/icons'
 import {useTranslation} from 'react-i18next'
@@ -21,7 +23,7 @@ import {
 	ReactTable,
 	EditButton,
 	DeleteModal,
-	DeleteButton
+	DeleteButton, Checkbox
 } from 'components'
 import {InferType} from 'yup'
 
@@ -32,6 +34,7 @@ const DEFAULT_FORM_VALUES = {
 }
 
 const Currencies = () => {
+	const [loader, setLoader] = useState(false)
 	const {page, pageSize} = usePagination()
 	const {t} = useTranslation()
 
@@ -82,6 +85,21 @@ const Currencies = () => {
 		resolver: yupResolver(currencySchema)
 	})
 
+	const setBaseCurrency = (id: number) => {
+		setLoader(true)
+		if (!loader) {
+			interceptor
+				.post(`currencies/${id}/set-main`)
+				.then(async () => {
+					showMessage('Successful', 'success')
+					await refetch()
+				})
+				.finally(async () => {
+					setLoader(false)
+				})
+		}
+	}
+
 	const columns: Column<ICurrencyDetail>[] = useMemo(
 		() => [
 			{
@@ -101,6 +119,21 @@ const Currencies = () => {
 				accessor: 'code'
 			},
 			{
+				Header: t('Base currency'),
+				accessor: row => <div>
+					<Checkbox
+						id={row.id as unknown as string}
+						checked={row?.is_main}
+						disabled={row?.is_main || loader}
+						onChange={e => {
+							if (e.target.checked && !loader) {
+								setBaseCurrency(row.id)
+							}
+						}}
+					/>
+				</div>
+			},
+			{
 				Header: t('Date added'),
 				accessor: row => formatDate(row.created_at)
 			},
@@ -114,7 +147,7 @@ const Currencies = () => {
 				)
 			}
 		],
-		[page, pageSize]
+		[page, pageSize, loader]
 	)
 
 	useEffect(() => {

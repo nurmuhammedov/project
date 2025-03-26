@@ -43,9 +43,13 @@
           line-height: 150%;
         }
 
-        &:hover {
+        &:nth-child(even) {
           background: var(--light-gray-1);
         }
+
+        //&:hover {
+        //  background: var(--light-gray-1);
+        //}
       }
     }
   }

@@ -17,6 +17,7 @@ const Index = forwardRef<HTMLInputElement | HTMLTextAreaElement, IField>(
 			radius = false,
 			handleDelete,
 			handleIcon,
+			disabled = false,
 			children,
 			label,
 			error,
@@ -33,6 +34,7 @@ const Index = forwardRef<HTMLInputElement | HTMLTextAreaElement, IField>(
 				[styles.error]: error,
 				[styles.icon]: icon,
 				[styles.delete]: handleDelete,
+				[styles.disabled]: disabled,
 				[styles['delete-children']]: !!children && handleDelete,
 				[styles.radius]: radius
 			})}>
@@ -57,6 +59,7 @@ const Index = forwardRef<HTMLInputElement | HTMLTextAreaElement, IField>(
 							<textarea
 								rows={5}
 								{...props}
+								disabled={disabled}
 								data-title="input"
 								ref={ref as React.Ref<HTMLTextAreaElement>}
 								id={id.toString()}
@@ -76,6 +79,7 @@ const Index = forwardRef<HTMLInputElement | HTMLTextAreaElement, IField>(
 								}
 								<input
 									{...props}
+									disabled={disabled}
 									ref={ref as React.Ref<HTMLInputElement>}
 									id={id.toString()}
 									type={type}

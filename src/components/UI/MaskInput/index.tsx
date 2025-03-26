@@ -29,6 +29,7 @@ const Index = forwardRef<HTMLInputElement, IProperties>(({
 	                                                         onBlur
                                                          }, ref) => {
 	const {t} = useTranslation()
+	// const inputRef = useRef(ref)
 
 	return (
 		<Input
@@ -36,6 +37,7 @@ const Index = forwardRef<HTMLInputElement, IProperties>(({
 			type="text"
 			label={label}
 			error={error}
+			// ref={inputRef}
 			disabled={disabled}
 		>
 			<InputMask
@@ -48,6 +50,7 @@ const Index = forwardRef<HTMLInputElement, IProperties>(({
 				mask={mask}
 				placeholder={t(placeholder)}
 				inputRef={ref}
+				// ref={inputRef}
 				className={classes.input}
 			/>
 		</Input>

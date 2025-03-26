@@ -24,16 +24,26 @@ import {
 	useSearchParams,
 	useUpdate
 } from 'hooks'
-import {IClientItemDetail} from 'interfaces/clients.interface'
+import {ISelectOption} from 'interfaces/form.interface'
+import {ICustomerDetail} from 'modules/clients/interfaces'
+import {customerSchema} from 'modules/clients/helpers/yup'
 import {useEffect, useMemo} from 'react'
 import {Controller, useForm} from 'react-hook-form'
 import {useTranslation} from 'react-i18next'
 import {Column} from 'react-table'
-import {clientSchema} from 'helpers/yup'
 import {getSelectValue} from 'utilities/common'
-import {getSelectOptions} from 'utilities/select'
-import {IIDName} from 'interfaces/configuration.interface'
-import {formatCurrencyData} from 'utilities/date'
+import {InferType} from 'yup'
+
+
+const DEFAULT_FORM_VALUES = {
+	name: '',
+	phone_number: '',
+	region: undefined,
+	address: '',
+	currency: undefined,
+	store: undefined,
+	price_type: undefined
+}
 
 
 const Index = () => {
@@ -44,12 +54,22 @@ const Index = () => {
 		removeParams,
 		paramsObject: {updateId = undefined, modal = undefined}
 	} = useSearchParams()
-	const {data: currencies = []} = useData<IIDName[]>('currency/select/', modal === 'client' || modal === 'edit')
-	const {data: stores = []} = useData<IIDName[]>('stores/select/', modal === 'client' || modal === 'edit')
-	const {data: priceTypes = []} = useData<IIDName[]>('/organization/price-type/select/', modal === 'client' || modal === 'edit')
+	const {data: currencies = []} = useData<ISelectOption[]>('currencies/select', modal === 'customer' || modal === 'edit')
+	const {data: stores = []} = useData<ISelectOption[]>('stores/select', modal === 'customer' || modal === 'edit')
+	const {data: priceTypes = []} = useData<ISelectOption[]>('price-types/select', modal === 'customer' || modal === 'edit')
 
-	const {data, totalPages, isPending: isLoading, refetch} = usePaginatedData<IClientItemDetail[]>(
-		`customer/`,
+
+	const {mutateAsync: addCustomer, isPending: isAdding} = useAdd('customers')
+	const {mutateAsync: updateCustomer, isPending: isUpdating} = useUpdate('customers/', updateId, 'patch')
+	const {
+		data: detail,
+		isPending: isDetailLoading,
+		isFetching
+	} = useDetail<ICustomerDetail>('customers/', updateId)
+
+
+	const {data, totalPages, isPending: isLoading, refetch} = usePaginatedData<ICustomerDetail[]>(
+		`customers`,
 		{page: page, page_size: pageSize}
 	)
 
@@ -59,76 +79,11 @@ const Index = () => {
 		reset: resetAdd,
 		control: controlAdd,
 		formState: {errors: addErrors}
-	} = useForm({
+	} = useForm<InferType<typeof customerSchema>>({
 		mode: 'onTouched',
-		defaultValues: {
-			full_name: '',
-			code: '',
-			phone_number: '',
-			address_detail: '',
-			address: undefined,
-			currency: undefined,
-			store: undefined,
-			price_type: undefined
-		},
-		resolver: yupResolver(clientSchema)
+		defaultValues: DEFAULT_FORM_VALUES,
+		resolver: yupResolver(customerSchema)
 	})
-
-	const columns: Column<IClientItemDetail>[] = useMemo(
-		() => [
-			{
-				Header: t('№'),
-				accessor: (_: IClientItemDetail, index: number) => (page - 1) * pageSize + (index + 1),
-				style: {
-					width: '3rem',
-					textAlign: 'center'
-				}
-			},
-			{
-				Header: t('Full name'),
-				accessor: (row: IClientItemDetail) => row.full_name
-			},
-			{
-				Header: t('Client code'),
-				accessor: (row: IClientItemDetail) => row.code
-			},
-			{
-				Header: t('Phone number'),
-				accessor: (row: IClientItemDetail) => row.phone_number
-			},
-			{
-				Header: t('Region'),
-				accessor: (row: IClientItemDetail) => t(regionsOptions?.find(i => i.value == row.address)?.label?.toString() ?? '')
-			},
-			{
-				Header: t('Balance'),
-				accessor: (row: IClientItemDetail) =>
-					<div dangerouslySetInnerHTML={{__html: formatCurrencyData(row?.customer_balance)}}></div>
-			},
-			{
-				Header: t('Price type'),
-				accessor: (row: IClientItemDetail) => <Badge title={row.price_type.name}/>
-			},
-			{
-				Header: t('Currency'),
-				accessor: (row: IClientItemDetail) => <Badge title={row.currency.name}/>
-			},
-			{
-				Header: t('Store'),
-				accessor: (row: IClientItemDetail) => row.store.name
-			},
-			{
-				Header: t('Actions'),
-				accessor: (row: IClientItemDetail) => (
-					<div className="flex items-start gap-lg">
-						<EditButton id={row.id}/>
-						<DetailButton id={row.id}/>
-					</div>
-				)
-			}
-		],
-		[t, page, pageSize]
-	)
 
 	const {
 		handleSubmit: handleEditSubmit,
@@ -136,38 +91,64 @@ const Index = () => {
 		reset: resetEdit,
 		control: controlEdit,
 		formState: {errors: editErrors}
-	} = useForm({
+	} = useForm<InferType<typeof customerSchema>>({
 		mode: 'onTouched',
-		defaultValues: {
-			full_name: '',
-			code: '',
-			phone_number: '',
-			address_detail: '',
-			address: undefined,
-			currency: undefined,
-			store: undefined,
-			price_type: undefined
-		},
-		resolver: yupResolver(clientSchema)
+		defaultValues: DEFAULT_FORM_VALUES,
+		resolver: yupResolver(customerSchema)
 	})
 
-	const {mutateAsync, isPending: isAdding} = useAdd('customer/create/')
-	const {mutateAsync: update, isPending: isUpdating} = useUpdate('customer/update/', updateId)
-	const {
-		data: detail,
-		isPending: isDetailLoading,
-		isFetching
-	} = useDetail<IClientItemDetail>('customer/detail/', updateId)
+	const columns: Column<ICustomerDetail>[] = useMemo(
+		() => [
+			{
+				Header: t('№'),
+				accessor: (_: ICustomerDetail, index: number) => (page - 1) * pageSize + (index + 1),
+				style: {
+					width: '3rem',
+					textAlign: 'center'
+				}
+			},
+			{
+				Header: t('Full name'),
+				accessor: row => row.name
+			},
+			{
+				Header: t('Client code'),
+				accessor: row => row.code
+			},
+			{
+				Header: t('Phone number'),
+				accessor: row => row.phone_number
+			},
+			{
+				Header: t('Price type'),
+				accessor: row => <Badge title={row.price_type?.name}/>
+			},
+			{
+				Header: t('Currency'),
+				accessor: row => <Badge title={row.currency?.name}/>
+			},
+			{
+				Header: t('Actions'),
+				accessor: row => (
+					<div className="flex items-start gap-lg">
+						<EditButton id={row.id}/>
+						<DetailButton id={row.id}/>
+					</div>
+				)
+			}
+		],
+		[page, pageSize]
+	)
+
 
 	useEffect(() => {
 		if (detail && !isDetailLoading) {
 			resetEdit({
-				full_name: detail.full_name,
-				code: detail.code,
+				name: detail.name,
 				phone_number: detail.phone_number,
 				address: detail.address,
 				currency: detail.currency?.id as number,
-				address_detail: detail.address_detail,
+				region: detail.region,
 				store: detail.store?.id as number,
 				price_type: detail.price_type?.id as number
 			})
@@ -180,7 +161,7 @@ const Index = () => {
 			<Card screen={true} className="span-9 gap-2xl">
 				<div className="flex justify-between align-center">
 					<Input id="search" icon={<Search/>} placeholder="Search" radius={true} style={{width: 400}}/>
-					<Button icon={<Plus/>} onClick={() => addParams({modal: 'client'})}>
+					<Button icon={<Plus/>} onClick={() => addParams({modal: 'customer'})}>
 						Add a new client
 					</Button>
 				</div>
@@ -189,10 +170,10 @@ const Index = () => {
 				<Pagination totalPages={totalPages}/>
 			</Card>
 
-			<Modal title="Add a new client" id="client" style={{height: '60rem', width: '60rem'}}>
+			<Modal title="Add a new client" id="customer" style={{height: '40rem', width: '60rem'}}>
 				<Form
 					onSubmit={handleAddSubmit((data) =>
-						mutateAsync(data).then(async () => {
+						addCustomer(data).then(async () => {
 							resetAdd()
 							removeParams('modal')
 							await refetch()
@@ -201,126 +182,115 @@ const Index = () => {
 				>
 
 					<div className="grid gap-lg">
-						<div className="span-12">
-							<Input
-								id="full_name"
-								label="Full name"
-								error={addErrors.full_name?.message}
-								{...registerAdd('full_name')}
-							/>
+						<div className="span-12 grid gap-lg">
+							<div className="span-4">
+								<Input
+									id="name"
+									label="Full name"
+									error={addErrors.name?.message}
+									{...registerAdd('name')}
+								/>
+							</div>
+							<div className="span-4">
+								<Controller
+									name="phone_number"
+									control={controlAdd}
+									render={({field}) => (
+										<MaskInput
+											id="phone_number"
+											label="Phone number"
+											error={addErrors.phone_number?.message}
+											{...field}
+										/>
+									)}
+								/>
+							</div>
+							<div className="span-4">
+								<Controller
+									name="region"
+									control={controlAdd}
+									render={({field: {value, ref, onChange, onBlur}}) => (
+										<Select
+											ref={ref}
+											id="region"
+											label="Region"
+											options={regionsOptions}
+											onBlur={onBlur}
+											error={addErrors.region?.message}
+											value={getSelectValue(regionsOptions, value)}
+											defaultValue={getSelectValue(regionsOptions, value)}
+											handleOnChange={(e) => onChange(e as string)}
+										/>
+									)}
+								/>
+							</div>
 						</div>
 
-						<div className="span-6">
-							<Input
-								id="code"
-								label="Client code"
-								error={addErrors.code?.message}
-								{...registerAdd('code')}
-							/>
-						</div>
-
-						<div className="span-6">
-							<Controller
-								name="phone_number"
-								control={controlAdd}
-								render={({field}) => (
-									<MaskInput
-										id="phone_number"
-										label="Phone number"
-										error={addErrors.phone_number?.message}
-										{...field}
-									/>
-								)}
-							/>
-						</div>
-
-						<div className="span-6">
-							<Controller
-								name="address"
-								control={controlAdd}
-								render={({field: {value, ref, onChange, onBlur}}) => (
-									<Select
-										ref={ref}
-										id="address"
-										label="Region"
-										options={regionsOptions}
-										onBlur={onBlur}
-										error={addErrors.address?.message}
-										value={getSelectValue(regionsOptions, value)}
-										defaultValue={getSelectValue(regionsOptions, value)}
-										handleOnChange={(e) => onChange(e as string)}
-									/>
-								)}
-							/>
-						</div>
-
-						<div className="span-6">
-							<Controller
-								name="store"
-								control={controlAdd}
-								render={({field: {value, ref, onChange, onBlur}}) => (
-									<Select
-										ref={ref}
-										id="store"
-										label="Store"
-										options={getSelectOptions(stores)}
-										onBlur={onBlur}
-										error={addErrors.store?.message}
-										value={getSelectValue(getSelectOptions(stores), value)}
-										defaultValue={getSelectValue(getSelectOptions(stores), value)}
-										handleOnChange={(e) => onChange(e as string)}
-									/>
-								)}
-							/>
-						</div>
-
-						<div className="span-6">
-							<Controller
-								name="currency"
-								control={controlAdd}
-								render={({field: {value, ref, onChange, onBlur}}) => (
-									<Select
-										ref={ref}
-										top={true}
-										id="currency"
-										label="Currency"
-										options={getSelectOptions(currencies)}
-										onBlur={onBlur}
-										error={addErrors.currency?.message}
-										value={getSelectValue(getSelectOptions(currencies), value)}
-										defaultValue={getSelectValue(getSelectOptions(currencies), value)}
-										handleOnChange={(e) => onChange(e as string)}
-									/>
-								)}
-							/>
-						</div>
-
-						<div className="span-6">
-							<Controller
-								name="price_type"
-								control={controlAdd}
-								render={({field: {value, ref, onChange, onBlur}}) => (
-									<Select
-										ref={ref}
-										top={true}
-										id="price_type"
-										label="Price type"
-										options={getSelectOptions(priceTypes)}
-										onBlur={onBlur}
-										error={addErrors.price_type?.message}
-										value={getSelectValue(getSelectOptions(priceTypes), value)}
-										defaultValue={getSelectValue(getSelectOptions(priceTypes), value)}
-										handleOnChange={(e) => onChange(e as string)}
-									/>
-								)}
-							/>
+						<div className="span-12 grid gap-lg">
+							<div className="span-4">
+								<Controller
+									name="store"
+									control={controlAdd}
+									render={({field: {value, ref, onChange, onBlur}}) => (
+										<Select
+											ref={ref}
+											id="store"
+											label="Store"
+											options={stores}
+											onBlur={onBlur}
+											error={addErrors.store?.message}
+											value={getSelectValue(stores, value)}
+											defaultValue={getSelectValue(stores, value)}
+											handleOnChange={(e) => onChange(e as string)}
+										/>
+									)}
+								/>
+							</div>
+							<div className="span-4">
+								<Controller
+									name="currency"
+									control={controlAdd}
+									render={({field: {value, ref, onChange, onBlur}}) => (
+										<Select
+											ref={ref}
+											id="currency"
+											label="Currency"
+											options={currencies}
+											onBlur={onBlur}
+											error={addErrors.currency?.message}
+											value={getSelectValue(currencies, value)}
+											defaultValue={getSelectValue(currencies, value)}
+											handleOnChange={(e) => onChange(e as string)}
+										/>
+									)}
+								/>
+							</div>
+							<div className="span-4">
+								<Controller
+									name="price_type"
+									control={controlAdd}
+									render={({field: {value, ref, onChange, onBlur}}) => (
+										<Select
+											ref={ref}
+											id="price_type"
+											label="Price type"
+											options={priceTypes}
+											onBlur={onBlur}
+											error={addErrors.price_type?.message}
+											value={getSelectValue(priceTypes, value)}
+											defaultValue={getSelectValue(priceTypes, value)}
+											handleOnChange={(e) => onChange(e as string)}
+										/>
+									)}
+								/>
+							</div>
 						</div>
 						<div className="span-12">
 							<Input
-								id="address_detail"
+								id="address"
 								label="Address"
-								error={addErrors.address_detail?.message}
-								{...registerAdd('address_detail')}
+								error={addErrors.address?.message}
+								{...registerAdd('address')}
 							/>
 						</div>
 					</div>
@@ -331,137 +301,143 @@ const Index = () => {
 				</Form>
 			</Modal>
 
-			<EditModal isLoading={isFetching || !detail} style={{height: '60rem', width: '60rem'}}>
+			<EditModal isLoading={isFetching || !detail} style={{height: '40rem', width: '60rem'}}>
 				<Form
-					onSubmit={handleEditSubmit((data) =>
-						update(data).then(async () => {
-							resetEdit()
-							removeParams('modal', 'updateId')
-							await refetch()
-						})
+					onSubmit={handleEditSubmit((data) => {
+							if (detail?.is_employee) {
+								// eslint-disable-next-line @typescript-eslint/no-unused-vars
+								const {name, phone_number, store, ...rest} = data
+								updateCustomer(rest).then(async () => {
+									resetEdit()
+									removeParams('modal', 'updateId')
+									await refetch()
+								})
+							} else {
+								updateCustomer(data).then(async () => {
+									resetEdit()
+									removeParams('modal', 'updateId')
+									await refetch()
+								})
+							}
+						}
 					)}
 				>
-					<Input
-						id="full_name"
-						label="Full name"
-						error={editErrors.full_name?.message}
-						{...registerEdit('full_name')}
-					/>
-
-					<Input
-						id="code"
-						label="Client code"
-						error={editErrors.code?.message}
-						{...registerEdit('code')}
-					/>
-
-					<Controller
-						name="phone_number"
-						control={controlEdit}
-						render={({field}) => (
-							<MaskInput
-								id="phone_number"
-								label="Phone number"
-								error={editErrors.phone_number?.message}
-								{...field}
-							/>
-						)}
-					/>
-
 					<div className="grid gap-lg">
-
-						<div className="span-6">
-							<Controller
-								name="address"
-								control={controlEdit}
-								render={({field: {value, ref, onChange, onBlur}}) => (
-									<Select
-										ref={ref}
-										top={true}
-										id="address"
-										label="Region"
-										options={regionsOptions}
-										onBlur={onBlur}
-										error={editErrors.address?.message}
-										value={getSelectValue(regionsOptions, value)}
-										defaultValue={getSelectValue(regionsOptions, value)}
-										handleOnChange={(e) => onChange(e as string)}
-									/>
-								)}
-							/>
+						<div className="span-12 grid gap-lg">
+							<div className="span-4">
+								<Input
+									id="name"
+									label="Full name"
+									disabled={!!detail?.is_employee}
+									error={editErrors.name?.message}
+									{...registerEdit('name')}
+								/>
+							</div>
+							<div className="span-4">
+								<Controller
+									name="phone_number"
+									control={controlEdit}
+									render={({field}) => (
+										<MaskInput
+											id="phone_number"
+											label="Phone number"
+											disabled={!!detail?.is_employee}
+											error={editErrors.phone_number?.message}
+											{...field}
+										/>
+									)}
+								/>
+							</div>
+							<div className="span-4">
+								<Controller
+									name="region"
+									control={controlEdit}
+									render={({field: {value, ref, onChange, onBlur}}) => (
+										<Select
+											ref={ref}
+											id="region"
+											label="Region"
+											options={regionsOptions}
+											onBlur={onBlur}
+											error={editErrors.region?.message}
+											value={getSelectValue(regionsOptions, value)}
+											defaultValue={getSelectValue(regionsOptions, value)}
+											handleOnChange={(e) => onChange(e as string)}
+										/>
+									)}
+								/>
+							</div>
 						</div>
 
-						<div className="span-6">
+						<div className="span-12 grid gap-lg">
+							<div className="span-4">
+								<Controller
+									name="store"
+									control={controlEdit}
+									render={({field: {value, ref, onChange, onBlur}}) => (
+										<Select
+											ref={ref}
+											id="store"
+											label="Store"
+											disabled={!!detail?.is_employee}
+											options={stores}
+											onBlur={onBlur}
+											error={editErrors.store?.message}
+											value={getSelectValue(stores, value)}
+											defaultValue={getSelectValue(stores, value)}
+											handleOnChange={(e) => onChange(e as string)}
+										/>
+									)}
+								/>
+							</div>
+							<div className="span-4">
+								<Controller
+									name="currency"
+									control={controlEdit}
+									render={({field: {value, ref, onChange, onBlur}}) => (
+										<Select
+											ref={ref}
+											id="currency"
+											label="Currency"
+											options={currencies}
+											onBlur={onBlur}
+											error={editErrors.currency?.message}
+											value={getSelectValue(currencies, value)}
+											defaultValue={getSelectValue(currencies, value)}
+											handleOnChange={(e) => onChange(e as string)}
+										/>
+									)}
+								/>
+							</div>
+							<div className="span-4">
+								<Controller
+									name="price_type"
+									control={controlEdit}
+									render={({field: {value, ref, onChange, onBlur}}) => (
+										<Select
+											ref={ref}
+											id="price_type"
+											label="Price type"
+											options={priceTypes}
+											onBlur={onBlur}
+											error={editErrors.price_type?.message}
+											value={getSelectValue(priceTypes, value)}
+											defaultValue={getSelectValue(priceTypes, value)}
+											handleOnChange={(e) => onChange(e as string)}
+										/>
+									)}
+								/>
+							</div>
+						</div>
+						<div className="span-12">
 							<Input
-								id="address_detail"
+								id="address"
 								label="Address"
-								error={editErrors.address_detail?.message}
-								{...registerEdit('address_detail')}
+								error={editErrors.address?.message}
+								{...registerEdit('address')}
 							/>
 						</div>
-
-						<div className="span-6">
-							<Controller
-								name="currency"
-								control={controlEdit}
-								render={({field: {value, ref, onChange, onBlur}}) => (
-									<Select
-										ref={ref}
-										top={true}
-										id="currency"
-										label="Currency"
-										options={getSelectOptions(currencies)}
-										onBlur={onBlur}
-										error={editErrors.currency?.message}
-										value={getSelectValue(getSelectOptions(currencies), value)}
-										defaultValue={getSelectValue(getSelectOptions(currencies), value)}
-										handleOnChange={(e) => onChange(e as string)}
-									/>
-								)}
-							/>
-						</div>
-
-						<div className="span-6">
-							<Controller
-								name="price_type"
-								control={controlEdit}
-								render={({field: {value, ref, onChange, onBlur}}) => (
-									<Select
-										ref={ref}
-										top={true}
-										id="price_type"
-										label="Price type"
-										options={getSelectOptions(priceTypes)}
-										onBlur={onBlur}
-										error={editErrors.price_type?.message}
-										value={getSelectValue(getSelectOptions(priceTypes), value)}
-										defaultValue={getSelectValue(getSelectOptions(priceTypes), value)}
-										handleOnChange={(e) => onChange(e as string)}
-									/>
-								)}
-							/>
-						</div>
-
 					</div>
-
-					<Controller
-						name="store"
-						control={controlEdit}
-						render={({field: {value, ref, onChange, onBlur}}) => (
-							<Select
-								ref={ref}
-								top={true}
-								id="store"
-								label="Store"
-								options={getSelectOptions(stores)}
-								onBlur={onBlur}
-								error={editErrors.store?.message}
-								value={getSelectValue(getSelectOptions(stores), value)}
-								defaultValue={getSelectValue(getSelectOptions(stores), value)}
-								handleOnChange={(e) => onChange(e as string)}
-							/>
-						)}
-					/>
 
 					<Button style={{marginTop: 'auto'}} type={FIELD.SUBMIT} disabled={isUpdating}>
 						Edit

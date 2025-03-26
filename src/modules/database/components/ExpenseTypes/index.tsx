@@ -141,7 +141,7 @@ const ExpenseTypes = () => {
 				</div>
 			</Card>
 
-			<Modal title="Add new Expense" id="expenses" style={{height: '20rem'}}>
+			<Modal title="Add new" id="expenses" style={{height: '20rem'}}>
 				<Form
 					onSubmit={handleAddSubmit((formData: InferType<typeof expenseTypeSchema>) =>
 						addExpenseType(formData).then(async () => {

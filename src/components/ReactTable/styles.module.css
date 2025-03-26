@@ -34,7 +34,7 @@
   font-weight: 500;
   line-height: 150%;
 }
-.root table tbody tr:hover {
+.root table tbody tr:nth-child(even) {
   background: var(--light-gray-1);
 }
 

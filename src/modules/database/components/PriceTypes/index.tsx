@@ -141,7 +141,7 @@ const PriceTypes = () => {
 				</div>
 			</Card>
 
-			<Modal title="Add new Price Type" id="price-types" style={{height: '25rem'}}>
+			<Modal title="Add new" id="price-types" style={{height: '25rem'}}>
 				<Form
 					onSubmit={handleAddSubmit((formData: InferType<typeof priceTypeSchema>) =>
 						addPriceType(formData).then(async () => {

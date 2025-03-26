@@ -11,11 +11,11 @@ import CardTitle from './CardTitle'
 import PageTitle from './PageTitle'
 import AlertItem from './AlertItem'
 import EditModal from './EditModal'
-import Chechbox from './Chechbox'
+import Checkbox  from './Checkbox'
 import PageInfo from './PageInfo'
 import CardTab from './CardTab'
 import Router from './Router'
-import Loader from './Loader'
+import Loader from './LoaderBlock'
 import Title from './Title'
 import Alert from './Alert'
 import Badge from './Badge'
@@ -40,7 +40,7 @@ export {
 	PageTitle,
 	CardTitle,
 	AlertItem,
-	Chechbox,
+	Checkbox ,
 	EditModal,
 	PageInfo,
 	CardTab,

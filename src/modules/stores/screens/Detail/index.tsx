@@ -1,28 +1,27 @@
-import {Box, Cart, Currency, Status, Store} from 'assets/icons'
-import {Button, Loader, PageInfo, HorizontalTab} from 'components'
-import {BUTTON_THEME} from 'constants/fields'
-import {useDetail, useSearchParams} from 'hooks'
-import {ISelectOption} from 'interfaces/form.interface'
-import {storeTypes} from 'modules/stores/helpers/options'
 import SalesHistory from 'modules/stores/components/SalesHistory'
-import Warehouse from 'modules/stores/components/Warehouse'
 import Employees from 'modules/stores/components/Employees'
+import {Loader, PageInfo, HorizontalTab} from 'components'
+import Warehouse from 'modules/stores/components/Warehouse'
+import {storeTypes} from 'modules/stores/helpers/options'
+import {ISelectOption} from 'interfaces/form.interface'
 import {IStoreDetail} from 'modules/stores/interfaces'
-import {useParams} from 'react-router-dom'
+import {useDetail, useSearchParams} from 'hooks'
 import {useTranslation} from 'react-i18next'
+import {useParams} from 'react-router-dom'
+import {Status, Store} from 'assets/icons'
 
 
 const tabOptions: ISelectOption[] = [
-	{
-		label: 'Sales history',
-		value: 'salesHistory',
-		icon: <Cart/>
-	},
-	{
-		label: 'Warehouse',
-		value: 'warehouse',
-		icon: <Box/>
-	},
+	// {
+	// 	label: 'Sales history',
+	// 	value: 'salesHistory',
+	// 	icon: <Cart/>
+	// },
+	// {
+	// 	label: 'Warehouse',
+	// 	value: 'warehouse',
+	// 	icon: <Box/>
+	// },
 	{
 		label: 'Employees',
 		value: 'employees',
@@ -49,14 +48,6 @@ const Index = () => {
 					subTitle={t(storeTypes.find(i => i.value == detail?.exchange_type)?.label?.toString() ?? '')}
 					icon={<Store/>}
 				/>
-				<div className="flex align-center gap-lg">
-					<Button
-						theme={BUTTON_THEME.DANGER_OUTLINE}
-						icon={<Currency/>}
-					>
-						Currency exchange
-					</Button>
-				</div>
 			</div>
 
 			<HorizontalTab

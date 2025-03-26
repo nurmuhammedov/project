@@ -7,11 +7,11 @@ interface IProperties {
 }
 
 const Index: FC<IProperties> = ({title = ''}) => {
-	return (
+	return title ? (
 		<div className={styles.root}>
 			{title ?? null}
 		</div>
-	)
+	) : null
 }
 
 export default Index

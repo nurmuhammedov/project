@@ -12,39 +12,39 @@ const paginationOptions: ISelectOption[] = [
 const regionsOptions: ISelectOption[] = [
 	{
 		label: 'Fergana region',
-		value: 6
+		value: 12
 	},
 	{
 		label: 'Tashkent region',
-		value: 2
+		value: 11
 	},
 	{
 		label: 'Namangan region',
-		value: 7
+		value: 6
 	},
 	{
 		label: 'Andijan region',
-		value: 8
+		value: 1
 	},
 	{
 		label: 'Sirdarya region',
-		value: 3
-	},
-	{
-		label: 'Jizzakh region',
-		value: 4
-	},
-	{
-		label: 'Samarkand region',
-		value: 5
-	},
-	{
-		label: 'Kashkadarya region',
 		value: 9
 	},
 	{
+		label: 'Jizzakh region',
+		value: 3
+	},
+	{
+		label: 'Samarkand region',
+		value: 7
+	},
+	{
+		label: 'Kashkadarya region',
+		value: 4
+	},
+	{
 		label: 'Surkhandarya region',
-		value: 10
+		value: 8
 	},
 	{
 		label: 'Republic of Karakalpakstan',
@@ -52,7 +52,7 @@ const regionsOptions: ISelectOption[] = [
 	},
 	{
 		label: 'Navoi region',
-		value: 12
+		value: 5
 	},
 	{
 		label: 'Khorezm region',
@@ -60,11 +60,11 @@ const regionsOptions: ISelectOption[] = [
 	},
 	{
 		label: 'Bukhara region',
-		value: 11
+		value: 2
 	},
 	{
 		label: 'Tashkent city',
-		value: 1
+		value: 10
 	}
 ]
 

@@ -40,7 +40,7 @@ const Index = <T extends object & { id: string | number }>({
 	                                                           isLoading,
 	                                                           className,
 	                                                           screen = true,
-	                                                           spacing = true,
+	                                                           spacing = false,
 	                                                           handleRow
                                                            }: ITableOptions<T>) => {
 	const {
@@ -93,13 +93,13 @@ const Index = <T extends object & { id: string | number }>({
 						</tr>
 					) : data && data.length ? (
 						<>
-						{
-							spacing && (
-								<tr className={classes.spacing}>
-									<td colSpan={columns.length}></td>
-								</tr>
-							)
-						}
+							{
+								spacing && (
+									<tr className={classes.spacing}>
+										<td colSpan={columns.length}></td>
+									</tr>
+								)
+							}
 							{
 								rows.map((row, index) => {
 									prepareRow(row)
