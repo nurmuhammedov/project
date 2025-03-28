@@ -185,7 +185,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 															integer={item?.product?.measure?.value_type == 'int'}
 															measure={item?.product?.measure?.name}
 															expiry={item?.expiry_date || ''}
-															currency={currencies?.find(i => i?.id == watch('currency'))?.label}
+															currency={currencies?.find(i => i?.id == watch('currency'))?.code}
 														/>
 													</div>
 												))
@@ -212,7 +212,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 																	integer={item?.product?.measure?.value_type == 'int'}
 																	measure={item?.product?.measure?.name}
 																	expiry={item?.expiry_date || ''}
-																	currency={currencies?.find(i => i?.id == watch('currency'))?.label}
+																	currency={currencies?.find(i => i?.id == watch('currency'))?.code}
 																/>
 															</div>
 														))
@@ -370,16 +370,16 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 												<p>{t('Products')}:</p>
 												{
 													retrieve ?
-														<span>{decimalToPrice(sumDecimals(purchase?.items?.map(i => i?.total_price ?? '0.00') ?? []))} {purchase?.currency?.label || ''}</span> :
-														<span>{decimalToPrice(sumDecimals(temporaryList?.map(i => i?.total_price ?? '0.00') ?? []))} {currencies?.find(i => i?.id == watch('currency'))?.label ?? ''}</span>
+														<span>{decimalToPrice(sumDecimals(purchase?.items?.map(i => i?.total_price ?? '0.00') ?? []))} {purchase?.currency?.code || ''}</span> :
+														<span>{decimalToPrice(sumDecimals(temporaryList?.map(i => i?.total_price ?? '0.00') ?? []))} {currencies?.find(i => i?.id == watch('currency'))?.code ?? ''}</span>
 												}
 											</div>
 											<div className={styles.price}>
 												<p>{t('Expense quantity')}:</p>
 												{
 													retrieve ?
-														<span>{decimalToPrice(purchase?.cost_amount || '0')} {purchase?.cost_currency?.label || ''}</span> :
-														<span>{decimalToPrice(watch('cost_amount') || '0')} {currencies?.find(i => i?.id == watch('cost_currency'))?.label ?? ''}</span>
+														<span>{decimalToPrice(purchase?.cost_amount || '0')} {purchase?.cost_currency?.code || ''}</span> :
+														<span>{decimalToPrice(watch('cost_amount') || '0')} {currencies?.find(i => i?.id == watch('cost_currency'))?.code ?? ''}</span>
 												}
 											</div>
 										</div>

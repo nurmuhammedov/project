@@ -175,7 +175,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 															price={item?.total_price}
 															measure={item?.product?.measure?.name}
 															expiry={item?.expiry_date || ''}
-															currency={currencies?.find(i => i?.id == watch('currency'))?.label}
+															currency={currencies?.find(i => i?.id == watch('currency'))?.code}
 														/>
 													</div>
 												))
@@ -202,7 +202,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 																	integer={item?.product?.measure?.value_type == 'int'}
 																	measure={item?.product?.measure?.name}
 																	expiry={item?.expiry_date || ''}
-																	currency={currencies?.find(i => i?.id == watch('currency'))?.label}
+																	currency={currencies?.find(i => i?.id == watch('currency'))?.code}
 																/>
 															</div>
 														))
@@ -360,8 +360,8 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 												<p>{t('Total')}:</p>
 												{
 													retrieve ?
-														<span>{decimalToPrice(sumDecimals(sale?.items?.map(i => i?.total_price ?? '0.00') ?? []))} {sale?.currency?.label || ''}</span> :
-														<span>{decimalToPrice(sumDecimals(temporaryList?.map(i => i?.total_price ?? '0.00') ?? []))} {currencies?.find(i => i?.id == watch('currency'))?.label ?? ''}</span>
+														<span>{decimalToPrice(sumDecimals(sale?.items?.map(i => i?.total_price ?? '0.00') ?? []))} {sale?.currency?.code || ''}</span> :
+														<span>{decimalToPrice(sumDecimals(temporaryList?.map(i => i?.total_price ?? '0.00') ?? []))} {currencies?.find(i => i?.id == watch('currency'))?.code ?? ''}</span>
 												}
 											</div>
 										</div>

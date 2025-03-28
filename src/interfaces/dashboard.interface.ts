@@ -9,13 +9,6 @@ interface ICashierItem {
 	created_at: string;
 }
 
-interface IDailyCurrency {
-	id: number;
-	summa: string;
-	currency: IIDName;
-	datetime: string;
-	previous: number;
-}
 
 
 interface ICurrencyExchangeDetail {
@@ -33,6 +26,5 @@ interface ICurrencyExchangeDetail {
 
 export type {
 	ICashierItem,
-	IDailyCurrency,
 	ICurrencyExchangeDetail
 }

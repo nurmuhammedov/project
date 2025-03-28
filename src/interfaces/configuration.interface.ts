@@ -23,7 +23,7 @@ interface IListResponse<T> {
 interface IIDName {
 	readonly id: number;
 	name: string;
-	label: string;
+	code: string;
 }
 
 export type {

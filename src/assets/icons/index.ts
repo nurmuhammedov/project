@@ -1,5 +1,6 @@
 import SelectIcon from './SelectIcon'
 import Currency from './Currency'
+import Exchange from './Exchange'
 import Product from './Product'
 import Delete from './Delete'
 import Status from './Status'
@@ -26,6 +27,7 @@ export * from './alert'
 export {
 	SelectIcon,
 	Currency,
+	Exchange,
 	Loader,
 	Product,
 	Status,

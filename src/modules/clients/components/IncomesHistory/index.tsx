@@ -39,11 +39,11 @@ const Index = () => {
 				},
 				{
 					Header: t('Total amount'),
-					accessor: (row: IPurchaseListItem) => `${decimalToPrice(row.total_price ?? '0')} ${row.currency?.label ?? ''}`
+					accessor: (row: IPurchaseListItem) => `${decimalToPrice(row.total_price ?? '0')} ${row.currency?.code ?? ''}`
 				},
 				{
 					Header: t('Expense'),
-					accessor: (row: IPurchaseListItem) => `${decimalToPrice(row.cost_amount ?? '0')} ${row.cost_currency?.label ?? ''}`
+					accessor: (row: IPurchaseListItem) => `${decimalToPrice(row.cost_amount ?? '0')} ${row.cost_currency?.code ?? ''}`
 				},
 				{
 					Header: t('Price type'),

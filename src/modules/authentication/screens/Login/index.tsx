@@ -22,7 +22,7 @@ const Index = () => {
 		mode: 'onTouched',
 		defaultValues: {
 			username: 'admin',
-			password: 'pass0101'
+			password: 'password'
 		},
 		resolver: yupResolver(loginSchema)
 	})

@@ -1,4 +1,4 @@
-import {IDailyCurrency} from 'interfaces/dashboard.interface'
+import {IDailyCurrency} from 'modules/dashboard/interfaces'
 import styles from './styles.module.scss'
 import {Card, CardTitle, Loader} from 'components'
 import {CSSProperties, FC} from 'react'
@@ -14,7 +14,7 @@ interface IProperties {
 }
 
 const Index: FC<IProperties> = ({style, className}) => {
-	const {data: currencies = [], isPending} = useData<IDailyCurrency[]>('currency/daily/last/')
+	const {data: currencies = [], isPending} = useData<IDailyCurrency[]>('exchange-rate/actual')
 	const navigate = useNavigate()
 
 	return (
@@ -30,11 +30,11 @@ const Index: FC<IProperties> = ({style, className}) => {
 							return (
 								<div className={styles.wrapper}>
 									<div className={styles.name}>
-										{item.currency?.name ?? ''}
+										1 {item.base_currency?.name?.toLowerCase() ?? ''}
 									</div>
 									<div className={styles.currencies}>
-										<p>{decimalToPrice(item?.summa ?? '')}</p>
-										<span>so‘m</span>
+										<p>{decimalToPrice(item?.rate ?? '')}</p>
+										<span>{item?.target_currency?.code}</span>
 									</div>
 								</div>
 							)

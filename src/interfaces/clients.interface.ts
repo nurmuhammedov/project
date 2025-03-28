@@ -16,7 +16,6 @@ interface IClientItemDetail {
 	customer_balance: { currency: IIDName; amount: string | number }[]
 }
 
-
 export type {
 	IClientItemDetail
 }

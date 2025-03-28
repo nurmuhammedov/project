@@ -60,12 +60,6 @@ const isNotFutureDate = date.test('isNotFutureDate', 'Date must be less than tod
 	return inputDate <= today
 })
 
-// CURRENCIES
-const dailyCurrencySchema = yup.object().shape({
-	summa: yup.string().trim().required('This field is required'),
-	currency_id: yup.number().required('This field is required'),
-	datetime: isNotFutureDate
-})
 
 const currencyExchangeSchema = yup.object().shape({
 	customer: yup.number().required('This field is required'),
@@ -144,7 +138,6 @@ export {
 	productSchema,
 	saleItemSchema,
 	purchaseItemSchema,
-	dailyCurrencySchema,
 	temporaryItemSchema,
 	currencyExchangeSchema,
 	temporarySaleItemSchema

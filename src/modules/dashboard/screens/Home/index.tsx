@@ -2,7 +2,6 @@ import {Cart, Currency, Income} from 'assets/icons'
 import {Button, PageTitle} from 'components'
 import {BUTTON_THEME} from 'constants/fields'
 import {useNavigate} from 'react-router-dom'
-import Cashier from 'modules/dashboard/components/Cashier'
 import Currencies from 'modules/dashboard/components/Currencies'
 
 
@@ -36,9 +35,6 @@ const Index = () => {
 				</div>
 			</PageTitle>
 			<div className="grid gap-lg">
-				<Cashier className="span-3"/>
-				<div className="span-9">
-				</div>
 				<Currencies className="span-3"/>
 			</div>
 		</>

@@ -36,7 +36,7 @@ function formatCurrencyData(data: { currency: IIDName; amount: string | number }
 		const amountNumber = Number(item.amount) || 0
 		const formattedAmount = decimalToPrice(amountNumber)
 
-		return `${formattedAmount} ${item.currency.label}`
+		return `${formattedAmount} ${item.currency.code}`
 	}).join('<br/>')
 }
 

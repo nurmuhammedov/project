@@ -50,10 +50,10 @@ interface ISelect extends SelectProps<ISelectOption> {
 	top?: boolean;
 }
 
-// interface IFIle {
-// 	name: string;
-// 	id: string | number;
-// 	file: string;
-// }
+interface IFile {
+	name: string;
+	id: string | number;
+	file: string;
+}
 
-export type {IButton, IField, ISelectOption, ISelect}
+export type {IButton, IField, ISelectOption, ISelect, IFile}
