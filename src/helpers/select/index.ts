@@ -2,6 +2,7 @@ import {
 	DropdownIndicatorProps,
 	CSSObjectWithLabel,
 	ControlProps,
+	IndicatorsContainerProps,
 	OptionProps
 } from 'react-select'
 
@@ -11,7 +12,7 @@ const getSelectStyles = (error?: boolean, top?: boolean) => ({
 		...base,
 		border: error ? '1px solid var(--red)!important' : state.isFocused ? '1px solid var(--teal)' : '1px solid var(--light-gray-3)',
 		boxShadow: error ? '0 0 0 1px var(--red)!important' : state.isFocused ? '0 0 0 1px var(--teal)' : 'none',
-		backgroundColor: 'var(--white)',
+		backgroundColor: state.isDisabled ? 'var(--light-gray-1)' : 'var(--white)',
 		padding: '1rem 1.25rem',
 		borderRadius: '0.9375rem',
 		fontFamily: 'Golos, Arial, Helvetica, sans-serif',
@@ -19,10 +20,10 @@ const getSelectStyles = (error?: boolean, top?: boolean) => ({
 		fontWeight: '400',
 		fontSize: '1rem',
 		lineHeight: '150%',
-		cursor: 'pointer',
 		outline: 'none',
 		gap: '0.5rem',
 		color: 'var(--dark-slate)',
+		cursor: state.isDisabled ? 'not-allowed' : 'pointer',
 		width: '100%',
 		transition: 'all ease-in-out 0.15s',
 		'&:hover': {
@@ -66,6 +67,10 @@ const getSelectStyles = (error?: boolean, top?: boolean) => ({
 		transform: state.selectProps.menuIsOpen
 			? 'rotate(-180deg)'
 			: null
+	}),
+	'indicatorsContainer': (base: CSSObjectWithLabel, state: IndicatorsContainerProps) => ({
+		...base,
+		display: state.isDisabled ? 'none' : 'flex'
 	}),
 	'clearIndicator': (base: CSSObjectWithLabel) => ({
 		...base,

@@ -61,20 +61,6 @@ const isNotFutureDate = date.test('isNotFutureDate', 'Date must be less than tod
 })
 
 
-const currencyExchangeSchema = yup.object().shape({
-	customer: yup.number().required('This field is required'),
-	store: yup.number().required('This field is required'),
-	date: isNotFutureDate,
-	payment: yup
-		.array()
-		.of(yup.object().shape({
-			currency: yup.number().required('This field is required'),
-			amount: yup.string().trim().required('This field is required')
-		}))
-		.required('This field is required')
-})
-
-
 // PRODUCTS
 const productSchema = yup.object().shape({
 	name: yup.string().trim().required('This field is required'),
@@ -139,6 +125,5 @@ export {
 	saleItemSchema,
 	purchaseItemSchema,
 	temporaryItemSchema,
-	currencyExchangeSchema,
 	temporarySaleItemSchema
 }

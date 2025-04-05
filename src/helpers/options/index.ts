@@ -85,19 +85,9 @@ const seriesOptions: ISelectOption[] = [
 	{label: 'No', value: false}
 ]
 
-
-// CURRENCY
-const currencyExchangeOptions: ISelectOption[] = [
-	{label: 'Making income', value: 'income'},
-	{label: 'Make loss', value: 'loss'},
-	{label: 'Expense', value: 'expense'}
-]
-
-
 export {
 	seriesOptions,
 	regionsOptions,
 	paginationOptions,
-	currencyExchangeOptions,
 	productExchangeTabOptions
 }

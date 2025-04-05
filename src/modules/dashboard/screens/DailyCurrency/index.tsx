@@ -14,7 +14,7 @@ import {
 	Pagination,
 	ReactTable,
 	Select
-} from 'components/index'
+} from 'components'
 import {BUTTON_THEME, FIELD} from 'constants/fields'
 import {useAdd, useData, useDetail, usePaginatedData, usePagination, useSearchParams, useUpdate} from 'hooks/index'
 import {ISelectOption} from 'interfaces/form.interface'
@@ -149,6 +149,12 @@ const Index = () => {
 					>
 						Back
 					</Button>
+				</div>
+			</PageTitle>
+
+			<Card screen={true} className="span-9 gap-2xl">
+				<div className="flex justify-between align-center">
+					<Input id="search" icon={<Search/>} placeholder="Search" radius={true} style={{width: 400}}/>
 					<Button
 						icon={<Plus/>}
 						onClick={() => addParams({modal: 'dailyCurrency'})}
@@ -157,18 +163,12 @@ const Index = () => {
 						Update currency
 					</Button>
 				</div>
-			</PageTitle>
-
-			<Card screen={true} className="span-9 gap-2xl">
-				<div className="flex justify-between align-center">
-					<Input id="search" icon={<Search/>} placeholder="Search" radius={true} style={{width: 400}}/>
-				</div>
 				<ReactTable columns={columns} data={data} isLoading={isLoading}/>
 				<HR/>
 				<Pagination totalPages={totalPages}/>
 			</Card>
 
-			<Modal title="Update currency" id="dailyCurrency" style={{height: '35rem', width: '60rem'}}>
+			<Modal title="Update currency" id="dailyCurrency" style={{height: '30rem', width: '60rem'}}>
 				<Form
 					onSubmit={handleAddSubmit((data) => {
 							addDailyCurrency(data).then(async () => {
@@ -183,7 +183,7 @@ const Index = () => {
 						<div className="grid gap-lg span-5">
 							<div className="span-4">
 								<Input
-									label="Price"
+									label="Value"
 									id="baseCurrency"
 									placeholder=" "
 									disabled={true}
@@ -230,7 +230,7 @@ const Index = () => {
 											maxLength={9}
 											disableGroupSeparators={false}
 											allowDecimals={true}
-											label="Price"
+											label="Value"
 											error={addErrors?.rate?.message}
 											{...field}
 										/>
@@ -265,7 +265,7 @@ const Index = () => {
 				</Form>
 			</Modal>
 
-			<EditModal isLoading={isFetching || !detail} style={{height: '35rem', width: '60rem'}}>
+			<EditModal isLoading={isFetching || !detail} style={{height: '30rem', width: '60rem'}}>
 				<Form
 					onSubmit={handleEditSubmit((data) => {
 							updateDailyCurrency(data).then(async () => {
@@ -280,8 +280,8 @@ const Index = () => {
 						<div className="grid gap-lg span-5">
 							<div className="span-4">
 								<Input
-									label="Price"
-									id="baseCurrency"
+									label="Value"
+									id="baseCurrencyEdit"
 									placeholder=" "
 									disabled={true}
 									value="1"
@@ -294,10 +294,11 @@ const Index = () => {
 									render={({field: {value, ref, onChange, onBlur}}) => (
 										<Select
 											ref={ref}
-											id="base_currency"
+											id="baseCurrencyEdit"
 											label="Currency"
 											options={currencies}
 											onBlur={onBlur}
+											isDisabled={true}
 											error={editErrors.base_currency?.message}
 											value={getSelectValue(currencies, value)}
 											defaultValue={getSelectValue(currencies, value)}
@@ -323,11 +324,12 @@ const Index = () => {
 									name="rate"
 									render={({field}) => (
 										<NumberFormattedInput
-											id="rate"
+											id="rateEdit"
 											maxLength={9}
 											disableGroupSeparators={false}
 											allowDecimals={true}
-											label="Price"
+											label="Value"
+											disabled={true}
 											error={editErrors?.rate?.message}
 											{...field}
 										/>
@@ -341,7 +343,7 @@ const Index = () => {
 									render={({field: {value, ref, onChange, onBlur}}) => (
 										<Select
 											ref={ref}
-											id="target_currency"
+											id="targetCurrencyEdit"
 											label="Currency"
 											options={currencies?.filter(item => item?.value != watchEdit('base_currency'))}
 											onBlur={onBlur}

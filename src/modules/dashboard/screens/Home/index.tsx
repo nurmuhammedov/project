@@ -1,4 +1,4 @@
-import {Cart, Currency, Income} from 'assets/icons'
+import {Cart, Currency, CurrencyExchange} from 'assets/icons'
 import {Button, PageTitle} from 'components'
 import {BUTTON_THEME} from 'constants/fields'
 import {useNavigate} from 'react-router-dom'
@@ -20,17 +20,17 @@ const Index = () => {
 					</Button>
 					<Button
 						theme={BUTTON_THEME.DANGER_OUTLINE}
-						icon={<Income/>}
-						onClick={() => navigate('product-exchange')}
-					>
-						Making income
-					</Button>
-					<Button
-						theme={BUTTON_THEME.DANGER_OUTLINE}
 						onClick={() => navigate('product-exchange?tab=sale')}
 						icon={<Cart/>}
 					>
-						Sale
+						Product exchange
+					</Button>
+					<Button
+						theme={BUTTON_THEME.DANGER_OUTLINE}
+						icon={<CurrencyExchange/>}
+						onClick={() => navigate('daily-currency?modal=dailyCurrency')}
+					>
+						Update currency
 					</Button>
 				</div>
 			</PageTitle>

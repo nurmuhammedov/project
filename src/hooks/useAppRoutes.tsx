@@ -104,32 +104,7 @@ function useAppRoutes() {
 												element: <ClientDetail/>
 											},
 											{
-												path: 'product-exchange',
-												element: <ProductExchange/>
-											},
-											{
-												path: 'currency-exchange',
-												element: <CurrencyExchange/>
-											},
-											{
-												path: ':productId',
-												children: [
-													{
-														index: true,
-														element: <Navigate to={routeByRole(user?.role)} replace/>
-													},
-													{
-														path: 'product-exchange',
-														element: <ProductExchange detail={true}/>
-													},
-													{
-														path: 'currency-exchange',
-														element: <CurrencyExchange detail={true}/>
-													}
-												]
-											},
-											{
-												path: ':currencyId',
+												path: ':exchangeId',
 												children: [
 													{
 														index: true,

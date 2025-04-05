@@ -157,7 +157,7 @@ const Index = () => {
 
 	return (
 		<>
-			<PageTitle title="Clients"/>
+			<PageTitle title="Customers"/>
 			<Card screen={true} className="span-9 gap-2xl">
 				<div className="flex justify-between align-center">
 					<Input id="search" icon={<Search/>} placeholder="Search" radius={true} style={{width: 400}}/>

@@ -1,29 +1,27 @@
-import {currencyExchangeOptions} from 'helpers/options'
+import {Exchange} from 'assets/icons'
 import {useAdd, useData, useDetail, useSearchParams} from 'hooks'
 import {
 	Button,
 	Card,
 	CardTab,
 	Form,
-	MaskInput,
+	Input, Loader,
 	NumberFormattedInput,
-	Select,
-	Title
+	PageTitle,
+	Select
 } from 'components'
-import React, {FC, useEffect} from 'react'
+import {ISelectOption} from 'interfaces/form.interface'
+import {currencyExchangeOptions, exchangeOptions} from 'modules/dashboard/helpers/options'
+import {currencyExchangeSchema} from 'modules/dashboard/helpers/yup'
+import {IBalance, ICustomerShortData, ITransaction, ITransactionDetail} from 'modules/dashboard/interfaces'
+import React, {FC, useEffect, useState} from 'react'
 import {Controller, useFieldArray, useForm} from 'react-hook-form'
-import {getSelectOptions, getSelectOptionsByKey} from 'utilities/select'
-import {getSelectValue} from 'utilities/common'
-import {getDate} from 'utilities/date'
+import {useTranslation} from 'react-i18next'
+import {convertCurrency, findName, getBalanceAsString, getSelectValue, noop} from 'utilities/common'
 import {BUTTON_THEME, FIELD} from 'constants/fields'
 import {yupResolver} from '@hookform/resolvers/yup'
-import {currencyExchangeSchema} from 'helpers/yup'
-import {ISearchParams} from 'interfaces/params.interface'
-import {useParams} from 'react-router-dom'
-import {IClientItemDetail} from 'interfaces/clients.interface'
-import {IIDName} from 'interfaces/configuration.interface'
-import {Plus} from 'assets/icons'
-import {ICurrencyExchangeDetail} from 'interfaces/dashboard.interface'
+import {useNavigate, useParams} from 'react-router-dom'
+import {InferType} from 'yup'
 
 
 interface IProperties {
@@ -31,248 +29,435 @@ interface IProperties {
 }
 
 const Index: FC<IProperties> = ({detail: retrieve = false}) => {
-	const {paramsObject: {tab = currencyExchangeOptions[0]?.value}} = useSearchParams()
-	const {productId: currencyId = undefined, id: clientId = undefined} = useParams()
-	const {data: clients = []} = useData<ISearchParams[]>('customer/select/')
+	const navigate = useNavigate()
+	const {t} = useTranslation()
+	const [isLoading, setIsLoading] = useState(false)
+	const {paramsObject: {tab = currencyExchangeOptions[0]?.value, customerId = undefined}} = useSearchParams()
+	const {id: storeId = undefined, exchangeId = undefined} = useParams()
+	const {data: stores = []} = useData<ISelectOption[]>('stores/select')
 
 	const {
 		watch,
 		reset,
 		control,
-		// register,
-		// setValue,
+		register,
+		setValue,
 		handleSubmit,
 		formState: {errors}
 	} = useForm({
 		mode: 'onTouched',
 		defaultValues: {
-			customer: clientId ? Number(clientId) : undefined,
-			date: '',
-			payment: [
-				{
-					currency: undefined,
-					amount: ''
-				}
-			],
-			store: undefined
+			customer: customerId ? Number(customerId) : undefined,
+			store: storeId ? Number(storeId) : undefined,
+			records: [],
+			currency: undefined,
+			first_amount: '',
+			type: Number(tab),
+			description: ''
 		},
 		resolver: yupResolver(currencyExchangeSchema)
 	})
 
-	const {fields, append, remove} = useFieldArray({
+	const {fields} = useFieldArray({
 		control,
-		name: 'payment' as never
+		name: 'records' as never
 	})
 
-	const canAddField = fields.every(field => !!watch(`payment.${fields.indexOf(field)}.currency`) && !!watch(`payment.${fields.indexOf(field)}.amount`))
 
-	const handleRemove = (index: number) => {
-		if (fields.length > 1 && !retrieve) {
-			remove(index)
-		}
-	}
+	const {data: serviceTypes = []} = useData<ISelectOption[]>('service-types/select', watch('type') == exchangeOptions[2].value)
+	const {data: customers = []} = useData<ISelectOption[]>('customers/select', !!watch('store'), {store: watch('store')})
+	const {data: currencies = []} = useData<ISelectOption[]>('currencies/select', !!watch('customer'))
 
-	const {data: currencies = []} = useData<IIDName[]>('currency/select/', !!watch('customer'))
-	const {data: stores = []} = useData<IIDName[]>('stores/select/', !!watch('customer'))
-	const {mutateAsync, isPending: isAdding} = useAdd(`currency/exchange/${watch('customer')}/create/`)
+	const {
+		data: storeBalance = [],
+		refetch: storeBalanceRefetch
+	} = useData<IBalance[]>(`stores/${watch('store')}/balance`, !!watch('store'))
+	const {
+		data: customerBalance = [],
+		refetch: customerBalanceRefetch
+	} = useData<IBalance[]>(`customers/${watch('customer')}/balance`, !!watch('customer'))
+	const {data: customer = undefined} = useData<ICustomerShortData>(`customers/${watch('customer')}/short-data`, !!watch('customer'))
+	const {
+		data: transactions = [],
+		refetch: transactionsRefetch
+	} = useData<ITransaction[]>(`exchange-rate/transaction`, !!watch('currency'), {currency: watch('currency')})
 
 	const {
 		data: detail,
 		isPending: isDetailLoading
-	} = useDetail<IClientItemDetail>('customer/detail/', watch('customer'), !!watch('customer') && !retrieve)
+	} = useDetail<ITransactionDetail>(`transactions/`, exchangeId, !!exchangeId && retrieve)
 
-	const {
-		data,
-		isPending
-	} = useDetail<ICurrencyExchangeDetail>(`currency/exchange/detail/`, currencyId, !!currencyId && retrieve)
+	const {mutateAsync: add, isPending: isAdding} = useAdd(`transactions`)
 
 	useEffect(() => {
-		if (detail && !isDetailLoading) {
-			reset((prevValues) => ({
-				...prevValues,
-				store: detail?.store?.id ?? undefined,
-				// customer: Number(clientId),
-				date: getDate() ?? ''
-			}))
+		setValue('type', Number(tab))
+		if (tab != exchangeOptions[2]?.value) {
+			setValue('service_type', undefined as unknown as number)
+		}
+		if (watch('customer')) {
+			customerBalanceRefetch().then(noop)
+		}
+
+		if (watch('store')) {
+			storeBalanceRefetch().then(noop)
+		}
+	}, [tab])
+
+	useEffect(() => {
+		if (customer?.currency?.id) {
+			setValue('currency', Number(customer?.currency?.id))
+		}
+
+		if (watch('customer')) {
+			customerBalanceRefetch().then(noop)
+		}
+
+		if (watch('store')) {
+			storeBalanceRefetch().then(noop)
+		}
+	}, [customer])
+
+	useEffect(() => {
+		if (transactions && transactions?.length && !retrieve) {
+			setValue('records', transactions?.map(item => ({
+				store_currency: item?.store_currency?.id,
+				store_amount: '',
+				customer_amount: ''
+			})))
+		}
+	}, [transactions])
+
+	useEffect(() => {
+		if (detail && retrieve) {
+			reset({
+				customer: detail?.customer?.id,
+				store: detail?.store?.id,
+				records: detail?.records?.map(item => ({
+					store_currency: item?.store_currency?.id,
+					store_amount: item?.store_amount,
+					customer_amount: item?.customer_amount
+				})),
+				currency: detail?.currency?.id,
+				first_amount: detail?.amount,
+				service_type: detail?.service_type?.id,
+				type: detail?.type,
+				description: detail?.description
+			})
 		}
 	}, [detail])
 
+	const handleDoubleClick = (
+		index: number,
+		fieldName: 'store_amount' | 'customer_amount'
+	) => {
+		const records = watch('records')
+		const record = records[index]
+		if (!record || !record.store_currency) return
+		let result
 
-	useEffect(() => {
-		if (data && !isPending) {
-			reset({
-				customer: data?.customer?.id ?? undefined,
-				date: getDate(data?.date || ''),
-				payment: data?.payment?.map(i => ({currency: i?.currency?.id, amount: i?.amount ?? '0'})),
-				store: data?.store?.id ?? undefined
-			})
+		if (fieldName === 'customer_amount') {
+			const storeAmount = parseFloat(record.store_amount || '0')
+			result = convertCurrency(storeAmount, 'toStore', record.store_currency, transactions)
+			setValue(`records.${index}.customer_amount`, result.toString())
+		} else {
+			const customerAmount = parseFloat(record.customer_amount || '0')
+			result = convertCurrency(customerAmount, 'fromStore', record.store_currency, transactions)
+			setValue(`records.${index}.store_amount`, result.toString())
 		}
-	}, [data])
+	}
 
+	if (isDetailLoading) {
+		return (<Loader/>)
+	}
 	return (
 		<>
-			<Title title="Currency exchange"/>
-			<Card shadow={true} style={{padding: '2.25rem', maxWidth: '100rem', width: '100%', margin: '.5rem auto'}}>
-				<CardTab
-					disabled={retrieve}
-					style={{marginBottom: '1.5rem'}}
-					fallbackValue={currencyExchangeOptions[0]?.value}
-					tabs={currencyExchangeOptions}
-				/>
+			<PageTitle title="Currency exchange">
+				<div className="flex align-center gap-lg">
+					<Button
+						onClick={() => navigate(-1)}
+						theme={BUTTON_THEME.DANGER_OUTLINE}
+					>
+						Back
+					</Button>
+				</div>
+			</PageTitle>
+			<Card screen={true}>
+				{
+					!retrieve &&
+					<CardTab
+						disabled={retrieve}
+						style={{marginBottom: '1.5rem'}}
+						fallbackValue={currencyExchangeOptions[0]?.value}
+						tabs={currencyExchangeOptions}
+					/>
+				}
 
 				<Form
 					onSubmit={
 						handleSubmit((data) => {
-							mutateAsync({
-								...data,
-								type: tab == 'income' ? 'kirim' : tab == 'loss' ? 'chiqim' : tab == 'expense' ? 'xarajat' : null
-							}).then(() => reset({
-								customer: undefined,
-								date: '',
-								payment: [
-									{
-										currency: undefined,
-										amount: ''
-									}
-								],
-								store: undefined
-							}))
+							setIsLoading(true)
+							add(data)
+								.then(() => {
+									transactionsRefetch()
+										.then(({data}) => {
+											reset(prevState => {
+												return {
+													...prevState,
+													records: data?.map(item => ({
+														store_currency: item?.store_currency?.id,
+														store_amount: '',
+														customer_amount: ''
+													})),
+													first_amount: '',
+													description: ''
+												} as InferType<typeof currencyExchangeSchema>
+											})
+											customerBalanceRefetch().then(noop)
+											storeBalanceRefetch().then(noop)
+										})
+										.finally(() => {
+											setIsLoading(false)
+										})
+								})
+								.catch(() => {
+									setIsLoading(false)
+								})
 						})
 					}
 				>
-					<div className="grid gap-lg">
-						<div className="span-4">
-							<Controller
-								name="customer"
-								control={control}
-								render={({field: {value, ref, onChange, onBlur}}) => (
-									<Select
-										ref={ref}
-										isDisabled={!!currencyId || retrieve || !!clientId}
-										id="customer"
-										label="Client"
-										onBlur={onBlur}
-										options={getSelectOptionsByKey(clients, 'full_name')}
-										error={errors.customer?.message}
-										value={getSelectValue(getSelectOptionsByKey(clients, 'full_name'), value)}
-										defaultValue={getSelectValue(getSelectOptionsByKey(clients, 'full_name'), value)}
-										handleOnChange={(e) => onChange(e as string)}
-									/>
-								)}
-							/>
+					<div className="grid gap-lg span-12">
+						<div className="grid gap-lg span-12">
+							<div className="span-6">
+								<Input
+									id="Checkout"
+									label="Checkout"
+									disabled={true}
+									placeholder=" "
+									value={getBalanceAsString(storeBalance)}
+								/>
+							</div>
+							<div className="span-6">
+								<Input
+									id="Checkout"
+									label="Customer"
+									disabled={true}
+									placeholder=" "
+									value={getBalanceAsString(customerBalance)}
+								/>
+							</div>
 						</div>
 
-						<div className="span-4">
-							<Controller
-								name="store"
-								control={control}
-								render={({field: {value, ref, onChange, onBlur}}) => (
-									<Select
-										ref={ref}
-										id="store"
-										label="Store"
-										options={getSelectOptions(stores)}
-										onBlur={onBlur}
-										isDisabled={retrieve}
-										error={errors.store?.message}
-										value={getSelectValue(getSelectOptions(stores), value)}
-										defaultValue={getSelectValue(getSelectOptions(stores), value)}
-										handleOnChange={(e) => onChange(e as string)}
-									/>
-								)}
-							/>
-						</div>
-
-						<div className="span-4">
-							<Controller
-								name="date"
-								control={control}
-								render={({field}) => (
-									<MaskInput
-										id="date"
-										disabled={retrieve}
-										label="Date"
-										placeholder={getDate()}
-										mask="99.99.9999"
-										error={errors?.date?.message}
-										{...field}
-									/>
-								)}
-							/>
-						</div>
-
-						{
-							fields?.map((field, index) => (
-								<React.Fragment key={field.id}>
-									<div className="span-6">
+						<div className="flex gap-lg span-12">
+							<div className="flex-1">
+								<Controller
+									name="type"
+									control={control}
+									render={({field: {value, ref, onChange, onBlur}}) => (
+										<Select
+											ref={ref}
+											id="type"
+											label="Type"
+											isDisabled={true}
+											onBlur={onBlur}
+											options={exchangeOptions}
+											error={errors.type?.message}
+											value={getSelectValue(exchangeOptions, value)}
+											defaultValue={getSelectValue(exchangeOptions, value)}
+											handleOnChange={(e) => onChange(e as string)}
+										/>
+									)}
+								/>
+							</div>
+							{
+								tab == exchangeOptions[2].value ?
+									<div className="flex-1">
 										<Controller
-											name={`payment.${index}.currency`}
+											name="service_type"
 											control={control}
 											render={({field: {value, ref, onChange, onBlur}}) => (
 												<Select
 													ref={ref}
-													top={true}
-													id={`payment.${index}.currency`}
-													label="Currency"
-													options={getSelectOptions(currencies)}
+													id="service_type"
+													label="Expense type"
+													options={serviceTypes}
 													onBlur={onBlur}
 													isDisabled={retrieve}
-													error={errors?.payment?.[index]?.currency?.message}
-													value={getSelectValue(getSelectOptions(currencies), value)}
-													defaultValue={getSelectValue(getSelectOptions(currencies), value)}
+													error={errors.service_type?.message}
+													value={getSelectValue(serviceTypes, value)}
+													defaultValue={getSelectValue(serviceTypes, value)}
 													handleOnChange={(e) => onChange(e as string)}
 												/>
 											)}
 										/>
-									</div>
+									</div> : null
+							}
+							<div className="flex-1">
+								<Controller
+									name="store"
+									control={control}
+									render={({field: {value, ref, onChange, onBlur}}) => (
+										<Select
+											ref={ref}
+											id="store"
+											label="Store"
+											options={stores}
+											onBlur={onBlur}
+											isDisabled={retrieve}
+											error={errors.store?.message}
+											value={getSelectValue(stores, value)}
+											defaultValue={getSelectValue(stores, value)}
+											handleOnChange={(e) => {
+												setValue('customer', undefined as unknown as number)
+												onChange(e as string)
+											}}
+										/>
+									)}
+								/>
+							</div>
+							<div className="flex-1">
+								<Controller
+									name="customer"
+									control={control}
+									render={({field: {value, ref, onChange, onBlur}}) => (
+										<Select
+											ref={ref}
+											id="customer"
+											label="Customer"
+											onBlur={onBlur}
+											options={customers}
+											isDisabled={retrieve}
+											error={errors.customer?.message}
+											value={getSelectValue(customers, value)}
+											defaultValue={getSelectValue(customers, value)}
+											handleOnChange={(e) => onChange(e as string)}
+										/>
+									)}
+								/>
+							</div>
+							<div className="flex-1">
+								<Controller
+									name="currency"
+									control={control}
+									render={({field: {value, ref, onChange, onBlur}}) => (
+										<Select
+											ref={ref}
+											id="currency"
+											label="Currency"
+											onBlur={onBlur}
+											isDisabled={retrieve}
+											options={currencies}
+											error={errors.currency?.message}
+											value={getSelectValue(currencies, value)}
+											defaultValue={getSelectValue(currencies, value)}
+											handleOnChange={(e) => onChange(e as string)}
+										/>
+									)}
+								/>
+							</div>
+						</div>
+						{
+							watch('currency') ?
 
+								<div className="grid span-12 gap-lg">
 									<div className="span-6">
 										<Controller
 											control={control}
-											name={`payment.${index}.amount`}
+											name="first_amount"
 											render={({field}) => (
 												<NumberFormattedInput
-													id={`payment.${index}.amount`}
+													{...field}
+													id="first_amount"
 													maxLength={12}
 													disableGroupSeparators={false}
 													allowDecimals={true}
 													disabled={retrieve}
-													handleDelete={retrieve ? undefined : () => handleRemove(index)}
-													label="Amount"
-													error={errors?.payment?.[index]?.amount?.message}
-													{...field}
+													label={`${findName(currencies, watch(`currency`))} (${t('Checkout')?.toLowerCase()})`}
+													error={errors?.first_amount?.message}
 												/>
 											)}
 										/>
 									</div>
-								</React.Fragment>
-							))
+									<div className="span-6">
+										<Input
+											id="comment"
+											label={`Comment`}
+											disabled={retrieve}
+											error={errors?.description?.message}
+											{...register(`description`)}
+										/>
+									</div>
+								</div> : null
 						}
+						<div
+							style={{gridTemplateColumns: 'repeat(15, 1fr)', display: 'grid'}}
+							className="span-12 gap-lg"
+						>
 
-						{
-							!retrieve && (
-								<div className="span-4">
-									<Button
-										theme={BUTTON_THEME.OUTLINE}
-										type="button"
-										disabled={!canAddField || retrieve}
-										icon={<Plus/>}
-										onClick={() => append({currency: undefined, amount: ''})}
-									>
-										Add
-									</Button>
-								</div>
-							)
-						}
+							{
+								(fields && fields.length && watch('currency')) ? fields?.map((field, index) => (
+									<React.Fragment key={field.id}>
+										{
+											index % 2 == 1 && (
+												<div className="span-1"></div>
+											)
+										}
+										<div className="flex gap-lg span-7">
+											<div className="flex-1">
+												<Controller
+													control={control}
+													name={`records.${index}.store_amount`}
+													render={({field}) => (
+														<NumberFormattedInput
+															{...field}
+															id={`records.${index}.store_amount`}
+															maxLength={12}
+															disableGroupSeparators={false}
+															allowDecimals={true}
+															disabled={retrieve}
+															label={`${findName(currencies, watch(`records.${index}.store_currency`))} (${t('Checkout')?.toLowerCase()})`}
+															error={errors?.records?.[index]?.store_amount?.message}
+															onDoubleClick={() => handleDoubleClick(index, 'store_amount')}
+														/>
+													)}
+												/>
+											</div>
 
+											<div className="span-1 flex justify-center">
+												<Exchange style={{transform: 'translateY(2.5rem)', height: '1.7rem'}}/>
+											</div>
 
+											<div className="flex-1">
+												<Controller
+													control={control}
+													name={`records.${index}.customer_amount`}
+													render={({field}) => (
+														<NumberFormattedInput
+															{...field}
+															id={`records.${index}.customer_amount`}
+															maxLength={12}
+															disableGroupSeparators={false}
+															allowDecimals={true}
+															disabled={retrieve}
+															label={`${findName(currencies, watch(`currency`))} (${t('Customer')?.toLowerCase()})`}
+															error={errors?.records?.[index]?.customer_amount?.message}
+															onDoubleClick={() => handleDoubleClick(index, 'customer_amount')}
+														/>
+													)}
+												/>
+											</div>
+										</div>
+
+									</React.Fragment>
+								)) : null
+							}
+						</div>
 					</div>
 					{
 						!retrieve &&
 						<Button
 							style={{marginTop: 'auto'}}
 							type={FIELD.SUBMIT}
-							disabled={isAdding}
+							disabled={isAdding || isLoading}
 						>
 							Save
 						</Button>

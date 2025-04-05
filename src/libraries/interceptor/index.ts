@@ -19,6 +19,19 @@ instance.interceptors.request.use(
 	error => Promise.reject(error)
 )
 
+// instance.interceptors.response.use(
+// 	response => response,
+// 	error => {
+// 		if (error?.response?.status <= 499 && error?.response?.status !== 401 && error?.response?.status !== 404) {
+// 			showErrorMessage(error)
+// 		} else if (error?.response?.status >= 500) {
+// 			showMessage('Internal server error', 'error', 15000)
+// 		}
+// 		return Promise.reject(error)
+// 	}
+// )
+
+
 instance.interceptors.response.use(
 	response => response,
 	error => {
@@ -26,6 +39,12 @@ instance.interceptors.response.use(
 			showErrorMessage(error)
 		} else if (error?.response?.status >= 500) {
 			showMessage('Internal server error', 'error', 15000)
+		} else if (error?.response?.status === 401 && error?.response?.config?.url === 'users/me') {
+			showMessage('Invalid or missing authentication token', 'alert', 15000)
+		} else if (error?.response?.status === 401 && error?.response?.config?.url === 'auth/login') {
+			showMessage('Invalid username or password', 'error', 15000)
+		} else if (error?.response?.status === 404) {
+			showMessage('API not found', 'error', 15000)
 		}
 		return Promise.reject(error)
 	}

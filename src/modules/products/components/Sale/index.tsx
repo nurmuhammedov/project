@@ -145,7 +145,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 											ref={ref}
 											isDisabled={!!clientId || retrieve}
 											id="customer"
-											label="Client"
+											label="Customer"
 											onBlur={onBlur}
 											options={getSelectOptionsByKey(clients, 'full_name')}
 											error={errors.customer?.message}

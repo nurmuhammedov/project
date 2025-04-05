@@ -1,3 +1,4 @@
+import CurrencyExchange from './CurrencyExchange'
 import SelectIcon from './SelectIcon'
 import Currency from './Currency'
 import Exchange from './Exchange'
@@ -25,6 +26,7 @@ import Eye from './Eye'
 export * from './alert'
 
 export {
+	CurrencyExchange,
 	SelectIcon,
 	Currency,
 	Exchange,

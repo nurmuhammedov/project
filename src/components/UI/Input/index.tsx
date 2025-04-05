@@ -1,9 +1,9 @@
-import {Delete} from 'assets/icons'
 import {IField} from 'interfaces/form.interface'
 import {useTranslation} from 'react-i18next'
 import styles from './styles.module.scss'
 import React, {forwardRef} from 'react'
 import {FIELD} from 'constants/fields'
+import {Delete} from 'assets/icons'
 import classNames from 'classnames'
 
 

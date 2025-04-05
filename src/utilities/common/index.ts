@@ -1,5 +1,6 @@
 import {ISearchParams} from 'interfaces/params.interface'
 import {ISelectOption} from 'interfaces/form.interface'
+import {IBalance, ITransaction} from 'modules/dashboard/interfaces'
 
 
 // function ensureHttps(url: string | undefined | null): string | undefined | null {
@@ -64,16 +65,54 @@ function sumDecimals(values: string[]): number {
 	return parseFloat(sum.toFixed(2))
 }
 
+function getBalanceAsString(arr: IBalance[]): string {
+	if (!arr || arr.length === 0) {
+		return decimalToPrice(0)
+	}
+
+	return arr
+		.map((item: IBalance) => `${decimalToPrice(item?.amount)} ${item?.currency?.name?.toLowerCase()}`)
+		.join(';  ')
+}
+
+function convertCurrency(
+	amount: number,
+	direction: 'toStore' | 'fromStore',
+	storeCurrencyId: number,
+	rates: ITransaction[]
+): number {
+	const storeCurrency = rates.find(r => r?.store_currency?.id == storeCurrencyId)
+
+	let result = 0
+
+	if (direction === 'toStore') {
+		const baseValue = amount /  (storeCurrency?.store_currency?.rate || 1)
+		result = baseValue * (storeCurrency?.rate || 1)
+	} else if (direction === 'fromStore') {
+		const baseValue = amount / (storeCurrency?.rate || 1)
+		result = baseValue * (storeCurrency?.store_currency?.rate || 1)
+	}
+
+	return parseFloat(result.toFixed(2))
+}
+
+function findName(arr: ISelectOption[], id: number | string | null | undefined): string {
+	console.log(arr?.find(i => i?.value == id), id, arr)
+	return arr.find(item => item?.value == id)?.label?.toString() || ''
+}
 
 export {
 	noop,
 	isObject,
 	noopAsync,
+	findName,
 	sumDecimals,
 	cleanParams,
 	getSelectValue,
 	decimalToPrice,
+	convertCurrency,
 	decimalToNumber,
+	getBalanceAsString,
 	decimalToInteger
 
 	// ensureHttps

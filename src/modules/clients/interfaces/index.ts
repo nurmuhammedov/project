@@ -13,3 +13,13 @@ export interface ICustomerDetail {
 	store: IIDName;
 	region: number;
 }
+
+export interface IExchange {
+	readonly id: number
+	store: IIDName;
+	currency: IIDName;
+	service_type: IIDName | null;
+	type: number;
+	amount: string;
+	created_at: string;
+}

@@ -1,27 +1,14 @@
-import ExchangesHistory from 'modules/clients/components/ExchangesHistory'
-import IncomesHistory from 'modules/clients/components/IncomesHistory'
-import TradesHistory from 'modules/clients/components/SalesHistory'
-import {Button, Loader, PageInfo, VerticalTab} from 'components'
-import {IClientItemDetail} from 'interfaces/clients.interface'
-import {ISelectOption} from 'interfaces/form.interface'
-import {Cart, Currency, Income} from 'assets/icons'
-import {useDetail, useSearchParams} from 'hooks'
 import {BUTTON_THEME} from 'constants/fields'
+import ExchangesHistory from 'modules/clients/components/ExchangesHistory'
+import {Button, Loader, PageInfo, VerticalTab} from 'components'
+import {ISelectOption} from 'interfaces/form.interface'
+import {Currency} from 'assets/icons'
+import {useDetail, useSearchParams} from 'hooks'
+import {ICustomerDetail} from 'modules/clients/interfaces'
 import {useNavigate, useParams} from 'react-router-dom'
 
 
 const tabOptions: ISelectOption[] = [
-	{
-		label: 'Incomes history',
-		value: 'incomesHistory',
-		icon: <Income/>
-	},
-
-	{
-		label: 'Sales history',
-		value: 'tradesHistory',
-		icon: <Cart/>
-	},
 	{
 		label: 'Exchanges history',
 		value: 'exchangesHistory',
@@ -31,9 +18,9 @@ const tabOptions: ISelectOption[] = [
 
 const Index = () => {
 	const {id = undefined} = useParams()
-	const {data: detail, isPending: isDetailLoading} = useDetail<IClientItemDetail>('customer/detail/', id)
-	const {paramsObject: {tab = tabOptions[0]?.value}} = useSearchParams()
 	const navigate = useNavigate()
+	const {data: detail, isPending: isDetailLoading} = useDetail<ICustomerDetail>('customers/', id)
+	const {paramsObject: {tab = tabOptions[0]?.value}} = useSearchParams()
 
 
 	if (isDetailLoading) {
@@ -45,30 +32,15 @@ const Index = () => {
 			<div className="flex align-center justify-between gap-lg" style={{marginBottom: '1.5rem'}}>
 				<PageInfo
 					type="user"
-					title={detail?.full_name}
+					title={detail?.name}
 					subTitle={detail?.phone_number}
 				/>
 				<div className="flex align-center gap-lg">
 					<Button
+						onClick={() => navigate(-1)}
 						theme={BUTTON_THEME.DANGER_OUTLINE}
-						icon={<Currency/>}
-						onClick={() => navigate('currency-exchange')}
 					>
-						Currency exchange
-					</Button>
-					<Button
-						theme={BUTTON_THEME.DANGER_OUTLINE}
-						icon={<Cart/>}
-						onClick={() => navigate('product-exchange?tab=sale')}
-					>
-						Sale
-					</Button>
-					<Button
-						theme={BUTTON_THEME.DANGER_OUTLINE}
-						icon={<Income/>}
-						onClick={() => navigate('product-exchange')}
-					>
-						Making income
+						Back
 					</Button>
 				</div>
 			</div>
@@ -78,10 +50,8 @@ const Index = () => {
 					<VerticalTab fallbackValue={tabOptions[0]?.value} tabs={tabOptions}/>
 				</div>
 				{
-					tab === 'incomesHistory' ? <IncomesHistory/> :
-						tab === 'tradesHistory' ? <TradesHistory/> :
-							tab === 'exchangesHistory' ? <ExchangesHistory/> :
-								null
+					tab === 'exchangesHistory' ? <ExchangesHistory/> :
+						null
 
 				}
 			</div>

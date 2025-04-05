@@ -1,7 +1,7 @@
 import {IIDName} from 'interfaces/configuration.interface'
 
 
-interface ICashierItem {
+interface ICheckoutItem {
 	readonly c_id: number;
 	name: string;
 	label: string;
@@ -25,6 +25,6 @@ interface ICurrencyExchangeDetail {
 
 
 export type {
-	ICashierItem,
+	ICheckoutItem,
 	ICurrencyExchangeDetail
 }

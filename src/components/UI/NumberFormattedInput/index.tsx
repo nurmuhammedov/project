@@ -15,10 +15,11 @@ interface IProps {
 	disableGroupSeparators?: boolean
 	allowDecimals?: boolean
 	groupSeparator?: string
-	value?: string | number
+	value?: string | number | null | undefined
 	disabled?: boolean
 	onChange?: (event: string) => void;
 	handleDelete?: () => void;
+	onDoubleClick?: () => void;
 	onBlur?: (event: FocusEvent<HTMLInputElement>) => void;
 }
 
@@ -45,7 +46,7 @@ const Index = forwardRef<HTMLInputElement, IProps>(({
 			type={FIELD.TEXT}
 			label={label}
 			error={error}
-			value={value}
+			value={value || ''}
 			disabled={disabled}
 			handleDelete={handleDelete}
 			{...props}
@@ -65,8 +66,8 @@ const Index = forwardRef<HTMLInputElement, IProps>(({
 				disableGroupSeparators={disableGroupSeparators}
 				decimalSeparator="."
 				ref={ref}
-				defaultValue={value}
-				value={value}
+				defaultValue={value || ''}
+				value={value || ''}
 				autoComplete="off"
 				onValueChange={value => !value ? onChange?.('') : onChange?.(value)}
 				onBlur={onBlur}

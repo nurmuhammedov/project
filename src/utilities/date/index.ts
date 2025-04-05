@@ -1,7 +1,3 @@
-import {IIDName} from 'interfaces/configuration.interface'
-import {decimalToPrice} from 'utilities/common'
-
-
 function formatDate(isoDateString: string | null | undefined): string {
 	if (!isoDateString) return ''
 	const date = new Date(isoDateString)
@@ -31,17 +27,8 @@ const getDate = (dateStr?: string): string => {
 	return `${day}.${month}.${year}`
 }
 
-function formatCurrencyData(data: { currency: IIDName; amount: string | number }[]): string {
-	return data.map(item => {
-		const amountNumber = Number(item.amount) || 0
-		const formattedAmount = decimalToPrice(amountNumber)
-
-		return `${formattedAmount} ${item.currency.code}`
-	}).join('<br/>')
-}
 
 export {
-	formatCurrencyData,
 	formatDate,
 	getDate
 }

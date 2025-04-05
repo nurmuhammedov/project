@@ -16,7 +16,7 @@ export const menu: IMenuItem[] = [
 	},
 	{
 		id: '/clients',
-		label: 'Clients',
+		label: 'Customers',
 		href: '/admin/clients',
 		allowedRoles: [
 			ROLE_LIST.ADMIN

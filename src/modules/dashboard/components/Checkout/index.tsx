@@ -1,4 +1,4 @@
-import {ICashierItem} from 'interfaces/dashboard.interface'
+import {ICheckoutItem} from 'interfaces/dashboard.interface'
 import styles from './styles.module.scss'
 import {Button, Card, CardTitle, Loader} from 'components'
 import {CSSProperties, FC} from 'react'
@@ -16,11 +16,11 @@ interface IProperties {
 
 const Index: FC<IProperties> = ({style, className}) => {
 	const navigate = useNavigate()
-	const {data: currencies = [], isPending} = useData<ICashierItem[]>('currency/organization/balance/')
+	const {data: currencies = [], isPending} = useData<ICheckoutItem[]>('currency/organization/balance/')
 
 	return (
 		<Card style={style} className={classNames(styles.root, className)}>
-			<CardTitle title="Cashier"/>
+			<CardTitle title="Checkout"/>
 			<div style={{marginTop: '1rem'}} className="flex flex-col gap-lg">
 				<div className={styles['currencies-wrapper']}>
 					{
@@ -46,7 +46,7 @@ const Index: FC<IProperties> = ({style, className}) => {
 						icon={<Loss/>}
 						style={{width: '100%'}}
 					>
-						Make loss
+						Making loss
 					</Button>
 				</div>
 			</div>

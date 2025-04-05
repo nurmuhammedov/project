@@ -22,17 +22,17 @@ const Index: FC<IProperties> = ({minHeight = 15.5}) => {
 			startsWith: true,
 			url: '/admin/products/exchange',
 			height: 0
-		},
-		{
-			startsWith: false,
-			url: 'product-exchange',
-			height: 0
-		},
-		{
-			startsWith: false,
-			url: 'currency-exchange',
-			height: 0
 		}
+		// {
+		// 	startsWith: false,
+		// 	url: 'product-exchange',
+		// 	height: 0
+		// },
+		// {
+		// 	startsWith: false,
+		// 	url: 'currency-exchange',
+		// 	height: 0
+		// }
 	]
 
 	useEffect(() => {

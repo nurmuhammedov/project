@@ -45,19 +45,19 @@ const ExpenseTypes = () => {
 		totalPages,
 		isPending: isLoading,
 		refetch
-	} = usePaginatedData<IExpenseTypeDetail[]>('cost-types', {
+	} = usePaginatedData<IExpenseTypeDetail[]>('service-types', {
 		page,
 		page_size: pageSize
 	})
 
-	const {mutateAsync: addExpenseType, isPending: isAdding} = useAdd('cost-types')
-	const {mutateAsync: updateExpenseType, isPending: isUpdating} = useUpdate('cost-types/', updateId)
+	const {mutateAsync: addExpenseType, isPending: isAdding} = useAdd('service-types')
+	const {mutateAsync: updateExpenseType, isPending: isUpdating} = useUpdate('service-types/', updateId)
 
 	const {
 		data: detail,
 		isPending: isDetailLoading,
 		isFetching
-	} = useDetail<IExpenseTypeDetail>('cost-types/', updateId)
+	} = useDetail<IExpenseTypeDetail>('service-types/', updateId)
 
 	const {
 		handleSubmit: handleAddSubmit,
@@ -187,7 +187,7 @@ const ExpenseTypes = () => {
 				</Form>
 			</EditModal>
 
-			<DeleteModal endpoint="cost-types/" onDelete={() => refetch()}/>
+			<DeleteModal endpoint="service-types/" onDelete={() => refetch()}/>
 		</>
 	)
 }
