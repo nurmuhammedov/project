@@ -1,16 +1,27 @@
 .root {
-  display: flex;
+  border-radius: 0.25rem;
+
   min-width: 6rem;
+  display: inline-block;
   padding: 0.375rem 0.75rem;
-  justify-content: center;
-  align-items: center;
-  color: var(--slate-gray);
+  //justify-content: center;
+  //align-items: flex-start;
+  background: var(--teal-green-light);
+  color: var(--teal-green);
   text-align: center;
   font-family: Golos, Arial, Helvetica, sans-serif;
-  font-size: 1rem;
+  font-size: 0.875rem;
   font-style: normal;
   font-weight: 500;
   line-height: 150%;
-  border-radius: 0.25rem;
-  background: var(--light-blue);
+}
+
+.loss {
+  background: var(--deep-red);
+  color: var(--crimson-red);
+}
+
+.expense {
+  background: var(--peach-cream);
+  color: var(--burnt-orange);
 }

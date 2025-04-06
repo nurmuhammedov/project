@@ -5,7 +5,8 @@ import {
 	Input,
 	ReactTable,
 	Pagination,
-	DetailButton, Badge
+	DetailButton,
+	Badge
 } from 'components'
 import {IExchange} from 'modules/clients/interfaces'
 import {exchangeOptions} from 'modules/dashboard/helpers/options'
@@ -15,17 +16,14 @@ import {usePaginatedData, usePagination} from 'hooks'
 import {decimalToPrice, findName} from 'utilities/common'
 import {formatDate} from 'utilities/date'
 import {useTranslation} from 'react-i18next'
-import {useParams} from 'react-router-dom'
 
 
 const Index = () => {
 	const {t} = useTranslation()
 	const {page, pageSize} = usePagination()
-	const {customerId = undefined} = useParams()
 	const {data, totalPages, isPending: isLoading} = usePaginatedData<IExchange[]>(
-		`transactions/by-customer`,
-		{page: page, page_size: pageSize, customer: customerId},
-		!!customerId
+		`transactions`,
+		{page: page, page_size: pageSize}
 	)
 
 	const columns: Column<IExchange>[] = useMemo(() =>
@@ -63,13 +61,13 @@ const Index = () => {
 						<div className="flex items-start gap-lg">
 							<DetailButton
 								id={row.id}
-								url={`${row.id}/currency-exchange?tab=${row.type == 2 ? '2' : row.type == 3 ? '3' : '1'}`}
+								url={`/admin/home/currency-exchange/${row.id}?tab=${row.type == 2 ? '2' : row.type == 3 ? '3' : '1'}`}
 							/>
 						</div>
 					)
 				}
 			],
-		[t, page, pageSize]
+		[]
 	)
 
 	return (
@@ -95,3 +93,5 @@ const Index = () => {
 }
 
 export default Index
+
+

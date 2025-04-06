@@ -2,21 +2,6 @@ import {IIDName} from 'interfaces/configuration.interface'
 import {IMeasureItemDetail} from 'interfaces/database.interface'
 
 
-interface IProductItemDetail {
-	id: number;
-	type: IIDName;
-	package: IIDName;
-	country: IIDName;
-	brand: IIDName;
-	measure: IIDName;
-	created_at: string; // ISO 8601 date-time
-	updated_at: string; // ISO 8601 date-time
-	name: string;
-	code: number;
-	is_serial: boolean;
-	barcodes: string[];
-}
-
 interface IPackage {
 	id?: number;
 	name: string;
@@ -92,7 +77,6 @@ interface IPurchaseListItem {
 
 
 export type {
-	IProductItemDetail,
 	TemporaryListItem,
 	IValidationData,
 	ISerialNumber,

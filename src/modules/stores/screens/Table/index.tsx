@@ -23,7 +23,7 @@ import {
 	ReactTable,
 	EditButton,
 	DetailButton,
-	Select
+	Select, PageTitle
 } from 'components'
 import {InferType} from 'yup'
 
@@ -128,10 +128,14 @@ const Stores = () => {
 
 	return (
 		<>
+			<PageTitle title="Stores">
+				<div className="flex align-center gap-lg">
+					<Button icon={<Plus/>} onClick={() => addParams({modal: 'store'})}>Add a new store</Button>
+				</div>
+			</PageTitle>
 			<Card screen={true} className="span-9 gap-2xl">
 				<div className="flex justify-between align-center">
 					<Input id="search" icon={<Search/>} placeholder="Search" radius style={{width: 400}}/>
-					<Button icon={<Plus/>} onClick={() => addParams({modal: 'store'})}>Add</Button>
 				</div>
 
 				<div className="flex flex-col gap-md flex-1">
@@ -141,7 +145,7 @@ const Stores = () => {
 				</div>
 			</Card>
 
-			<Modal title="Add new" id="store" style={{height: '35rem'}}>
+			<Modal title="Add a new store" id="store" style={{height: '35rem'}}>
 				<Form
 					onSubmit={handleAddSubmit((formData) =>
 						addStore(formData).then(async () => {

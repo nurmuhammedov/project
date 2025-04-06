@@ -21,3 +21,8 @@ export const expenseTypeSchema = yup.object().shape({
 export const priceTypeSchema = yup.object().shape({
 	name: yup.string().trim().required('This field is required')
 })
+
+export const productTypeSchema = yup.object().shape({
+	name: yup.string().trim().required('This field is required'),
+	expiry: yup.boolean().nullable().default(false)
+})

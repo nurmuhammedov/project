@@ -1,20 +1,18 @@
-import {Box, Cart, Income, Plus} from 'assets/icons'
+import {Box, Cart, Plus} from 'assets/icons'
 import {Button, HorizontalTab, PageTitle} from 'components'
-import {BUTTON_THEME} from 'constants/fields'
 import {useSearchParams} from 'hooks'
 import {ISelectOption} from 'interfaces/form.interface'
-import ProductWarehouse from 'modules/products/components/Warehouse'
-import {useNavigate} from 'react-router-dom'
+import ProductWarehouse from 'modules/products/components/Products'
 
 
 const tabOptions: ISelectOption[] = [
 	{
-		label: 'Product warehouse',
-		value: 'productWarehouse',
+		label: 'Products',
+		value: 'products',
 		icon: <Cart/>
 	},
 	{
-		label: 'Warehouse',
+		label: 'Products',
 		value: 'warehouse',
 		icon: <Box/>
 	}
@@ -22,26 +20,11 @@ const tabOptions: ISelectOption[] = [
 
 const Index = () => {
 	const {paramsObject: {tab = tabOptions[0]?.value}, addParams} = useSearchParams()
-	const navigate = useNavigate()
 
 	return (
 		<>
 			<PageTitle title="Products">
 				<div className="flex align-center gap-lg">
-					<Button
-						theme={BUTTON_THEME.DANGER_OUTLINE}
-						icon={<Cart/>}
-						onClick={() => navigate('exchange?tab=sale')}
-					>
-						Sale
-					</Button>
-					<Button
-						theme={BUTTON_THEME.DANGER_OUTLINE}
-						icon={<Income/>}
-						onClick={() => navigate('exchange')}
-					>
-						Making income
-					</Button>
 					<Button
 						icon={<Plus/>}
 						onClick={() => addParams({modal: 'product'})}
@@ -56,7 +39,7 @@ const Index = () => {
 				style={{marginTop: '1rem', marginBottom: '1rem'}}
 			/>
 			{
-				tab === 'productWarehouse' ? <ProductWarehouse/> :
+				tab === 'products' ? <ProductWarehouse/> :
 					null
 			}
 		</>

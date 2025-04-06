@@ -8,7 +8,7 @@ const getSelectOptions = (data: IIDName[]): ISelectOption[] => {
 }
 
 const getSelectOptionsByKey = (data: ISearchParams[], key: string = 'name'): ISelectOption[] => {
-	return data.map((item) => ({value: Number(item?.id || 0), label: String(item?.[key] || '')}))
+	return data.map((item) => ({value: item?.id || 'nb', label: String(item?.[key] || '')}))
 }
 
 export {

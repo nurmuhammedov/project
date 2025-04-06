@@ -14,7 +14,7 @@ import {
 	StoreDetail,
 	StoresTable,
 	Login,
-	Home
+	Home, CurrencyExchangeHistory
 } from 'modules'
 
 
@@ -55,7 +55,25 @@ function useAppRoutes() {
 									},
 									{
 										path: 'currency-exchange',
-										element: <CurrencyExchange/>
+										children: [
+											{
+												index: true,
+												element: <CurrencyExchange/>
+											},
+											{
+												path: 'history',
+												element: <CurrencyExchangeHistory/>
+											},
+											{
+												path: ':exchangeId',
+												children: [
+													{
+														index: true,
+														element: <CurrencyExchange detail={true}/>
+													}
+												]
+											}
+										]
 									}
 								]
 							},
@@ -97,7 +115,7 @@ function useAppRoutes() {
 										element: <ClientsTable/>
 									},
 									{
-										path: 'detail/:id',
+										path: 'detail/:customerId',
 										children: [
 											{
 												index: true,

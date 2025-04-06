@@ -1,10 +1,11 @@
+import {ISearchParams} from 'interfaces/params.interface'
+import {measurementUnits} from 'modules/database/helpers/options'
+import {IProductDetail} from 'modules/products/interfaces'
 import {Controller, useForm, useFieldArray} from 'react-hook-form'
-import {IProductItemDetail} from 'interfaces/products.interface'
 import {ISelectOption} from 'interfaces/form.interface'
 import {BUTTON_THEME, FIELD} from 'constants/fields'
 import {yupResolver} from '@hookform/resolvers/yup'
 import {getSelectValue} from 'utilities/common'
-import {seriesOptions} from 'helpers/options'
 import {useTranslation} from 'react-i18next'
 import {Plus, Search} from 'assets/icons'
 import {productSchema} from 'helpers/yup'
@@ -24,7 +25,7 @@ import {
 	EditButton,
 	Pagination,
 	DeleteModal,
-	DeleteButton
+	DeleteButton, Checkbox
 } from 'components'
 
 import {
@@ -36,6 +37,7 @@ import {
 	useSearchParams,
 	usePaginatedData
 } from 'hooks'
+import {getSelectOptionsByKey} from 'utilities/select'
 
 
 const Products = () => {
@@ -46,12 +48,10 @@ const Products = () => {
 		paramsObject: {updateId = undefined, modal = undefined}
 	} = useSearchParams()
 	const {data: types = []} = useData<ISelectOption[]>('product-types/select', modal === 'product' || modal === 'edit')
-	const {data: packages = []} = useData<ISelectOption[]>('packages/select', modal === 'product' || modal === 'edit')
 	const {data: countries = []} = useData<ISelectOption[]>('countries/select', modal === 'product' || modal === 'edit')
 	const {data: brands = []} = useData<ISelectOption[]>('brands/select', modal === 'product' || modal === 'edit')
-	const {data: measures = []} = useData<ISelectOption[]>('organization/measurement/select', modal === 'product' || modal === 'edit')
 
-	const {data, totalPages, isPending: isLoading, refetch} = usePaginatedData<IProductItemDetail[]>(
+	const {data, totalPages, isPending: isLoading, refetch} = usePaginatedData<IProductDetail[]>(
 		`products`,
 		{page: page, page_size: pageSize}
 	)
@@ -70,7 +70,6 @@ const Products = () => {
 			is_serial: false,
 			barcodes: [],
 			type: undefined,
-			package: undefined,
 			country: undefined,
 			brand: undefined,
 			measure: undefined
@@ -87,11 +86,11 @@ const Products = () => {
 		name: 'barcodes' as never
 	})
 
-	const columns: Column<IProductItemDetail>[] = useMemo(
+	const columns: Column<IProductDetail>[] = useMemo(
 		() => [
 			{
 				Header: t('№'),
-				accessor: (_: IProductItemDetail, index: number) => (page - 1) * pageSize + (index + 1),
+				accessor: (_: IProductDetail, index: number) => (page - 1) * pageSize + (index + 1),
 				style: {
 					width: '3rem',
 					textAlign: 'center'
@@ -99,31 +98,27 @@ const Products = () => {
 			},
 			{
 				Header: t('Name'),
-				accessor: (row: IProductItemDetail) => row.name
+				accessor: (row: IProductDetail) => row.name
 			},
 			{
 				Header: t('Type'),
-				accessor: (row: IProductItemDetail) => row.type?.name
+				accessor: (row: IProductDetail) => row.type?.name
 			},
 			{
 				Header: t('Brand'),
-				accessor: (row: IProductItemDetail) => row.brand?.name
+				accessor: (row: IProductDetail) => row.brand?.name
 			},
 			{
 				Header: t('Country'),
-				accessor: (row: IProductItemDetail) => row.country?.name
-			},
-			{
-				Header: t('Measure unit'),
-				accessor: (row: IProductItemDetail) => row.measure?.name
+				accessor: (row: IProductDetail) => row.country?.name
 			},
 			{
 				Header: t('Series'),
-				accessor: (row: IProductItemDetail) => (row.is_serial ? t('With a series') : t('Without a series'))
+				accessor: (row: IProductDetail) => (row.is_serial ? t('With a series') : t('Without a series'))
 			},
 			{
 				Header: t('Actions'),
-				accessor: (row: IProductItemDetail) => (
+				accessor: (row: IProductDetail) => (
 					<div className="flex items-start gap-lg">
 						<EditButton id={row.id}/>
 						<DeleteButton id={row.id}/>
@@ -131,7 +126,7 @@ const Products = () => {
 				)
 			}
 		],
-		[t, page, pageSize]
+		[page, pageSize]
 	)
 
 	const {
@@ -148,7 +143,6 @@ const Products = () => {
 			is_serial: false,
 			barcodes: [],
 			type: undefined,
-			package: undefined,
 			country: undefined,
 			brand: undefined,
 			measure: undefined
@@ -167,7 +161,7 @@ const Products = () => {
 
 	const {mutateAsync, isPending: isAdding} = useAdd('products')
 	const {mutateAsync: update, isPending: isUpdating} = useUpdate('products/', updateId)
-	const {data: detail, isPending: isDetailLoading, isFetching} = useDetail<IProductItemDetail>('products/', updateId)
+	const {data: detail, isPending: isDetailLoading, isFetching} = useDetail<IProductDetail>('products/', updateId)
 
 	useEffect(() => {
 		if (detail && !isDetailLoading) {
@@ -176,14 +170,12 @@ const Products = () => {
 				is_serial: detail.is_serial,
 				barcodes: detail.barcodes || [],
 				type: detail.type?.id as number,
-				package: detail.package?.id as number || null,
 				country: detail.country?.id as number || undefined,
 				brand: detail.brand?.id as number || undefined,
-				measure: detail.measure?.id as number
+				measure: detail.measure as unknown as string
 			})
 		}
 	}, [detail])
-
 
 	return (
 		<>
@@ -202,7 +194,7 @@ const Products = () => {
 				<Pagination totalPages={totalPages}/>
 			</Card>
 
-			<Modal title="Add a new product" id="product" style={{height: '60rem', width: '60rem'}}>
+			<Modal title="Add a new product" id="product" style={{height: '45rem', width: '60rem'}}>
 				<Form
 					onSubmit={handleAddSubmit((data) =>
 						mutateAsync(data).then(async () => {
@@ -212,14 +204,15 @@ const Products = () => {
 						})
 					)}
 				>
-					<Input
-						id="name"
-						label="Name"
-						error={addErrors.name?.message}
-						{...registerAdd('name')}
-					/>
-
 					<div className="grid gap-lg">
+						<div className="span-6">
+							<Input
+								id="nameAdd"
+								label="Name"
+								error={addErrors.name?.message}
+								{...registerAdd('name')}
+							/>
+						</div>
 						<div className="span-6">
 							<Controller
 								name="type"
@@ -239,14 +232,14 @@ const Products = () => {
 								)}
 							/>
 						</div>
-						<div className="span-6">
+						<div className="span-4">
 							<Controller
 								name="brand"
 								control={controlAdd}
 								render={({field: {value, ref, onChange, onBlur}}) => (
 									<Select
 										ref={ref}
-										id="brand"
+										id="brandAdd"
 										label="Brand"
 										options={brands}
 										onBlur={onBlur}
@@ -258,14 +251,33 @@ const Products = () => {
 								)}
 							/>
 						</div>
-						<div className="span-6">
+						<div className="span-4">
+							<Controller
+								name="measure"
+								control={controlAdd}
+								render={({field: {value, ref, onChange, onBlur}}) => (
+									<Select
+										ref={ref}
+										id="measureAdd"
+										label="Measure unit"
+										options={getSelectOptionsByKey(measurementUnits as unknown as ISearchParams[], 'name')}
+										onBlur={onBlur}
+										error={addErrors.measure?.message}
+										value={getSelectValue(getSelectOptionsByKey(measurementUnits as unknown as ISearchParams[], 'name'), value)}
+										defaultValue={getSelectValue(getSelectOptionsByKey(measurementUnits as unknown as ISearchParams[], 'name'), value)}
+										handleOnChange={(e) => onChange(e as string)}
+									/>
+								)}
+							/>
+						</div>
+						<div className="span-4">
 							<Controller
 								name="country"
 								control={controlAdd}
 								render={({field: {value, ref, onChange, onBlur}}) => (
 									<Select
 										ref={ref}
-										id="country"
+										id="countryAdd"
 										label="Country"
 										options={countries}
 										onBlur={onBlur}
@@ -277,77 +289,26 @@ const Products = () => {
 								)}
 							/>
 						</div>
-						<div className="span-6">
-							<Controller
-								name="measure"
-								control={controlAdd}
-								render={({field: {value, ref, onChange, onBlur}}) => (
-									<Select
-										ref={ref}
-										id="measure"
-										label="Measure unit"
-										options={measures}
-										onBlur={onBlur}
-										error={addErrors.measure?.message}
-										value={getSelectValue(measures, value)}
-										defaultValue={getSelectValue(measures, value)}
-										handleOnChange={(e) => onChange(e as string)}
-									/>
-								)}
+
+						<div className="span-12">
+							<Checkbox
+								id="seriesAdd"
+								title="Series?"
+								{...registerAdd('is_serial')}
 							/>
 						</div>
+						{
+							addBarcodeFields?.map((_field, index) => (
+								<Input
+									id={`barcodes.${index}.add`}
+									label={`Barcode`}
+									handleDelete={() => addBarcodeRemove(index)}
+									error={addErrors.barcodes?.[index]?.message}
+									{...registerAdd(`barcodes.${index}`)}
+								/>
+							))
+						}
 					</div>
-
-					<Controller
-						name="package"
-						control={controlAdd}
-						render={({field: {value, ref, onChange, onBlur}}) => (
-							<Select
-								ref={ref}
-								top={true}
-								id="package"
-								label="Package"
-								isClearable={true}
-								options={packages}
-								onBlur={onBlur}
-								error={addErrors.package?.message}
-								value={getSelectValue(packages, value)}
-								defaultValue={getSelectValue(packages, value)}
-								handleOnChange={(e) => onChange(e as string)}
-							/>
-						)}
-					/>
-
-					<Controller
-						name="is_serial"
-						control={controlAdd}
-						render={({field: {value, ref, onChange, onBlur}}) => (
-							<Select
-								ref={ref}
-								top={true}
-								id="is_serial"
-								label="Series?"
-								onBlur={onBlur}
-								error={addErrors.is_serial?.message}
-								options={seriesOptions}
-								value={getSelectValue(seriesOptions, value)}
-								defaultValue={getSelectValue(seriesOptions, value)}
-								handleOnChange={(e) => onChange(e as string)}
-							/>
-						)}
-					/>
-
-					{
-						addBarcodeFields?.map((_field, index) => (
-							<Input
-								id={`barcodes.${index}`}
-								label={`Barcode`}
-								handleDelete={() => addBarcodeRemove(index)}
-								error={addErrors.barcodes?.[index]?.message}
-								{...registerAdd(`barcodes.${index}`)}
-							/>
-						))
-					}
 
 					<div>
 						<Button
@@ -367,7 +328,7 @@ const Products = () => {
 				</Form>
 			</Modal>
 
-			<EditModal isLoading={isFetching || !detail} style={{height: '60rem', width: '60rem'}}>
+			<EditModal isLoading={isFetching || !detail} style={{height: '45rem', width: '60rem'}}>
 				<Form
 					onSubmit={handleEditSubmit((data) =>
 						update(data)
@@ -378,14 +339,17 @@ const Products = () => {
 							})
 					)}
 				>
-					<Input
-						id="name"
-						label="Name"
-						error={editErrors.name?.message}
-						{...registerEdit('name')}
-					/>
 
 					<div className="grid gap-lg">
+
+						<div className="span-6">
+							<Input
+								id="nameEdit"
+								label="Name"
+								error={editErrors.name?.message}
+								{...registerEdit('name')}
+							/>
+						</div>
 						<div className="span-6">
 							<Controller
 								name="type"
@@ -393,11 +357,11 @@ const Products = () => {
 								render={({field: {value, ref, onChange, onBlur}}) => (
 									<Select
 										ref={ref}
-										id="type"
+										id="typeEdit"
 										label="Type"
-										options={types}
 										onBlur={onBlur}
 										error={editErrors.type?.message}
+										options={types}
 										value={getSelectValue(types, value)}
 										defaultValue={getSelectValue(types, value)}
 										handleOnChange={(e) => onChange(e as string)}
@@ -405,14 +369,14 @@ const Products = () => {
 								)}
 							/>
 						</div>
-						<div className="span-6">
+						<div className="span-4">
 							<Controller
 								name="brand"
 								control={controlEdit}
 								render={({field: {value, ref, onChange, onBlur}}) => (
 									<Select
 										ref={ref}
-										id="brand"
+										id="brandEdit"
 										label="Brand"
 										options={brands}
 										onBlur={onBlur}
@@ -424,14 +388,34 @@ const Products = () => {
 								)}
 							/>
 						</div>
-						<div className="span-6">
+						<div className="span-4">
+							<Controller
+								name="measure"
+								control={controlEdit}
+								render={({field: {value, ref, onChange, onBlur}}) => (
+									<Select
+										ref={ref}
+										id="measureEdit"
+										isDisabled={true}
+										label="Measure unit"
+										options={getSelectOptionsByKey(measurementUnits as unknown as ISearchParams[], 'name')}
+										onBlur={onBlur}
+										error={editErrors.measure?.message}
+										value={getSelectValue(getSelectOptionsByKey(measurementUnits as unknown as ISearchParams[], 'name'), value)}
+										defaultValue={getSelectValue(getSelectOptionsByKey(measurementUnits as unknown as ISearchParams[], 'name'), value)}
+										handleOnChange={(e) => onChange(e as string)}
+									/>
+								)}
+							/>
+						</div>
+						<div className="span-4">
 							<Controller
 								name="country"
 								control={controlEdit}
 								render={({field: {value, ref, onChange, onBlur}}) => (
 									<Select
 										ref={ref}
-										id="country"
+										id="countryEdit"
 										label="Country"
 										options={countries}
 										onBlur={onBlur}
@@ -443,79 +427,28 @@ const Products = () => {
 								)}
 							/>
 						</div>
-						<div className="span-6">
-							<Controller
-								name="measure"
-								control={controlEdit}
-								render={({field: {value, ref, onChange, onBlur}}) => (
-									<Select
-										ref={ref}
-										id="measure"
-										label="Measure unit"
-										options={measures}
-										onBlur={onBlur}
-										error={editErrors.measure?.message}
-										value={getSelectValue(measures, value)}
-										defaultValue={getSelectValue(measures, value)}
-										handleOnChange={(e) => onChange(e as string)}
-									/>
-								)}
+
+						<div className="span-12">
+							<Checkbox
+								id="seriesEdit"
+								title="Series?"
+								{...registerEdit('is_serial')}
 							/>
 						</div>
-					</div>
 
-					<Controller
-						name="package"
-						control={controlEdit}
-						render={({field: {value, ref, onChange, onBlur}}) => (
-							<Select
-								ref={ref}
-								top={true}
-								id="package"
-								label="Package"
-								options={packages}
-								isClearable={true}
-								onBlur={onBlur}
-								error={editErrors.package?.message}
-								value={getSelectValue(packages, value)}
-								defaultValue={getSelectValue(packages, value)}
-								handleOnChange={(e) => onChange(e as string)}
-							/>
-						)}
-					/>
-
-					<Controller
-						name="is_serial"
-						control={controlEdit}
-						render={({field: {value, ref, onChange, onBlur}}) => (
-							<Select
-								ref={ref}
-								top={true}
-								id="is_serial"
-								label="Series?"
-								onBlur={onBlur}
-								error={editErrors.is_serial?.message}
-								options={seriesOptions}
-								value={getSelectValue(seriesOptions, value)}
-								defaultValue={getSelectValue(seriesOptions, value)}
-								handleOnChange={(e) => onChange(e as string)}
-							/>
-						)}
-					/>
-
-					{
-						editBarcodeFields?.map((_field, index) => {
-							return (
+						{
+							editBarcodeFields?.map((_field, index) => (
 								<Input
-									id={`barcodes.${index}`}
+									id={`barcodes.${index}.edit`}
 									label={`Barcode`}
 									handleDelete={() => editBarcodeRemove(index)}
 									error={editErrors.barcodes?.[index]?.message}
 									{...registerEdit(`barcodes.${index}`)}
 								/>
-							)
-						})
-					}
+							))
+						}
+					</div>
+
 					<div>
 						<Button
 							type="button"

@@ -12,7 +12,9 @@ import {
 	Pagination,
 	ReactTable,
 	Form,
-	Select, PageTitle, Badge, DetailButton
+	Select,
+	PageTitle,
+	DetailButton
 } from 'components'
 import {FIELD} from 'constants/fields'
 import {regionsOptions} from 'helpers/options'
@@ -57,7 +59,6 @@ const Index = () => {
 	const {data: currencies = []} = useData<ISelectOption[]>('currencies/select', modal === 'customer' || modal === 'edit')
 	const {data: stores = []} = useData<ISelectOption[]>('stores/select', modal === 'customer' || modal === 'edit')
 	const {data: priceTypes = []} = useData<ISelectOption[]>('price-types/select', modal === 'customer' || modal === 'edit')
-
 
 	const {mutateAsync: addCustomer, isPending: isAdding} = useAdd('customers')
 	const {mutateAsync: updateCustomer, isPending: isUpdating} = useUpdate('customers/', updateId, 'patch')
@@ -112,6 +113,10 @@ const Index = () => {
 				accessor: row => row.name
 			},
 			{
+				Header: t('Store'),
+				accessor: row => row.store?.name
+			},
+			{
 				Header: t('Client code'),
 				accessor: row => row.code
 			},
@@ -121,11 +126,11 @@ const Index = () => {
 			},
 			{
 				Header: t('Price type'),
-				accessor: row => <Badge title={row.price_type?.name}/>
+				accessor: row => row.price_type?.name
 			},
 			{
 				Header: t('Currency'),
-				accessor: row => <Badge title={row.currency?.name}/>
+				accessor: row => row.currency?.name
 			},
 			{
 				Header: t('Actions'),

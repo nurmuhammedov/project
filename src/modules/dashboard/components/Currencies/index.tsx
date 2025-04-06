@@ -20,7 +20,8 @@ const Index: FC<IProperties> = ({style, className}) => {
 	return (
 		<Card style={style} className={classNames(styles.root, className)}>
 			<CardTitle
-				title="Exchange rate" subTitle="Exchange rate history"
+				title="Exchange rate"
+				subTitle="Exchange rate history"
 				onClick={() => navigate(`daily-currency`)}
 			/>
 			<div style={{marginTop: '2.12rem'}} className="flex flex-col gap-lg">

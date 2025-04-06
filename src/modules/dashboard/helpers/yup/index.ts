@@ -28,16 +28,7 @@ export const currencyExchangeSchema = yup.object().shape({
 						'This field is required',
 						function () {
 							const {customer_amount} = this.parent
-							// If `store_amount` has a value, `customer_amount` must have a value too
-							if (this.parent.store_amount && !customer_amount) {
-								return false
-							}
-							// If `customer_amount` has a value, `store_amount` must have a value too
-							if (!this.parent.store_amount && customer_amount) {
-								return false
-							}
-							// If both are null, it's valid
-							return true
+							return !(!this.parent.store_amount && !!customer_amount);
 						}
 					)
 					.transform(value => value ? value : null)
@@ -55,16 +46,7 @@ export const currencyExchangeSchema = yup.object().shape({
 						'This field is required',
 						function () {
 							const {store_amount} = this.parent
-							// If `customer_amount` has a value, `store_amount` must have a value too
-							if (this.parent.customer_amount && !store_amount) {
-								return false
-							}
-							// If `store_amount` has a value, `customer_amount` must have a value too
-							if (!this.parent.customer_amount && store_amount) {
-								return false
-							}
-							// If both are null, it's valid
-							return true
+							return !(!this.parent.customer_amount && !!store_amount);
 						}
 					)
 					.transform(value => value ? value : null)

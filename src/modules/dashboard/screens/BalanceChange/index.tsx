@@ -5,34 +5,30 @@ import {
 	Input,
 	ReactTable,
 	Pagination,
-	DetailButton, Badge
+	Badge
 } from 'components'
-import {IExchange} from 'modules/clients/interfaces'
-import {exchangeOptions} from 'modules/dashboard/helpers/options'
+import {IBalanceChange} from 'modules/dashboard/interfaces'
 import {useMemo} from 'react'
 import {Column} from 'react-table'
 import {usePaginatedData, usePagination} from 'hooks'
-import {decimalToPrice, findName} from 'utilities/common'
+import {decimalToPrice} from 'utilities/common'
 import {formatDate} from 'utilities/date'
 import {useTranslation} from 'react-i18next'
-import {useParams} from 'react-router-dom'
 
 
 const Index = () => {
 	const {t} = useTranslation()
 	const {page, pageSize} = usePagination()
-	const {customerId = undefined} = useParams()
-	const {data, totalPages, isPending: isLoading} = usePaginatedData<IExchange[]>(
-		`transactions/by-customer`,
-		{page: page, page_size: pageSize, customer: customerId},
-		!!customerId
+	const {data, totalPages, isPending: isLoading} = usePaginatedData<IBalanceChange[]>(
+		`transactions/changes`,
+		{page: page, page_size: pageSize}
 	)
 
-	const columns: Column<IExchange>[] = useMemo(() =>
+	const columns: Column<IBalanceChange>[] = useMemo(() =>
 			[
 				{
 					Header: t('№'),
-					accessor: (_: IExchange, index: number) => ((page - 1) * pageSize) + (index + 1),
+					accessor: (_: IBalanceChange, index: number) => ((page - 1) * pageSize) + (index + 1),
 					style: {
 						width: '3rem',
 						textAlign: 'center'
@@ -43,33 +39,30 @@ const Index = () => {
 					accessor: row => row?.store?.name
 				},
 				{
-					Header: t('Amount'),
-					accessor: row => `${decimalToPrice(row?.amount || 0)} ${row?.currency?.name?.toLowerCase()}`
+					Header: t('Customer'),
+					accessor: row => row?.customer?.name
 				},
+				{
+					Header: t('Conversion'),
+					accessor: row => `${row?.store_currency?.name?.toLowerCase()} -> ${row?.customer_currency?.name?.toLowerCase()}`
+				},
+				// {
+				// 	Header: t('Amount'),
+				// 	accessor: row => `${decimalToPrice(row?.amount || 0)} ${row?.currency?.name?.toLowerCase()}`
+				// },
 				{
 					Header: t('Type'),
 					accessor: row => <Badge
-						title={findName(exchangeOptions, row.type)}
-						type={row.type == 2 ? 'loss' : row?.type == 3 ? 'expense' : undefined}
+						title={`${decimalToPrice(row.change)} ${row?.store_currency?.name?.toLowerCase()}`}
+						type={Number(row.change) < 0 ? 'loss' : undefined}
 					/>
 				},
 				{
 					Header: t('Date'),
 					accessor: row => formatDate(row.created_at ?? '')
-				},
-				{
-					Header: t('Actions'),
-					accessor: row => (
-						<div className="flex items-start gap-lg">
-							<DetailButton
-								id={row.id}
-								url={`${row.id}/currency-exchange?tab=${row.type == 2 ? '2' : row.type == 3 ? '3' : '1'}`}
-							/>
-						</div>
-					)
 				}
 			],
-		[t, page, pageSize]
+		[]
 	)
 
 	return (
@@ -95,3 +88,5 @@ const Index = () => {
 }
 
 export default Index
+
+

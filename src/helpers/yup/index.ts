@@ -66,14 +66,14 @@ const productSchema = yup.object().shape({
 	name: yup.string().trim().required('This field is required'),
 	is_serial: yup.boolean().required('This field is required'),
 	type: yup.number().required('This field is required'),
-	package: yup.number().nullable(),
+	// package: yup.number().nullable(),
 	country: yup.number().nullable(),
 	barcodes: yup
 		.array()
 		.of(yup.string().trim().required('This field is required'))
 		.nullable(),
 	brand: yup.number().required('This field is required'),
-	measure: yup.number().required('This field is required')
+	measure: yup.string().trim().required('This field is required')
 })
 
 const temporaryItemSchema = yup.object().shape({

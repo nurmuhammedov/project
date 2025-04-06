@@ -54,3 +54,16 @@ export interface ITransactionDetail {
 	records: IRecord[];
 	created_at: string;
 }
+
+
+export interface IBalanceChange {
+	readonly id: number;
+	store: IIDName;
+	customer: IIDName;
+	type: number;
+	created_at: string;
+	store_currency: IIDName;
+	customer_currency: IIDName;
+	change: string;
+}
+

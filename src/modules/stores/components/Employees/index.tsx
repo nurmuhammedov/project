@@ -63,7 +63,7 @@ const Employees = () => {
 
 	const {data, totalPages, isPending: isLoading, refetch} = usePaginatedData<IEmployeeDetail[]>(
 		`users`,
-		{page: page, page_size: pageSize},
+		{page: page, page_size: pageSize, store: id},
 		!!id
 	)
 

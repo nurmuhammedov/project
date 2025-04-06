@@ -13,3 +13,8 @@ export const exchangeOptions: ISelectOption[] = [
 	{label: 'Loss', value: 2},
 	{label: 'Expense', value: 3}
 ]
+
+export const exchangeTabs: ISelectOption[] = [
+	{label: 'Currency exchange history', value: 'currencies'},
+	{label: 'Balance change', value: 'balanceChange'},
+]

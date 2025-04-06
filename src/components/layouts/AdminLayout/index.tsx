@@ -22,6 +22,11 @@ const Index: FC<IProperties> = ({minHeight = 15.5}) => {
 			startsWith: true,
 			url: '/admin/products/exchange',
 			height: 0
+		},
+		{
+			startsWith: false,
+			url: 'admin/home',
+			height: 22
 		}
 		// {
 		// 	startsWith: false,

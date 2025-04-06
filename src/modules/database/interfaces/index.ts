@@ -36,3 +36,10 @@ export interface IPriceTypeDetail {
 	name: string;
 	created_at: string;
 }
+
+export interface IProductTypeDetail {
+	id: number;
+	name: string;
+	expiry: boolean;
+	created_at: string;
+}

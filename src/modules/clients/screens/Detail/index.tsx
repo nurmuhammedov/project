@@ -17,9 +17,9 @@ const tabOptions: ISelectOption[] = [
 ]
 
 const Index = () => {
-	const {id = undefined} = useParams()
+	const {customerId = undefined} = useParams()
 	const navigate = useNavigate()
-	const {data: detail, isPending: isDetailLoading} = useDetail<ICustomerDetail>('customers/', id)
+	const {data: detail, isPending: isDetailLoading} = useDetail<ICustomerDetail>('customers/', customerId)
 	const {paramsObject: {tab = tabOptions[0]?.value}} = useSearchParams()
 
 

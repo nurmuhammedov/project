@@ -18,7 +18,7 @@ const tabOptions: ISelectOption[] = [
 	// 	icon: <Cart/>
 	// },
 	// {
-	// 	label: 'Warehouse',
+	// 	label: 'Products',
 	// 	value: 'warehouse',
 	// 	icon: <Box/>
 	// },
