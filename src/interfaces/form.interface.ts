@@ -34,7 +34,7 @@ interface ISelectOption {
 	value: string | number | boolean;
 	label: string | number | boolean;
 	icon?: React.ReactNode;
-	value_type?: 'int' | 'float';
+	code?: string;
 }
 
 // Select Interface

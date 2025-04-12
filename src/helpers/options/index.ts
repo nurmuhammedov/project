@@ -1,7 +1,7 @@
 import {ISelectOption} from 'interfaces/form.interface'
 
 // COMMON
-const paginationOptions: ISelectOption[] = [
+export const paginationOptions: ISelectOption[] = [
 	{value: 5, label: '5'},
 	{value: 10, label: '10'},
 	{value: 20, label: '20'},
@@ -9,7 +9,15 @@ const paginationOptions: ISelectOption[] = [
 	{value: 100, label: '100'}
 ]
 
-const regionsOptions: ISelectOption[] = [
+export const currencyOptions: ISelectOption[] = [
+	{value: 'USD', label: 'Dollar', code: '$'},
+	{value: 'UZS', label: 'Sum', code: 'sum'},
+	{value: 'P2P', label: 'Click', code: 'sum'},
+	{value: 'TRANSFER', label: 'Transfer', code: 'sum'},
+	{value: 'RUB', label: 'Ruble', code: 'ruble'}
+]
+
+export const regionsOptions: ISelectOption[] = [
 	{
 		label: 'Fergana region',
 		value: 12
@@ -87,7 +95,5 @@ const seriesOptions: ISelectOption[] = [
 
 export {
 	seriesOptions,
-	regionsOptions,
-	paginationOptions,
 	productExchangeTabOptions
 }
