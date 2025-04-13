@@ -2,6 +2,7 @@ import {currencyOptions} from 'helpers/options'
 import {IBalance, ITransaction} from 'modules/dashboard/interfaces'
 import {ISearchParams} from 'interfaces/params.interface'
 import {ISelectOption} from 'interfaces/form.interface'
+import {TFunction} from 'i18next'
 
 
 export const noop = (): void => {}
@@ -55,13 +56,13 @@ export function sumDecimals(values: string[]): number {
 	return parseFloat(sum.toFixed(2))
 }
 
-export function getBalanceAsString(arr: IBalance[]): string {
+export function getBalanceAsString(arr: IBalance[], t: TFunction<'translation', undefined>): string {
 	if (!arr || arr.length === 0) {
 		return decimalToPrice(0)
 	}
 
 	return arr
-		.map((item: IBalance) => `${decimalToPrice(item?.amount)} ${findName(currencyOptions, item?.currency)?.toLowerCase()}`)
+		.map((item: IBalance) => `${decimalToPrice(item?.amount)} ${t(findName(currencyOptions, item?.currency) || '')?.toLowerCase()}`)
 		.join(';  ')
 }
 

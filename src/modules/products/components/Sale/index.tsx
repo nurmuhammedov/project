@@ -5,8 +5,9 @@ import {
 	DeleteModal, EditButton, EditModal,
 	Form,
 	Input,
-	MaskInput, Modal,
-	NumberFormattedInput, ReactTable,
+	MaskInput,
+	Modal,
+	ReactTable,
 	Select
 } from 'components'
 import {currencyOptions} from 'helpers/options'
@@ -15,14 +16,14 @@ import {ICustomerShortData} from 'modules/dashboard/interfaces'
 import {measurementUnits} from 'modules/database/helpers/options'
 import AddSale from 'modules/products/components/AddSale'
 import {productExchangeTabOptions} from 'modules/products/helpers/options'
+import {saleItemSchema} from 'modules/products/helpers/yup'
 import {IPurchaseItem, ITemporaryListItem} from 'modules/products/interfaces/purchase.interface'
 import {Column} from 'react-table'
-import {decimalToInteger, decimalToPrice, findName, getSelectValue, sumDecimals} from 'utilities/common'
+import {decimalToInteger, decimalToPrice, getSelectValue, sumDecimals} from 'utilities/common'
 import {Controller, useForm} from 'react-hook-form'
 import {getDate} from 'utilities/date'
 import {BUTTON_THEME, FIELD} from 'constants/fields'
 import {yupResolver} from '@hookform/resolvers/yup'
-import {purchaseItemSchema} from 'helpers/yup'
 import {useAdd, useData, useDetail, useSearchParams} from 'hooks'
 import {useParams} from 'react-router-dom'
 import {useTranslation} from 'react-i18next'
@@ -41,7 +42,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 	const {removeParams} = useSearchParams()
 	const {id: clientId = undefined, productId = undefined} = useParams()
 	const {mutateAsync, isPending: isAdding} = useAdd('sale/create')
-	const {data: stores = []} = useData<ISelectOption[]>('stores/select')
+	const {data: clients = []} = useData<ISelectOption[]>('customers/select')
 
 	const {
 		data: purchase,
@@ -60,7 +61,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 			},
 			{
 				Header: t('Name'),
-				accessor: row => row?.product?.name
+				accessor: row => `${row?.product?.name} (${row?.product?.brand?.name || ''})`
 			},
 			{
 				Header: t('Price'),
@@ -98,40 +99,35 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 	} = useForm({
 		mode: 'onTouched',
 		defaultValues: {
-			cost_currency: undefined,
-			cost_amount: '',
 			comment: '',
-			store: undefined,
 			price_type: undefined,
 			currency: undefined,
-			supplier: clientId ? Number(clientId) : undefined,
-			purchase_date: getDate()
+			customer: clientId ? Number(clientId) : undefined,
+			sale_date: getDate()
 		},
-		resolver: yupResolver(purchaseItemSchema)
+		resolver: yupResolver(saleItemSchema)
 	})
-	const {data: clients = []} = useData<ISelectOption[]>('customers/select', !!watch('store'), {store: watch('store')})
 
-	const {data: priceTypes = []} = useData<ISelectOption[]>('price-types/select', !!watch('supplier'))
+	const {data: priceTypes = []} = useData<ISelectOption[]>('price-types/select', !!watch('customer'))
 
 	const {
 		data: temporaryList = [],
 		isFetching: isTemporaryListFetching,
 		refetch: refetchTemporaryList
-	} = useData<ITemporaryListItem[]>('sale-temporary/list', !!watch('supplier') && !retrieve, {supplier: watch('supplier')})
+	} = useData<ITemporaryListItem[]>('sale-temporary/list', !!watch('customer') && !retrieve, {supplier: watch('customer')})
 
 	const {
 		data: detail,
 		isPending: isDetailLoading
-	} = useData<ICustomerShortData>(`customers/${watch('supplier')}/short-data`, !!watch('supplier') && !retrieve)
+	} = useData<ICustomerShortData>(`customers/${watch('customer')}/short-data`, !!watch('customer') && !retrieve)
 
 	useEffect(() => {
 		if (detail && !isDetailLoading) {
 			reset((prevValues) => ({
 				...prevValues,
-				cost_currency: detail?.currency ?? undefined,
 				price_type: detail?.price_type?.id ?? undefined,
 				currency: detail?.currency ?? undefined,
-				purchase_date: getDate(),
+				sale_date: getDate(),
 				cost_amount: '0'
 			}))
 		}
@@ -141,13 +137,11 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 		if (purchase && !isPurchaseLoading) {
 			reset((prevValues) => ({
 				...prevValues,
-				supplier: purchase?.supplier?.id ?? undefined,
-				cost_currency: purchase?.currency ?? undefined,
+				customer: purchase?.supplier?.id ?? undefined,
 				store: purchase?.store?.id ?? undefined,
 				price_type: purchase?.price_type?.id ?? undefined,
 				currency: purchase?.currency ?? undefined,
-				purchase_date: purchase?.purchase_date ? getDate(purchase.purchase_date) : getDate(),
-				cost_amount: purchase?.cost_amount ?? undefined,
+				sale_date: purchase?.sale_date ? getDate(purchase.sale_date) : getDate(),
 				comment: purchase?.comment ?? undefined
 			}))
 		}
@@ -169,7 +163,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 						handleSubmit((data) => {
 							mutateAsync({
 								...data,
-								temporary_items: temporaryList?.map(i => i?.id)
+								sale_temporary_items: temporaryList?.map(i => i?.id)
 							}).then(async () => {
 								await refetchTemporaryList()
 								removeParams('updateId', 'type')
@@ -179,158 +173,99 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 				>
 					<div className="grid gap-lg span-12">
 
-						<div className="span-3">
-							<Controller
-								name="store"
-								control={control}
-								render={({field: {value, ref, onChange, onBlur}}) => (
-									<Select
-										ref={ref}
-										id="store"
-										label="Store"
-										options={stores}
-										onBlur={onBlur}
-										isDisabled={retrieve}
-										error={errors.store?.message}
-										value={getSelectValue(stores, value)}
-										defaultValue={getSelectValue(stores, value)}
-										handleOnChange={(e) => onChange(e as string)}
-									/>
-								)}
-							/>
-						</div>
+						<div className="flex gap-lg">
 
-						<div className="span-3">
-							<Controller
-								name="supplier"
-								control={control}
-								render={({field: {value, ref, onChange, onBlur}}) => (
-									<Select
-										ref={ref}
-										isDisabled={!!clientId || retrieve}
-										id="supplier"
-										label="Customer"
-										onBlur={onBlur}
-										options={clients}
-										error={errors.supplier?.message}
-										value={getSelectValue(clients, value)}
-										defaultValue={getSelectValue(clients, value)}
-										handleOnChange={(e) => onChange(e as string)}
-									/>
-								)}
-							/>
-						</div>
+							<div className="flex-1">
+								<Controller
+									name="customer"
+									control={control}
+									render={({field: {value, ref, onChange, onBlur}}) => (
+										<Select
+											ref={ref}
+											isDisabled={!!clientId || retrieve}
+											id="customer"
+											label="Customer"
+											onBlur={onBlur}
+											options={clients}
+											error={errors.customer?.message}
+											value={getSelectValue(clients, value)}
+											defaultValue={getSelectValue(clients, value)}
+											handleOnChange={(e) => onChange(e as string)}
+										/>
+									)}
+								/>
+							</div>
 
 
-						<div className="span-3">
-							<Controller
-								name="currency"
-								control={control}
-								render={({field: {value, ref, onChange, onBlur}}) => (
-									<Select
-										ref={ref}
-										id="currency"
-										label="Currency"
-										options={currencyOptions}
-										onBlur={onBlur}
-										isDisabled={retrieve}
-										error={errors.currency?.message}
-										value={getSelectValue(currencyOptions, value)}
-										defaultValue={getSelectValue(currencyOptions, value)}
-										handleOnChange={(e) => onChange(e as string)}
-									/>
-								)}
-							/>
-						</div>
+							<div className="flex-1">
+								<Controller
+									name="currency"
+									control={control}
+									render={({field: {value, ref, onChange, onBlur}}) => (
+										<Select
+											ref={ref}
+											id="currency"
+											label="Currency"
+											options={currencyOptions}
+											onBlur={onBlur}
+											isDisabled={retrieve}
+											error={errors.currency?.message}
+											value={getSelectValue(currencyOptions, value)}
+											defaultValue={getSelectValue(currencyOptions, value)}
+											handleOnChange={(e) => onChange(e as string)}
+										/>
+									)}
+								/>
+							</div>
 
-						<div className="span-3">
-							<Controller
-								name="purchase_date"
-								control={control}
-								render={({field}) => (
-									<MaskInput
-										id="purchase_date"
-										disabled={retrieve}
-										label="Date"
-										placeholder={getDate()}
-										mask="99.99.9999"
-										error={errors?.purchase_date?.message}
-										{...field}
-									/>
-								)}
-							/>
-						</div>
+							<div className="flex-1">
+								<Controller
+									name="price_type"
+									control={control}
+									render={({field: {value, ref, onChange, onBlur}}) => (
+										<Select
+											ref={ref}
+											id="price_type"
+											label="Price type"
+											options={priceTypes}
+											onBlur={onBlur}
+											isDisabled={retrieve}
+											error={errors.price_type?.message}
+											value={getSelectValue(priceTypes, value)}
+											defaultValue={getSelectValue(priceTypes, value)}
+											handleOnChange={(e) => onChange(e as string)}
+										/>
+									)}
+								/>
+							</div>
 
-						<div className="span-3">
-							<Controller
-								name="price_type"
-								control={control}
-								render={({field: {value, ref, onChange, onBlur}}) => (
-									<Select
-										ref={ref}
-										id="price_type"
-										label="Price type"
-										options={priceTypes}
-										onBlur={onBlur}
-										isDisabled={retrieve}
-										error={errors.price_type?.message}
-										value={getSelectValue(priceTypes, value)}
-										defaultValue={getSelectValue(priceTypes, value)}
-										handleOnChange={(e) => onChange(e as string)}
-									/>
-								)}
-							/>
-						</div>
+							<div className="flex-1">
+								<Input
+									id="comment"
+									label={`Comment`}
+									disabled={retrieve}
+									error={errors?.comment?.message}
+									{...register(`comment`)}
+								/>
+							</div>
 
-
-						<div className="span-3">
-							<Controller
-								name="cost_currency"
-								control={control}
-								render={({field: {value, ref, onChange, onBlur}}) => (
-									<Select
-										ref={ref}
-										id="cost_currency"
-										label="Expense currency"
-										options={currencyOptions}
-										onBlur={onBlur}
-										isDisabled={retrieve}
-										error={errors.cost_currency?.message}
-										value={getSelectValue(currencyOptions, value)}
-										defaultValue={getSelectValue(currencyOptions, value)}
-										handleOnChange={(e) => onChange(e as string)}
-									/>
-								)}
-							/>
-						</div>
-
-						<div className="span-3">
-							<Controller
-								control={control}
-								name="cost_amount"
-								render={({field}) => (
-									<NumberFormattedInput
-										id="cost_amount"
-										maxLength={13}
-										disableGroupSeparators={false}
-										disabled={retrieve}
-										allowDecimals={true}
-										label={watch('cost_currency') ? t('Expense quantity in', {currency: t(findName(currencyOptions, watch('cost_currency'))).toLowerCase() ?? ''}) : 'Expense quantity'}
-										error={errors?.cost_amount?.message}
-										{...field}
-									/>
-								)}
-							/>
-						</div>
-
-						<div className="span-3">
-							<Input
-								id="comment"
-								label={`Comment`}
-								disabled={retrieve}
-								error={errors?.comment?.message}
-								{...register(`comment`)}
-							/>
+							<div className="flex-1">
+								<Controller
+									name="sale_date"
+									control={control}
+									render={({field}) => (
+										<MaskInput
+											id="sale_date"
+											disabled={retrieve}
+											label="Date"
+											placeholder={getDate()}
+											mask="99.99.9999"
+											error={errors?.sale_date?.message}
+											{...field}
+										/>
+									)}
+								/>
+							</div>
 						</div>
 
 						<div className="span-12" style={{paddingBottom: '.5rem'}}>
@@ -339,7 +274,6 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 							<ReactTable columns={columns} data={temporaryList} isLoading={isTemporaryListFetching}/>
 							<HR style={{marginBottom: '1rem'}}/>
 						</div>
-
 
 					</div>
 
@@ -351,14 +285,6 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 									retrieve ?
 										<span>{decimalToPrice(sumDecimals(purchase?.items?.map(i => i?.total_price ?? '0.00') ?? []))} {t(currencyOptions?.find(i => i?.value == purchase?.currency)?.label?.toString() || '')?.toLowerCase() ?? ''}</span> :
 										<span>{decimalToPrice(sumDecimals(temporaryList?.map(i => i?.total_price ?? '0.00') ?? []))} {t(currencyOptions?.find(i => i?.value == watch('currency'))?.label?.toString() || '')?.toLowerCase() ?? ''}</span>
-								}
-							</div>
-							<div className={styles.price}>
-								<p>{t('Expense quantity')}:</p>
-								{
-									retrieve ?
-										<span>{decimalToPrice(purchase?.cost_amount || '0')} {t(currencyOptions?.find(i => i?.value == purchase?.cost_currency)?.label?.toString() || '')?.toLowerCase() ?? ''}</span> :
-										<span>{decimalToPrice(watch('cost_amount') || '0')} {t(currencyOptions?.find(i => i?.value == watch('cost_currency'))?.label?.toString() || '')?.toLowerCase() ?? ''}</span>
 								}
 							</div>
 						</div>
@@ -373,18 +299,18 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 							theme={BUTTON_THEME.ALERT_DANGER}
 							disabled={isAdding || temporaryList?.length < 1}
 						>
-							Save
+							{t(productExchangeTabOptions[1]?.label)}
 						</Button>
 					}
 				</Form>
 			</Card>
 
 
-			<Modal title="Add a new product" id="product" style={{height: '45rem', width: '60rem'}}>
-				<AddSale clientId={watch('supplier')} refetchTemporaryList={refetchTemporaryList}/>
+			<Modal title="Add a new product" id="product" style={{height: '40rem', width: '50rem'}}>
+				<AddSale clientId={watch('customer')} refetchTemporaryList={refetchTemporaryList}/>
 			</Modal>
 			<EditModal isLoading={false}>
-				<AddSale clientId={watch('supplier')} refetchTemporaryList={refetchTemporaryList}/>
+				<AddSale clientId={watch('customer')} refetchTemporaryList={refetchTemporaryList}/>
 			</EditModal>
 
 			{

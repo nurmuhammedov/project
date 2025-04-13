@@ -1,14 +1,12 @@
 import {yupResolver} from '@hookform/resolvers/yup'
 import {
 	Button,
-	Input,
-	MaskInput,
 	Form,
 	Select,
 	NumberFormattedInput,
-	Loader
+	Loader, FileUploader
 } from 'components'
-import {BUTTON_THEME, FIELD} from 'constants/fields'
+import {FIELD} from 'constants/fields'
 import {
 	useAdd,
 	useData,
@@ -17,17 +15,17 @@ import {
 	useUpdate
 } from 'hooks'
 import {measurementUnits} from 'modules/database/helpers/options'
+import {temporarySaleItemSchema} from 'modules/products/helpers/yup'
 import {ITemporaryListItem, IValidationData} from 'modules/products/interfaces/purchase.interface'
 import {FC, useEffect} from 'react'
-import {Controller, useFieldArray, useForm} from 'react-hook-form'
-import {temporaryItemSchema} from 'helpers/yup'
+import {Controller, useForm} from 'react-hook-form'
 import {cleanParams, decimalToNumber, getSelectValue} from 'utilities/common'
 import {ISelectOption} from 'interfaces/form.interface'
 import {getDate} from 'utilities/date'
-import {Plus} from 'assets/icons'
 import {useTranslation} from 'react-i18next'
 import {showMessage} from 'utilities/alert'
 import {ISearchParams} from 'interfaces/params.interface'
+import {getSelectOptionsByKey} from 'utilities/select'
 
 
 interface IProperties {
@@ -37,6 +35,7 @@ interface IProperties {
 
 const Index: FC<IProperties> = ({clientId, refetchTemporaryList}) => {
 	const {t} = useTranslation()
+	const {data: stores = []} = useData<ISelectOption[]>('stores/select')
 	const {
 		removeParams,
 		paramsObject: {updateId = undefined}
@@ -48,7 +47,6 @@ const Index: FC<IProperties> = ({clientId, refetchTemporaryList}) => {
 		handleSubmit,
 		watch,
 		reset,
-		register,
 		control,
 		setValue,
 		formState: {errors}
@@ -59,9 +57,9 @@ const Index: FC<IProperties> = ({clientId, refetchTemporaryList}) => {
 			unit_quantity: '',
 			serial_numbers: [],
 			product: undefined,
-			expiry_date: ''
+			store: undefined
 		},
-		resolver: yupResolver(temporaryItemSchema)
+		resolver: yupResolver(temporarySaleItemSchema)
 	})
 
 
@@ -79,12 +77,15 @@ const Index: FC<IProperties> = ({clientId, refetchTemporaryList}) => {
 		isFetching: isValidationDataFetching
 	} = useDetail<IValidationData>('products/val-data/', watch('product'))
 
+	const {data: series = []} = useData<ISearchParams[]>(`products/free-serial/select/${watch('product')}`, !!watch('product') && !!watch('store') && !!validationData?.is_serial, {store: watch('store')})
+
 	useEffect(() => {
 		if (detail && !isDetailLoading) {
 			reset({
 				product: detail.product.id,
-				expiry_date: detail.expiry_date ? getDate(detail.expiry_date) : getDate(),
+				// expiry_date: detail.expiry_date ? getDate(detail.expiry_date) : getDate(),
 				price: detail.price,
+				store: detail?.store?.id ?? undefined,
 				serial_numbers: detail.serial_numbers || [],
 				unit_quantity: detail?.product?.is_serial ? detail.serial_numbers?.length?.toString() || '0' : measurementUnits.find(i => i.id == detail.product?.measure)?.type == 'int' ? decimalToNumber(detail.unit_quantity) : detail.unit_quantity
 			})
@@ -111,16 +112,12 @@ const Index: FC<IProperties> = ({clientId, refetchTemporaryList}) => {
 				unit_quantity: '',
 				serial_numbers: [],
 				product: undefined,
-				expiry_date: ''
+				store: undefined
 			})
 		}
 	}, [updateId])
 
-
-	const {fields, append, remove} = useFieldArray({
-		control,
-		name: 'serial_numbers' as never
-	})
+	console.log(errors)
 
 	return (
 		<Form
@@ -130,11 +127,12 @@ const Index: FC<IProperties> = ({clientId, refetchTemporaryList}) => {
 					} else if (updateId) {
 						const newData = {
 							product: data?.product,
-							expiry_date: validationData?.expiry ? data?.expiry_date : null,
+							// expiry_date: validationData?.expiry ? data?.expiry_date : null,
 							price: data?.price,
 							serial_numbers: validationData?.is_serial ? data?.serial_numbers : null,
+							store: data?.store ?? null,
 							unit_quantity: validationData?.is_serial ? null : data?.unit_quantity,
-							supplier: clientId
+							customer: clientId
 						}
 						update(cleanParams(newData as ISearchParams)).then(async () => {
 							removeParams('updateId', 'modal')
@@ -143,18 +141,20 @@ const Index: FC<IProperties> = ({clientId, refetchTemporaryList}) => {
 								unit_quantity: '',
 								serial_numbers: [],
 								product: undefined,
-								expiry_date: ''
+								store: undefined
+								// expiry_date: ''
 							})
 							refetchTemporaryList?.()
 						})
 					} else {
 						const newData = {
 							product: data?.product,
-							expiry_date: validationData?.expiry ? data?.expiry_date : null,
+							// expiry_date: validationData?.expiry ? data?.expiry_date : null,
 							price: data?.price,
+							store: data?.store ?? null,
 							serial_numbers: validationData?.is_serial ? data?.serial_numbers : null,
 							unit_quantity: validationData?.is_serial ? null : data?.unit_quantity,
-							supplier: clientId
+							customer: clientId
 						}
 						mutateAsync(cleanParams(newData as ISearchParams)).then(async () => {
 							reset({
@@ -162,7 +162,8 @@ const Index: FC<IProperties> = ({clientId, refetchTemporaryList}) => {
 								unit_quantity: '',
 								serial_numbers: [],
 								product: undefined,
-								expiry_date: ''
+								store: undefined
+								// expiry_date: ''
 							})
 							removeParams('modal')
 							refetchTemporaryList?.()
@@ -193,31 +194,30 @@ const Index: FC<IProperties> = ({clientId, refetchTemporaryList}) => {
 					/>
 				</div>
 
-
 				{
 					(isValidationDataFetching) ?
 						<Loader/> : validationData ?
 							<>
 								<div className="span-12 flex gap-lg">
-									{
-										validationData.expiry &&
-										<div className="flex-1">
-											<Controller
-												name="expiry_date"
-												control={control}
-												render={({field}) => (
-													<MaskInput
-														id="expiry_date"
-														label="Expiry date"
-														placeholder={getDate()}
-														mask="99.99.9999"
-														error={errors?.expiry_date?.message}
-														{...field}
-													/>
-												)}
-											/>
-										</div>
-									}
+									<div className="flex-1">
+										<Controller
+											name="store"
+											control={control}
+											render={({field: {value, ref, onChange, onBlur}}) => (
+												<Select
+													ref={ref}
+													id="store"
+													label="Store"
+													options={stores}
+													onBlur={onBlur}
+													error={errors.store?.message}
+													value={getSelectValue(stores, value)}
+													defaultValue={getSelectValue(stores, value)}
+													handleOnChange={(e) => onChange(e as string)}
+												/>
+											)}
+										/>
+									</div>
 
 									<div className="flex-1">
 										<Controller
@@ -261,39 +261,38 @@ const Index: FC<IProperties> = ({clientId, refetchTemporaryList}) => {
 									validationData.is_serial &&
 									<>
 										<div className="grip span-12 gap-lg">
-											{
-												fields?.map((field, index) => (
-													<div className="span-6" key={field.id}>
-														<Input
-															id={`serial_numbers.${index}`}
-															label={t('Product serial number', {index: index + 1})}
-															handleDelete={() => {
-																setValue('unit_quantity', String(fields?.length - 1))
-																remove(index)
-															}}
-															error={errors.serial_numbers?.[index]?.message}
-															{...register(`serial_numbers.${index}`)}
-														/>
-													</div>
-												))
-											}
+											<Controller
+												name="serial_numbers"
+												control={control}
+												render={({field: {value, ref, onChange, onBlur}}) => (
+													<Select
+														ref={ref}
+														id="serial_numbers"
+														label="Series"
+														onBlur={onBlur}
+														options={getSelectOptionsByKey(series, 'serial')}
+														isMulti={true}
+														error={errors.serial_numbers?.message}
+														value={getSelectValue(getSelectOptionsByKey(series, 'serial'), value)}
+														defaultValue={getSelectValue(getSelectOptionsByKey(series, 'serial'), value)}
+														handleOnChange={(e) => {
+															const value = e as string[]
+															setValue('unit_quantity', String(value?.length || '0'))
+															onChange(value as string[])
+														}}
+													/>
+												)}
+											/>
 										</div>
-										<div className="span-12">
-											<Button
-												theme={BUTTON_THEME.OUTLINE}
-												type="button"
-												disabled={(watch('serial_numbers')?.length !== 0 && watch('serial_numbers')?.[(watch('serial_numbers')?.length ?? 1) - 1]?.toString()?.trim() === '')}
-												icon={<Plus/>}
-												onClick={() => {
-													setValue('unit_quantity', String(fields?.length + 1))
-													append('')
-												}}
-											>
-												Add series
-											</Button>
+										<div className="span-12 flex gap-lg">
+											<FileUploader
+												type="txt"
+												handleOnChange={(arr) => setValue('serial_numbers', Array.isArray(arr) ? Array.from(new Set([...(watch('serial_numbers') || []), ...(arr?.filter(item => series?.map(i => i?.serial).includes(item)) || [])])) : [])}
+												value={undefined}
+												id="series"
+											/>
 										</div>
 									</>
-
 								}
 							</> :
 							null

@@ -31,11 +31,11 @@ const Index: FC<IProperties> = ({style, className}) => {
 							return (
 								<div className={styles.wrapper}>
 									<div className={styles.name}>
-										1 {item.base_currency?.name?.toLowerCase() ?? ''}
+										1 {item.base_currency?.toLowerCase() ?? ''}
 									</div>
 									<div className={styles.currencies}>
 										<p>{decimalToPrice(item?.rate ?? '')}</p>
-										<span>{item?.target_currency?.code}</span>
+										<span>{item?.target_currency}</span>
 									</div>
 								</div>
 							)

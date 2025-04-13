@@ -5,14 +5,12 @@ import {
 	Input,
 	ReactTable,
 	Pagination,
-	Badge
 } from 'components'
-import {currencyOptions} from 'helpers/options'
-import {IBalanceChange} from 'modules/dashboard/interfaces'
+import {ITemporaryListItem} from 'modules/products/interfaces/purchase.interface'
 import {useMemo} from 'react'
 import {Column} from 'react-table'
 import {usePaginatedData, usePagination} from 'hooks'
-import {decimalToPrice, findName} from 'utilities/common'
+import {decimalToPrice} from 'utilities/common'
 import {formatDate} from 'utilities/date'
 import {useTranslation} from 'react-i18next'
 
@@ -20,43 +18,44 @@ import {useTranslation} from 'react-i18next'
 const Index = () => {
 	const {t} = useTranslation()
 	const {page, pageSize} = usePagination()
-	const {data, totalPages, isPending: isLoading} = usePaginatedData<IBalanceChange[]>(
-		`transactions/changes`,
+	const {data, totalPages, isPending: isLoading} = usePaginatedData<ITemporaryListItem[]>(
+		`purchase/list`,
 		{page: page, page_size: pageSize}
 	)
 
-	const columns: Column<IBalanceChange>[] = useMemo(() =>
+	const columns: Column<ITemporaryListItem>[] = useMemo(() =>
 			[
 				{
 					Header: t('№'),
-					accessor: (_: IBalanceChange, index: number) => ((page - 1) * pageSize) + (index + 1),
+					accessor: (_, index: number) => (index + 1),
 					style: {
 						width: '3rem',
 						textAlign: 'center'
 					}
 				},
 				{
+					Header: t('Full name'),
+					accessor: row => row?.store?.name || ''
+				},
+				{
 					Header: t('Store'),
-					accessor: row => row?.store?.name
+					accessor: row => row?.store?.name || ''
 				},
 				{
-					Header: t('Customer'),
-					accessor: row => row?.customer?.name
+					Header: t('Price type'),
+					accessor: row => row?.price_type?.name || ''
 				},
 				{
-					Header: t('Conversion'),
-					accessor: row => ` ${t(findName(currencyOptions, row?.store_currency) || '')?.toLowerCase()} ->  ${t(findName(currencyOptions, row?.customer_currency) || '')?.toLowerCase()}`
+					Header: `${t('Total')} ${t('Price')?.toLowerCase()}`,
+					accessor: row => ` ${decimalToPrice(row?.total_price || 0)} ${row?.currency?.toLowerCase()}`
 				},
 				{
-					Header: t('Amount'),
-					accessor: row => <Badge
-						title={`${decimalToPrice(row.change)}  ${t(findName(currencyOptions, row?.store_currency) || '')?.toLowerCase()}`}
-						type={Number(row.change) < 0 ? 'loss' : undefined}
-					/>
+					Header: `${t('Expense')}`,
+					accessor: row => ` ${decimalToPrice(row?.cost_amount || 0)} ${row?.cost_currency?.toLowerCase()}`
 				},
 				{
 					Header: t('Date'),
-					accessor: row => formatDate(row.created_at ?? '')
+					accessor: row => formatDate(row.purchase_date ?? '')
 				}
 			],
 		[]
@@ -64,7 +63,7 @@ const Index = () => {
 
 	return (
 		<>
-			<Card screen={true} className="span-9 gap-2xl flex-1">
+			<Card screen={true} className="span-12 gap-2xl flex-1">
 				<div className="flex justify-between align-center">
 					<Input
 						id="search"

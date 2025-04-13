@@ -229,8 +229,8 @@ const Index: FC<IProperties> = ({detail: retrieve = false, expanse = false}) => 
 						{
 							!retrieve &&
 							<div className="flex gap-xl span-12">
-								<Info title="Checkout" text={getBalanceAsString(storeBalance)}/>
-								<Info title="Customer" text={getBalanceAsString(customerBalance)}/>
+								<Info title="Checkout" text={getBalanceAsString(storeBalance, t)}/>
+								<Info title="Customer" text={getBalanceAsString(customerBalance, t)}/>
 							</div>
 						}
 

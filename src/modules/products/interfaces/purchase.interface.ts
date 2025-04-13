@@ -5,14 +5,22 @@ import {IProductDetail} from 'modules/products/interfaces/index'
 export interface ITemporaryListItem {
 	id: number;
 	product: IProductDetail;
-	total_quantity?: string;
-	total_price?: string;
+	total_quantity: string;
+	total_price: string;
 	price: string;
 	package_quantity?: number;
 	unit_quantity?: string;
 	serial_numbers?: string[];
-	store?: IIDName;
+	store: IIDName;
 	expiry_date?: string | null;
+	supplier: IIDName;
+	price_type: IIDName;
+	currency: string;
+	purchase_date: string;
+	cost_currency: string;
+	cost_amount: string;
+	created_at: string;
+	sale_date: string;
 }
 
 export interface IValidationData {

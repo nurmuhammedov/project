@@ -18,10 +18,10 @@ import {
 	useUpdate
 } from 'hooks'
 import {measurementUnits} from 'modules/database/helpers/options'
+import {temporaryItemSchema} from 'modules/products/helpers/yup'
 import {ITemporaryListItem, IValidationData} from 'modules/products/interfaces/purchase.interface'
 import {FC, useEffect} from 'react'
 import {Controller, useFieldArray, useForm} from 'react-hook-form'
-import {temporaryItemSchema} from 'helpers/yup'
 import {cleanParams, decimalToNumber, getSelectValue} from 'utilities/common'
 import {ISelectOption} from 'interfaces/form.interface'
 import {getDate} from 'utilities/date'
@@ -200,26 +200,6 @@ const Index: FC<IProperties> = ({clientId, refetchTemporaryList}) => {
 						<Loader/> : validationData ?
 							<>
 								<div className="span-12 flex gap-lg">
-									{
-										validationData.expiry &&
-										<div className="flex-1">
-											<Controller
-												name="expiry_date"
-												control={control}
-												render={({field}) => (
-													<MaskInput
-														id="expiry_date"
-														label="Expiry date"
-														placeholder={getDate()}
-														mask="99.99.9999"
-														error={errors?.expiry_date?.message}
-														{...field}
-													/>
-												)}
-											/>
-										</div>
-									}
-
 									<div className="flex-1">
 										<Controller
 											control={control}
@@ -256,6 +236,26 @@ const Index: FC<IProperties> = ({clientId, refetchTemporaryList}) => {
 											)}
 										/>
 									</div>
+
+									{
+										validationData.expiry &&
+										<div className="flex-1">
+											<Controller
+												name="expiry_date"
+												control={control}
+												render={({field}) => (
+													<MaskInput
+														id="expiry_date"
+														label="Expiry date"
+														placeholder={getDate()}
+														mask="99.99.9999"
+														error={errors?.expiry_date?.message}
+														{...field}
+													/>
+												)}
+											/>
+										</div>
+									}
 								</div>
 
 								{
@@ -294,7 +294,7 @@ const Index: FC<IProperties> = ({clientId, refetchTemporaryList}) => {
 											</Button>
 											<FileUploader
 												type="txt"
-												handleOnChange={(arr) => setValue('serial_numbers', Array.isArray(arr) ? arr : [])}
+												handleOnChange={(arr) => setValue('serial_numbers', Array.isArray(arr) ? Array.from(new Set([...(watch('serial_numbers') || []), ...arr])) : [])}
 												value={undefined}
 												id="series"
 											/>

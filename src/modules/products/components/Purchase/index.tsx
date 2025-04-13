@@ -15,6 +15,7 @@ import {ICustomerShortData} from 'modules/dashboard/interfaces'
 import {measurementUnits} from 'modules/database/helpers/options'
 import AddPurchase from 'modules/products/components/AddPurchase'
 import {productExchangeTabOptions} from 'modules/products/helpers/options'
+import {purchaseItemSchema} from 'modules/products/helpers/yup'
 import {IPurchaseItem, ITemporaryListItem} from 'modules/products/interfaces/purchase.interface'
 import {Column} from 'react-table'
 import {decimalToInteger, decimalToPrice, findName, getSelectValue, sumDecimals} from 'utilities/common'
@@ -22,7 +23,6 @@ import {Controller, useForm} from 'react-hook-form'
 import {getDate} from 'utilities/date'
 import {FIELD} from 'constants/fields'
 import {yupResolver} from '@hookform/resolvers/yup'
-import {purchaseItemSchema} from 'helpers/yup'
 import {useAdd, useData, useDetail, useSearchParams} from 'hooks'
 import {useParams} from 'react-router-dom'
 import {useTranslation} from 'react-i18next'
@@ -60,7 +60,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 			},
 			{
 				Header: t('Name'),
-				accessor: row => row?.product?.name
+				accessor: row => `${row?.product?.name} (${row?.product?.brand?.name || ''})`
 			},
 			{
 				Header: t('Price'),
@@ -372,14 +372,14 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 							type={FIELD.SUBMIT}
 							disabled={isAdding || temporaryList?.length < 1}
 						>
-							Save
+							{t(productExchangeTabOptions[0]?.label)}
 						</Button>
 					}
 				</Form>
 			</Card>
 
 
-			<Modal title="Add a new product" id="product" style={{height: '45rem', width: '60rem'}}>
+			<Modal title="Add a new product" id="product" style={{height: '45rem', width: '55rem'}}>
 				<AddPurchase clientId={watch('supplier')} refetchTemporaryList={refetchTemporaryList}/>
 			</Modal>
 			<EditModal isLoading={false}>

@@ -14,7 +14,7 @@ import {
 	StoreDetail,
 	StoresTable,
 	Login,
-	Home, CurrencyExchangeHistory
+	Home, CurrencyExchangeHistory, ProductExchangeHistory
 } from 'modules'
 
 
@@ -47,7 +47,16 @@ function useAppRoutes() {
 									},
 									{
 										path: 'product-exchange',
-										element: <ProductExchange/>
+										children: [
+											{
+												index: true,
+												element: <ProductExchange/>
+											},
+											{
+												path: 'history',
+												element: <ProductExchangeHistory/>
+											}
+										]
 									},
 									{
 										path: 'daily-currency',
