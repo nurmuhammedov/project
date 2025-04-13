@@ -17,7 +17,7 @@ import {
 	DetailButton
 } from 'components'
 import {FIELD} from 'constants/fields'
-import {regionsOptions} from 'helpers/options'
+import {currencyOptions, regionsOptions} from 'helpers/options'
 import {
 	useAdd, useData,
 	useDetail,
@@ -33,7 +33,7 @@ import {useEffect, useMemo} from 'react'
 import {Controller, useForm} from 'react-hook-form'
 import {useTranslation} from 'react-i18next'
 import {Column} from 'react-table'
-import {getSelectValue} from 'utilities/common'
+import {findName, getSelectValue} from 'utilities/common'
 import {InferType} from 'yup'
 
 
@@ -56,7 +56,6 @@ const Index = () => {
 		removeParams,
 		paramsObject: {updateId = undefined, modal = undefined}
 	} = useSearchParams()
-	const {data: currencies = []} = useData<ISelectOption[]>('currencies/select', modal === 'customer' || modal === 'edit')
 	const {data: stores = []} = useData<ISelectOption[]>('stores/select', modal === 'customer' || modal === 'edit')
 	const {data: priceTypes = []} = useData<ISelectOption[]>('price-types/select', modal === 'customer' || modal === 'edit')
 
@@ -130,7 +129,7 @@ const Index = () => {
 			},
 			{
 				Header: t('Currency'),
-				accessor: row => row.currency?.name
+				accessor: row => t(findName(currencyOptions, row.currency))
 			},
 			{
 				Header: t('Actions'),
@@ -152,7 +151,7 @@ const Index = () => {
 				name: detail.name,
 				phone_number: detail.phone_number,
 				address: detail.address,
-				currency: detail.currency?.id as number,
+				currency: detail.currency,
 				region: detail.region,
 				store: detail.store?.id as number,
 				price_type: detail.price_type?.id as number
@@ -260,11 +259,11 @@ const Index = () => {
 											ref={ref}
 											id="currency"
 											label="Currency"
-											options={currencies}
+											options={currencyOptions}
 											onBlur={onBlur}
 											error={addErrors.currency?.message}
-											value={getSelectValue(currencies, value)}
-											defaultValue={getSelectValue(currencies, value)}
+											value={getSelectValue(currencyOptions, value)}
+											defaultValue={getSelectValue(currencyOptions, value)}
 											handleOnChange={(e) => onChange(e as string)}
 										/>
 									)}
@@ -404,11 +403,11 @@ const Index = () => {
 											ref={ref}
 											id="currency"
 											label="Currency"
-											options={currencies}
+											options={currencyOptions}
 											onBlur={onBlur}
 											error={editErrors.currency?.message}
-											value={getSelectValue(currencies, value)}
-											defaultValue={getSelectValue(currencies, value)}
+											value={getSelectValue(currencyOptions, value)}
+											defaultValue={getSelectValue(currencyOptions, value)}
 											handleOnChange={(e) => onChange(e as string)}
 										/>
 									)}

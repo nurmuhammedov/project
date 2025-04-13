@@ -1,3 +1,4 @@
+import {currencyOptions} from 'helpers/options'
 import {IBalance, ITransaction} from 'modules/dashboard/interfaces'
 import {ISearchParams} from 'interfaces/params.interface'
 import {ISelectOption} from 'interfaces/form.interface'
@@ -60,11 +61,11 @@ export function getBalanceAsString(arr: IBalance[]): string {
 	}
 
 	return arr
-		.map((item: IBalance) => `${decimalToPrice(item?.amount)} ${item?.currency?.name?.toLowerCase()}`)
+		.map((item: IBalance) => `${decimalToPrice(item?.amount)} ${findName(currencyOptions, item?.currency)?.toLowerCase()}`)
 		.join(';  ')
 }
 
-export function convertCurrency(amount: number, direction: 'toStore' | 'fromStore', storeCurrencyId: number, rates: ITransaction[]): number {
+export function convertCurrency(amount: number, direction: 'toStore' | 'fromStore', storeCurrencyId: string, rates: ITransaction[]): number {
 	const storeCurrency = rates.find(r => r?.store_currency?.id == storeCurrencyId)
 
 	let result = 0

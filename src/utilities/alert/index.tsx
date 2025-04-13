@@ -3,7 +3,7 @@ import {AlertItem} from 'components'
 import {AxiosError} from 'axios'
 
 
-const showMessage = (message: string = '', type: 'success' | 'error' | 'alert' = 'alert', duration: number = 5000, position: 'top-right' | 'top-center' = 'top-right'): void => {
+export const showMessage = (message: string = '', type: 'success' | 'error' | 'alert' = 'alert', duration: number = 5000, position: 'top-right' | 'top-center' = 'top-right'): void => {
 	toast.custom(
 		(customToast: Toast) => {
 			return (
@@ -20,7 +20,7 @@ const showMessage = (message: string = '', type: 'success' | 'error' | 'alert' =
 }
 
 
-const showErrorMessage = (error: AxiosError<{ [key: string]: string | string[] } | string | string[]>) => {
+export const showErrorMessage = (error: AxiosError<{ [key: string]: string | string[] } | string | string[]>) => {
 	const responseData = error?.response?.data
 
 	if (Array.isArray(responseData)) {
@@ -41,10 +41,4 @@ const showErrorMessage = (error: AxiosError<{ [key: string]: string | string[] }
 	} else {
 		showMessage('Internal server error', 'error', 10000)
 	}
-}
-
-
-export {
-	showErrorMessage,
-	showMessage
 }

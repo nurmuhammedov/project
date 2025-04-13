@@ -11,6 +11,7 @@ enum BUTTON_THEME {
 	DANGER = 'danger',
 	DANGER_OUTLINE = 'danger outline',
 	OUTLINE = 'outline',
+	ALERT_DANGER = 'alert danger',
 }
 
 export {

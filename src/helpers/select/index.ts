@@ -10,8 +10,8 @@ import {
 const getSelectStyles = (error?: boolean, top?: boolean) => ({
 	'control': (base: CSSObjectWithLabel, state: ControlProps) => ({
 		...base,
-		border: error ? '1px solid var(--red)!important' : state.isFocused ? '1px solid var(--teal)' : '1px solid var(--light-gray-3)',
-		boxShadow: error ? '0 0 0 1px var(--red)!important' : state.isFocused ? '0 0 0 1px var(--teal)' : 'none',
+		border: error ? '1px solid var(--red-alert)!important' : state.isFocused ? '1px solid var(--teal)' : '1px solid var(--light-gray-3)',
+		boxShadow: error ? '0 0 0 1px var(--red-alert)!important' : state.isFocused ? '0 0 0 1px var(--teal)' : 'none',
 		backgroundColor: state.isDisabled ? 'var(--light-gray-1)' : 'var(--white)',
 		padding: '1rem 1.25rem',
 		borderRadius: '0.9375rem',
@@ -98,7 +98,9 @@ const getSelectStyles = (error?: boolean, top?: boolean) => ({
 	}),
 	'menuList': (base: CSSObjectWithLabel) => ({
 		...base,
-		margin: 0
+		margin: 0,
+		maxHeight: '14.5rem',
+		overflowY: 'auto'
 	}),
 	'option': (base: CSSObjectWithLabel, state: OptionProps) => ({
 		...base,
@@ -149,7 +151,7 @@ const getSelectStyles = (error?: boolean, top?: boolean) => ({
 			padding: '.2rem .5rem'
 		},
 		'& div[role="button"]:hover svg': {
-			fill: 'var(--red)'
+			fill: 'var(----red-alert)'
 		}
 	})
 })

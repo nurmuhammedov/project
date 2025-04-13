@@ -6,7 +6,7 @@ export interface IProductDetail {
 	type: IIDName
 	country: IIDName
 	brand: IIDName
-	measure: string;
+	measure: 'nb';
 	created_at: string; // ISO 8601 date-time
 	updated_at: string; // ISO 8601 date-time
 	name: string;

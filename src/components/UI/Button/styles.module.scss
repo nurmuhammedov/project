@@ -34,6 +34,11 @@
     color: var(--white);
   }
 
+  &--alert-danger {
+    background: var(--red-alert);
+    color: var(--white);
+  }
+
   &--danger-outline {
     background: transparent;
     border: 1px solid var(--teal-green);

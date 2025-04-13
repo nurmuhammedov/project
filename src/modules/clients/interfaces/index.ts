@@ -9,7 +9,7 @@ export interface ICustomerDetail {
 	address: string;
 	is_employee: boolean;
 	price_type: IIDName;
-	currency: IIDName;
+	currency: string;
 	store: IIDName;
 	region: number;
 }
@@ -17,7 +17,7 @@ export interface ICustomerDetail {
 export interface IExchange {
 	readonly id: number
 	store: IIDName;
-	currency: IIDName;
+	currency: string;
 	service_type: IIDName | null;
 	type: number;
 	amount: string;

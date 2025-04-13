@@ -16,8 +16,8 @@ import {
 	Select
 } from 'components'
 import {BUTTON_THEME, FIELD} from 'constants/fields'
-import {useAdd, useData, useDetail, usePaginatedData, usePagination, useSearchParams, useUpdate} from 'hooks/index'
-import {ISelectOption} from 'interfaces/form.interface'
+import {currencyOptions} from 'helpers/options'
+import {useAdd, useDetail, usePaginatedData, usePagination, useSearchParams, useUpdate} from 'hooks'
 import {dailyCurrencySchema} from 'modules/dashboard/helpers/yup'
 import {IDailyCurrency} from 'modules/dashboard/interfaces'
 import {useEffect, useMemo} from 'react'
@@ -25,7 +25,7 @@ import {Controller, useForm} from 'react-hook-form'
 import {useTranslation} from 'react-i18next'
 import {useNavigate} from 'react-router-dom'
 import {Column} from 'react-table'
-import {decimalToPrice, getSelectValue} from 'utilities/common'
+import {decimalToPrice, findName, getSelectValue} from 'utilities/common'
 import {formatDate} from 'utilities/date'
 import {InferType} from 'yup'
 
@@ -43,26 +43,24 @@ const Index = () => {
 	const {
 		addParams,
 		removeParams,
-		paramsObject: {updateId = undefined, modal = undefined}
+		paramsObject: {updateId = undefined}
 	} = useSearchParams()
 
-	const {data: currencies = []} = useData<ISelectOption[]>('currencies/select', modal === 'dailyCurrency' || modal === 'edit')
 
-	const {data, totalPages, isPending: isLoading, refetch} = usePaginatedData<IDailyCurrency[]>(
-		`exchange-rate/histories`,
-		{page: page, page_size: pageSize}
-	)
+	const {data, totalPages, isPending: isLoading, refetch} = usePaginatedData<IDailyCurrency[]>(`exchange-rates`)
 
-	const {mutateAsync: addDailyCurrency, isPending: isAdding} = useAdd('exchange-rate/histories')
+	const {mutateAsync: addDailyCurrency, isPending: isAdding} = useAdd('exchange-rates')
+
 	const {
 		mutateAsync: updateDailyCurrency,
 		isPending: isUpdating
-	} = useUpdate('exchange-rate/histories/', updateId)
+	} = useUpdate('exchange-rates/', updateId, 'patch')
+
 	const {
 		data: detail,
 		isPending: isDetailLoading,
 		isFetching
-	} = useDetail<IDailyCurrency>('exchange-rate/histories/', updateId)
+	} = useDetail<IDailyCurrency>('exchange-rates/', updateId)
 
 
 	const {
@@ -103,19 +101,15 @@ const Index = () => {
 			},
 			{
 				Header: `1-${t('Currency')?.toLowerCase()}`,
-				accessor: row => `${1} ${row.base_currency?.name?.toLowerCase()}`
+				accessor: row => `${1} ${t(findName(currencyOptions, row.base_currency))?.toLowerCase()}`
 			},
-			// {
-			// 	Header: t('Previous currency'),
-			// 	accessor: row => `${decimalToPrice(row.previous || '0')}`
-			// },
 			{
 				Header: `2-${t('Currency')?.toLowerCase()}`,
-				accessor: row => `${decimalToPrice(row?.rate)} ${row.target_currency?.name?.toLowerCase()}`
+				accessor: row => `${decimalToPrice(row?.rate)} ${t(findName(currencyOptions, row.target_currency))?.toLowerCase()}`
 			},
 			{
 				Header: t('Date'),
-				accessor: row => formatDate(row.created_at)
+				accessor: row => formatDate(row.updated_at)
 			},
 			{
 				Header: t('Actions'),
@@ -133,8 +127,8 @@ const Index = () => {
 		if (detail && !isDetailLoading) {
 			resetEdit({
 				rate: detail.rate,
-				base_currency: detail.base_currency?.id,
-				target_currency: detail.target_currency?.id
+				base_currency: detail.base_currency,
+				target_currency: detail.target_currency
 			})
 		}
 	}, [detail])
@@ -199,14 +193,14 @@ const Index = () => {
 											ref={ref}
 											id="base_currency"
 											label="Currency"
-											options={currencies}
+											options={currencyOptions}
 											onBlur={onBlur}
 											error={addErrors.base_currency?.message}
-											value={getSelectValue(currencies, value)}
-											defaultValue={getSelectValue(currencies, value)}
+											value={getSelectValue(currencyOptions, value)}
+											defaultValue={getSelectValue(currencyOptions, value)}
 											handleOnChange={(e) => {
 												onChange(e as string)
-												setValueAdd('target_currency', undefined as unknown as number)
+												setValueAdd('target_currency', undefined as unknown as string)
 											}}
 										/>
 									)}
@@ -246,11 +240,11 @@ const Index = () => {
 											ref={ref}
 											id="target_currency"
 											label="Currency"
-											options={currencies?.filter(item => item?.value != watchAdd('base_currency'))}
+											options={currencyOptions?.filter(item => item?.value != watchAdd('base_currency'))}
 											onBlur={onBlur}
 											error={addErrors.target_currency?.message}
-											value={getSelectValue(currencies, value)}
-											defaultValue={getSelectValue(currencies, value)}
+											value={getSelectValue(currencyOptions, value)}
+											defaultValue={getSelectValue(currencyOptions, value)}
 											handleOnChange={(e) => onChange(e as string)}
 										/>
 									)}
@@ -296,15 +290,15 @@ const Index = () => {
 											ref={ref}
 											id="baseCurrencyEdit"
 											label="Currency"
-											options={currencies}
+											options={currencyOptions}
 											onBlur={onBlur}
 											isDisabled={true}
 											error={editErrors.base_currency?.message}
-											value={getSelectValue(currencies, value)}
-											defaultValue={getSelectValue(currencies, value)}
+											value={getSelectValue(currencyOptions, value)}
+											defaultValue={getSelectValue(currencyOptions, value)}
 											handleOnChange={(e) => {
 												onChange(e as string)
-												setValueEdit('target_currency', undefined as unknown as number)
+												setValueEdit('target_currency', undefined as unknown as string)
 											}}
 										/>
 									)}
@@ -329,7 +323,6 @@ const Index = () => {
 											disableGroupSeparators={false}
 											allowDecimals={true}
 											label="Value"
-											disabled={true}
 											error={editErrors?.rate?.message}
 											{...field}
 										/>
@@ -345,12 +338,12 @@ const Index = () => {
 											ref={ref}
 											id="targetCurrencyEdit"
 											label="Currency"
-											options={currencies?.filter(item => item?.value != watchEdit('base_currency'))}
+											options={currencyOptions?.filter(item => item?.value != watchEdit('base_currency'))}
 											onBlur={onBlur}
 											isDisabled={true}
 											error={editErrors.target_currency?.message}
-											value={getSelectValue(currencies, value)}
-											defaultValue={getSelectValue(currencies, value)}
+											value={getSelectValue(currencyOptions, value)}
+											defaultValue={getSelectValue(currencyOptions, value)}
 											handleOnChange={(e) => onChange(e as string)}
 										/>
 									)}
@@ -359,7 +352,7 @@ const Index = () => {
 						</div>
 					</div>
 
-					<Button style={{marginTop: 'auto'}} type={FIELD.SUBMIT} disabled={isUpdating || !!1}>
+					<Button style={{marginTop: 'auto'}} type={FIELD.SUBMIT} disabled={isUpdating}>
 						Edit
 					</Button>
 				</Form>

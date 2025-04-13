@@ -32,9 +32,11 @@ const Index: FC<IProperties> = ({tabs, fallbackValue, query = 'tab', style, onTa
 				tabs?.map(item => {
 					return (
 						<button
+							type="button"
 							disabled={disabled}
 							key={item.value?.toString()}
-							className={classNames(styles.tab, {[styles.active]: item.value === status})}
+							className={classNames(styles.tab, {[styles.active]: item.value == status})}
+							style={item.value == status ? {color: item.color, borderBottomColor: item?.color} : {}}
 							onClick={() => handleTabChange(item.value)}
 						>
 							{t(item.label as string || '')}

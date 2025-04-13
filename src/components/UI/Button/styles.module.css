@@ -30,6 +30,10 @@
   background: var(--red);
   color: var(--white);
 }
+.button--alert-danger {
+  background: var(--red-alert);
+  color: var(--white);
+}
 .button--danger-outline {
   background: transparent;
   border: 1px solid var(--teal-green);

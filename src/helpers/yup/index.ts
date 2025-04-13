@@ -78,7 +78,6 @@ const productSchema = yup.object().shape({
 
 const temporaryItemSchema = yup.object().shape({
 	unit_quantity: yup.string().trim().required('This field is required'),
-	package_quantity: yup.string().trim().required('This field is required'),
 	price: yup.string().trim().required('This field is required'),
 	serial_numbers: yup
 		.array()
@@ -105,10 +104,10 @@ const purchaseItemSchema = yup.object().shape({
 	store: yup.number().required('This field is required'),
 	supplier: yup.number().required('This field is required'),
 	price_type: yup.number().required('This field is required'),
-	currency: yup.number().required('This field is required'),
+	currency: yup.string().trim().required('This field is required'),
 	purchase_date: isNotFutureDate,
 	cost_amount: yup.string().trim().required('This field is required'),
-	cost_currency: yup.number().required('This field is required'),
+	cost_currency: yup.string().trim().required('This field is required'),
 	comment: yup.string().transform(value => value ? String(value) : '').trim().nullable()
 })
 

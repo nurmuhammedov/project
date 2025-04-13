@@ -17,7 +17,7 @@ const usePaginatedData = <T>(endpoint: string, params?: ISearchParams, enabled: 
 
 	return {
 		...queryMethods,
-		data: results,
+		data: Array.isArray(queryMethods.data) ? queryMethods.data : results,
 		totalPages: num_pages
 	}
 }

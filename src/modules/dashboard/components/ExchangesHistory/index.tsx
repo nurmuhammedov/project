@@ -1,3 +1,4 @@
+import {currencyOptions} from 'helpers/options'
 import {IExchange} from 'modules/clients/interfaces'
 import {exchangeOptions} from 'modules/dashboard/helpers/options'
 import {useTranslation} from 'react-i18next'
@@ -20,7 +21,7 @@ const Index: FC<IProperties> = ({style, className}) => {
 	const {t} = useTranslation()
 	const {data, isPending: isLoading} = usePaginatedData<IExchange[]>(
 		`transactions`,
-		{page: 1, page_size: 5}
+		{page: 1, page_size: 7}
 	)
 
 	const columns: Column<IExchange>[] = useMemo(() =>
@@ -39,7 +40,7 @@ const Index: FC<IProperties> = ({style, className}) => {
 				},
 				{
 					Header: t('Amount'),
-					accessor: row => `${decimalToPrice(row?.amount || 0)} ${row?.currency?.name?.toLowerCase()}`
+					accessor: row => `${decimalToPrice(row?.amount || 0)} ${t(findName(currencyOptions, row?.currency)).toLowerCase()}`
 				},
 				{
 					Header: t('Type'),

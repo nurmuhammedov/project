@@ -6,6 +6,8 @@ import Product from './Product'
 import Delete from './Delete'
 import Status from './Status'
 import Logout from './Logout'
+import FileUploader from './FileUploader'
+import Download from './Download'
 import Switch from './Switch'
 import Detail from './Detail'
 import Income from './Income'
@@ -27,6 +29,8 @@ export * from './alert'
 
 export {
 	CurrencyExchange,
+	FileUploader,
+	Download,
 	SelectIcon,
 	Currency,
 	Exchange,

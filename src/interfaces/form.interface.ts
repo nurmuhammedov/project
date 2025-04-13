@@ -3,7 +3,7 @@ import React, {InputHTMLAttributes, TextareaHTMLAttributes, ButtonHTMLAttributes
 import {Props as SelectProps} from 'react-select'
 
 // Input Interface
-interface IFieldProperties {
+export interface IFieldProperties {
 	id: string;
 	type?: string;
 	error?: string | React.ReactNode;
@@ -18,10 +18,13 @@ interface IFieldProperties {
 	handleDelete?: () => void;
 }
 
-type IField = InputHTMLAttributes<HTMLInputElement> & TextareaHTMLAttributes<HTMLTextAreaElement> & IFieldProperties;
+export type IField =
+	InputHTMLAttributes<HTMLInputElement>
+	& TextareaHTMLAttributes<HTMLTextAreaElement>
+	& IFieldProperties;
 
 // Button Interface
-interface IButton extends ButtonHTMLAttributes<HTMLButtonElement> {
+export interface IButton extends ButtonHTMLAttributes<HTMLButtonElement> {
 	theme?: BUTTON_THEME,
 	mini?: boolean,
 	navigate?: string,
@@ -30,15 +33,16 @@ interface IButton extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 // Select Option Interface
-interface ISelectOption {
+export interface ISelectOption {
 	value: string | number | boolean;
 	label: string | number | boolean;
 	icon?: React.ReactNode;
 	code?: string;
+	color?: string;
 }
 
 // Select Interface
-interface ISelect extends SelectProps<ISelectOption> {
+export interface ISelect extends SelectProps<ISelectOption> {
 	id: string;
 	options: ISelectOption[];
 	placeholder?: string;
@@ -50,10 +54,8 @@ interface ISelect extends SelectProps<ISelectOption> {
 	top?: boolean;
 }
 
-interface IFile {
+export interface IFile {
 	name: string;
 	id: string | number;
 	file: string;
 }
-
-export type {IButton, IField, ISelectOption, ISelect, IFile}

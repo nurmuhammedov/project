@@ -84,6 +84,7 @@
   "Product": "Mahsulot",
   "Money, Product": "Pul, Mahsulot",
   "Currency exchange": "Valyuta ayirboshlash",
+  "Trade": "Savdo",
   "Sales history": "Sotuvlar tarixi",
   "Warehouse": "Omborxona",
   "Employees": "Xodimlar",
@@ -199,5 +200,16 @@
   "Previous currency": "Eski kurs",
   "New currency": "Yangi kurs",
   "Invalid username or password": "Login yoki parol xato",
-  "Update currency": "Kursni yangilash"
+  "Update currency": "Kursni yangilash",
+  "Upload a file": "Fayl yuklang",
+  "up to 10 mb": "10 mb gacha",
+  "Drop your files": "Faylni qo‘yib yuboring",
+  "File successfully removed": "Fayl muvaffaqiyatli o‘chirildi",
+  "Send each file separately": "Har bir faylni alohida yuboring",
+  "File must not exceed 10 mb": "Fayl 10 mb dan oshmasligi lozim",
+  "Only .pdf files are accepted": "Faqat .pdf kengaytmali fayllar qabul qilinadi",
+  "Only .jpg, .png, .jpeg files are accepted": "Faqat .jpg, .png, .jpeg kengaytmali fayllar qabul qilinadi",
+  "Only .txt files are accepted": "Faqat .txt kengaytmali fayllar qabul qilinadi",
+  "File successfully accepted": "fayli muvaffaqiyatli yuklandi",
+  "Loading...": "yuklanmoqda"
 }

@@ -1,32 +1,30 @@
 .root {
-
   .title {
     color: var(--light-gray-2);
-    font-family: Manrope, Arial, Helvetica, sans-serif;
+    font-family: Golos, Arial, Helvetica, sans-serif;
     font-size: 1rem;
     font-style: normal;
-    font-weight: 500;
+    font-weight: 400;
     line-height: 160%; /* 1.2rem */
-    letter-spacing: -0.01rem;
     margin-bottom: .75rem;
   }
 
   .not-found {
     color: var(--dark-slate);
-    font-family: Manrope, Arial, Helvetica, sans-serif;
+    font-family: Golos, Arial, Helvetica, sans-serif;
     font-size: 1rem;
     font-style: normal;
-    font-weight: 500;
+    font-weight: 400;
     line-height: 160%; /* 1.2rem */
-    letter-spacing: -0.015rem;
     margin-bottom: .75rem;
     text-align: center;
   }
 
   .footer {
     display: flex;
+    flex: 1;
+    align-items: flex-end;
     justify-content: space-between;
-    align-items: center;
     gap: 1rem;
 
     .price-wrapper {
@@ -43,12 +41,11 @@
 
         p, span {
           color: var(--light-gray-2);
-          font-family: Manrope, Arial, Helvetica, sans-serif;
+          font-family: Golos, Arial, Helvetica, sans-serif;
           font-size: 1.125rem;
           font-style: normal;
-          font-weight: 500;
+          font-weight: 400;
           line-height: 150%; /* 1.6875rem */
-          letter-spacing: -0.03375rem;
         }
 
         span {

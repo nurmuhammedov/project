@@ -2,10 +2,11 @@ import {CSSProperties} from 'react'
 
 
 interface IProperties {
-	style: CSSProperties
+	style: CSSProperties,
+	onClick?: () => void,
 }
 
-const Index = ({style}: IProperties) => {
+const Index = ({style, onClick}: IProperties) => {
 	return (
 		<svg
 			style={{maxWidth: '1.7rem', minWidth: '1.7rem', width: '100%', height: 'auto', ...style}}
@@ -16,6 +17,7 @@ const Index = ({style}: IProperties) => {
 			strokeWidth="1.5"
 			strokeLinecap="round"
 			strokeLinejoin="round"
+			onClick={onClick}
 		>
 			<path stroke="none" d="M0 0h24v24H0z" fill="none"/>
 			<path d="M7 10h14l-4 -4"/>

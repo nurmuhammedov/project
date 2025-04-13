@@ -30,6 +30,7 @@ const Index: React.FC<IButton> = ({
 				{[styles[`button--danger`]]: theme === BUTTON_THEME.DANGER},
 				{[styles[`button--danger-outline`]]: theme === BUTTON_THEME.DANGER_OUTLINE},
 				{[styles[`button--outline`]]: theme === BUTTON_THEME.OUTLINE},
+				{[styles[`button--alert-danger`]]: theme === BUTTON_THEME.ALERT_DANGER},
 				{[styles[`button--disabled`]]: disabled}
 			)}
 			disabled={disabled}

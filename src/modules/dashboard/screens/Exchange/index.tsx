@@ -1,15 +1,9 @@
+import {yupResolver} from '@hookform/resolvers/yup'
 import {Exchange} from 'assets/icons'
+import {Button, Card, CardTab, Form, Info, Input, Loader, NumberFormattedInput, PageTitle, Select} from 'components'
+import {BUTTON_THEME, FIELD} from 'constants/fields'
+import {currencyOptions} from 'helpers/options'
 import {useAdd, useData, useDetail, useSearchParams} from 'hooks'
-import {
-	Button,
-	Card,
-	CardTab,
-	Form,
-	Input, Loader,
-	NumberFormattedInput,
-	PageTitle,
-	Select
-} from 'components'
 import {ISelectOption} from 'interfaces/form.interface'
 import {currencyExchangeOptions, exchangeOptions} from 'modules/dashboard/helpers/options'
 import {currencyExchangeSchema} from 'modules/dashboard/helpers/yup'
@@ -17,18 +11,18 @@ import {IBalance, ICustomerShortData, ITransaction, ITransactionDetail} from 'mo
 import React, {FC, useEffect, useState} from 'react'
 import {Controller, useFieldArray, useForm} from 'react-hook-form'
 import {useTranslation} from 'react-i18next'
-import {convertCurrency, decimalToPrice, findName, getBalanceAsString, getSelectValue, noop} from 'utilities/common'
-import {BUTTON_THEME, FIELD} from 'constants/fields'
-import {yupResolver} from '@hookform/resolvers/yup'
 import {useNavigate, useParams} from 'react-router-dom'
+import {convertCurrency, findName, getBalanceAsString, getSelectValue, noop} from 'utilities/common'
+import {transformTransactions} from 'utilities/currency'
 import {InferType} from 'yup'
 
 
 interface IProperties {
 	detail?: boolean
+	expanse?: boolean
 }
 
-const Index: FC<IProperties> = ({detail: retrieve = false}) => {
+const Index: FC<IProperties> = ({detail: retrieve = false, expanse = false}) => {
 	const navigate = useNavigate()
 	const {t} = useTranslation()
 	const [isLoading, setIsLoading] = useState(false)
@@ -51,7 +45,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 			store: storeId ? Number(storeId) : undefined,
 			records: [],
 			currency: undefined,
-			first_amount: '',
+			first_amount: '0',
 			type: Number(tab),
 			description: ''
 		},
@@ -63,35 +57,32 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 		name: 'records' as never
 	})
 
-
 	const {
 		data: serviceTypes = [],
 		isPending: isServiceTypesLoading
-	} = useData<ISelectOption[]>('service-types/select', watch('type') == exchangeOptions[2].value)
+	} = useData<ISelectOption[]>('service-types/select', expanse)
+
 	const {
 		data: customers = [],
 		isPending: isCustomersLoading
 	} = useData<ISelectOption[]>('customers/select', !!watch('store'), {store: watch('store')})
-	const {
-		data: currencies = [],
-		isPending: isCurrenciesLoading
-	} = useData<ISelectOption[]>('currencies/select', !!watch('customer'))
 
 	const {
 		data: storeBalance = [],
 		refetch: storeBalanceRefetch
-	} = useData<IBalance[]>(`stores/${watch('store')}/balance`, !!watch('store') && !retrieve)
+	} = useData<IBalance[]>(`stores/${watch('store')}/balance`, !!watch('store') && !retrieve, {}, [watch('store')])
+
 	const {
 		data: customerBalance = [],
 		refetch: customerBalanceRefetch
 	} = useData<IBalance[]>(`customers/${watch('customer')}/balance`, !!watch('customer') && !retrieve)
 
-	const {data: customer = undefined} = useData<ICustomerShortData>(`customers/${watch('customer')}/short-data`, !!watch('customer') && !retrieve)
+	const {data: customer = undefined} = useData<ICustomerShortData>(`customers/${watch('customer')}/short-data`, !!watch('customer') && !retrieve, {}, [watch('customer')])
 
 	const {
 		data: transactions = [],
 		refetch: transactionsRefetch
-	} = useData<ITransaction[]>(`exchange-rate/transaction`, !!watch('currency') && !retrieve, {currency: watch('currency')})
+	} = useData<ITransaction[]>(`exchange-rates/transaction`, !!watch('currency') && !retrieve, {currency: watch('currency')})
 
 	const {
 		data: detail,
@@ -102,38 +93,33 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 
 	useEffect(() => {
 		setValue('type', Number(tab))
-		if (tab != exchangeOptions[2]?.value) {
+		if (tab != expanse) {
 			setValue('service_type', undefined as unknown as number)
 		}
-		if (watch('customer') && !retrieve) {
-			customerBalanceRefetch().then(noop)
-		}
 
-		if (watch('store') && !retrieve) {
-			storeBalanceRefetch().then(noop)
-		}
+		reset({
+			customer: customerId ? Number(customerId) : undefined,
+			store: storeId ? Number(storeId) : undefined,
+			records: [],
+			currency: undefined,
+			first_amount: '0',
+			type: Number(tab),
+			description: ''
+		})
 	}, [tab])
 
 	useEffect(() => {
-		if (customer?.currency?.id) {
-			setValue('currency', Number(customer?.currency?.id))
-		}
-
-		if (watch('customer') && !retrieve) {
-			customerBalanceRefetch().then(noop)
-		}
-
-		if (watch('store') && !retrieve) {
-			storeBalanceRefetch().then(noop)
+		if (customer?.currency) {
+			setValue('currency', customer?.currency)
 		}
 	}, [customer])
 
 	useEffect(() => {
-		if (transactions && transactions?.length && !retrieve) {
-			setValue('records', transactions?.map(item => ({
+		if (watch('currency') && !retrieve) {
+			setValue('records', transformTransactions(transactions, watch('currency'))?.map(item => ({
 				store_currency: item?.store_currency?.id,
-				store_amount: '',
-				customer_amount: ''
+				store_amount: '0',
+				customer_amount: '0'
 			})))
 		}
 	}, [transactions])
@@ -143,13 +129,13 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 			reset({
 				customer: detail?.customer?.id,
 				store: detail?.store?.id,
-				records: detail?.records?.filter(item => item?.store_currency?.id != item?.customer_currency?.id)?.map(item => ({
-					store_currency: item?.store_currency?.id,
+				records: detail?.records?.filter(item => item?.store_currency != item?.customer_currency)?.map(item => ({
+					store_currency: item?.store_currency,
 					store_amount: Math.abs(Number(item?.store_amount || 0)) as unknown as string,
 					customer_amount: Math.abs(Number(item?.customer_amount || 0)) as unknown as string
 				})),
-				currency: detail?.currency?.id,
-				first_amount: Math.abs(Number(detail?.records?.find(item => item?.store_currency?.id == item?.customer_currency?.id)?.customer_amount || 0)) as unknown as string,
+				currency: detail?.currency,
+				first_amount: Math.abs(Number(detail?.records?.find(item => item?.store_currency == item?.customer_currency)?.customer_amount || 0)) as unknown as string,
 				service_type: detail?.service_type?.id,
 				type: detail?.type,
 				description: detail?.description
@@ -177,13 +163,15 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 		}
 	}
 
-	if ((isDetailLoading || isCurrenciesLoading || (isServiceTypesLoading && tab == exchangeOptions[2].value) || isStoresLoading || isCustomersLoading) && retrieve) {
+	if ((isDetailLoading || (isServiceTypesLoading && tab == expanse) || isStoresLoading || isCustomersLoading) && retrieve) {
 		return (<Loader/>)
 	}
 
 	return (
 		<>
-			<PageTitle title="Currency exchange">
+			<PageTitle
+				title={`${t('Currency exchange')}`}
+			>
 				<div className="flex align-center gap-lg">
 					<Button
 						onClick={() => navigate(-1)}
@@ -211,16 +199,16 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 							add(data)
 								.then(() => {
 									transactionsRefetch()
-										.then(({data}) => {
+										.then(() => {
 											reset(prevState => {
 												return {
 													...prevState,
-													records: data?.map(item => ({
+													records: transformTransactions(transactions, watch('currency'))?.map(item => ({
 														store_currency: item?.store_currency?.id,
-														store_amount: '',
-														customer_amount: ''
+														store_amount: '0',
+														customer_amount: '0'
 													})),
-													first_amount: '',
+													first_amount: '0',
 													description: ''
 												} as InferType<typeof currencyExchangeSchema>
 											})
@@ -240,25 +228,9 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 					<div className="grid gap-lg span-12">
 						{
 							!retrieve &&
-							<div className="grid gap-lg span-12">
-								<div className="span-6">
-									<Input
-										id="Checkout"
-										label="Checkout"
-										disabled={true}
-										placeholder=" "
-										value={getBalanceAsString(storeBalance)}
-									/>
-								</div>
-								<div className="span-6">
-									<Input
-										id="Checkout"
-										label="Customer"
-										disabled={true}
-										placeholder=" "
-										value={getBalanceAsString(customerBalance)}
-									/>
-								</div>
+							<div className="flex gap-xl span-12">
+								<Info title="Checkout" text={getBalanceAsString(storeBalance)}/>
+								<Info title="Customer" text={getBalanceAsString(customerBalance)}/>
 							</div>
 						}
 
@@ -284,7 +256,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 								/>
 							</div>
 							{
-								tab == exchangeOptions[2].value ?
+								expanse ?
 									<div className="flex-1">
 										<Controller
 											name="service_type"
@@ -360,21 +332,29 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 											label="Currency"
 											onBlur={onBlur}
 											isDisabled={retrieve}
-											options={currencies}
+											options={currencyOptions}
 											error={errors.currency?.message}
-											value={getSelectValue(currencies, value)}
-											defaultValue={getSelectValue(currencies, value)}
+											value={getSelectValue(currencyOptions, value)}
+											defaultValue={getSelectValue(currencyOptions, value)}
 											handleOnChange={(e) => onChange(e as string)}
 										/>
 									)}
 								/>
 							</div>
+							<div className="flex-1">
+								<Input
+									id="comment"
+									label={`Comment`}
+									disabled={retrieve}
+									error={errors?.description?.message}
+									{...register(`description`)}
+								/>
+							</div>
 						</div>
-						{
-							watch('currency') ?
-
-								<div className="flex span-12 gap-lg">
-									<div className="flex-1">
+						<div className="span-12 grid gap-2xl">
+							{
+								watch('currency') ?
+									<div className="span-3">
 										<Controller
 											control={control}
 											name="first_amount"
@@ -382,53 +362,36 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 												<NumberFormattedInput
 													{...field}
 													id="first_amount"
-													maxLength={12}
+													maxLength={15}
 													disableGroupSeparators={false}
 													allowDecimals={true}
 													disabled={retrieve}
-													label={`${findName(currencies, watch(`currency`))} (${t('Checkout')?.toLowerCase()})`}
+													label={`${t(findName(currencyOptions, watch(`currency`)))} (${t('Checkout')})`}
 													error={errors?.first_amount?.message}
 												/>
 											)}
 										/>
 									</div>
-									{
-										retrieve &&
-										<div className="flex-1">
-											<Input
-												id="all"
-												disabled={true}
-												placeholder=" "
-												label={`${findName(currencies, watch(`currency`))} (${t('Checkout')?.toLowerCase()})`}
-												value={decimalToPrice(detail?.amount || 0)}
-											/>
-										</div>
-									}
-									<div className="flex-1">
-										<Input
-											id="comment"
-											label={`Comment`}
-											disabled={retrieve}
-											error={errors?.description?.message}
-											{...register(`description`)}
-										/>
-									</div>
-								</div> : null
-						}
-						<div
-							style={{gridTemplateColumns: 'repeat(15, 1fr)', display: 'grid'}}
-							className="span-12 gap-lg"
-						>
+									// {
+									// 	retrieve &&
+									// 	<div className="flex-1">
+									// 		<Input
+									// 			id="all"
+									// 			disabled={true}
+									// 			placeholder=" "
+									// 			label={`${t(findName(currencyOptions, watch(`currency`)))?.toLowerCase()} (${t('Checkout')})`}
+									// 			value={decimalToPrice(detail?.amount || 0)}
+									// 		/>
+									// 	</div>
+									// }
+									: null
+							}
+
 
 							{
 								(fields && fields.length && watch('currency')) ? fields?.map((field, index) => (
 									<React.Fragment key={field.id}>
-										{
-											index % 2 == 1 && (
-												<div className="span-1"></div>
-											)
-										}
-										<div className="flex gap-lg span-7">
+										<div className="flex gap-xs span-3">
 											<div className="flex-1">
 												<Controller
 													control={control}
@@ -436,21 +399,33 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 													render={({field}) => (
 														<NumberFormattedInput
 															{...field}
+															onChange={event => {
+																const storeAmount = parseFloat(event || '0')
+																setValue(`records.${index}.customer_amount`, convertCurrency(storeAmount, 'toStore', watch(`records.${index}.store_currency`), transactions)?.toString()
+																)
+																field.onChange(event as string)
+															}}
 															id={`records.${index}.store_amount`}
-															maxLength={12}
+															maxLength={15}
 															disableGroupSeparators={false}
 															allowDecimals={true}
 															disabled={retrieve}
-															label={`${findName(currencies, watch(`records.${index}.store_currency`))} (${t('Checkout')?.toLowerCase()})`}
+															label={`${t(findName(currencyOptions, watch(`records.${index}.store_currency`)))} (${t('Checkout')?.toLowerCase()})`}
 															error={errors?.records?.[index]?.store_amount?.message}
-															onDoubleClick={() => handleDoubleClick(index, 'store_amount')}
 														/>
 													)}
 												/>
 											</div>
 
 											<div className="span-1 flex justify-center">
-												<Exchange style={{transform: 'translateY(2.5rem)', height: '1.7rem'}}/>
+												<Exchange
+													style={{
+														transform: 'translateY(2.5rem)',
+														height: '1.7rem',
+														cursor: 'pointer'
+													}}
+													onClick={() => handleDoubleClick(index, 'customer_amount')}
+												/>
 											</div>
 
 											<div className="flex-1">
@@ -461,13 +436,13 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 														<NumberFormattedInput
 															{...field}
 															id={`records.${index}.customer_amount`}
-															maxLength={12}
+															maxLength={15}
 															disableGroupSeparators={false}
 															allowDecimals={true}
 															disabled={retrieve}
-															label={`${findName(currencies, watch(`currency`))} (${t('Customer')?.toLowerCase()})`}
+															label={`${t(findName(currencyOptions, watch(`currency`)))} (${t('Customer')?.toLowerCase()})`}
 															error={errors?.records?.[index]?.customer_amount?.message}
-															onDoubleClick={() => handleDoubleClick(index, 'customer_amount')}
+															// onDoubleClick={() => handleDoubleClick(index, 'customer_amount')}
 														/>
 													)}
 												/>
@@ -479,15 +454,26 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 							}
 						</div>
 					</div>
+
 					{
-						!retrieve &&
-						<Button
-							style={{marginTop: 'auto'}}
-							type={FIELD.SUBMIT}
-							disabled={isAdding || isLoading}
-						>
-							Save
-						</Button>
+
+						!retrieve && tab == exchangeOptions[1].value ?
+							<Button
+								style={{marginTop: 'auto'}}
+								type={FIELD.SUBMIT}
+								theme={BUTTON_THEME.ALERT_DANGER}
+								disabled={isAdding || isLoading}
+							>
+								{t(findName(currencyExchangeOptions, String(tab)))}
+							</Button> : !retrieve ?
+								<Button
+									style={{marginTop: 'auto'}}
+									type={FIELD.SUBMIT}
+									theme={BUTTON_THEME.PRIMARY}
+									disabled={isAdding || isLoading}
+								>
+									{t(findName(currencyExchangeOptions, String(tab)))}
+								</Button> : null
 					}
 				</Form>
 			</Card>

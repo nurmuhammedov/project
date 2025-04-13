@@ -3,11 +3,11 @@ import {
 	Button,
 	Input,
 	MaskInput,
+	FileUploader,
 	Form,
 	Select,
 	NumberFormattedInput,
-	Loader,
-	HR
+	Loader
 } from 'components'
 import {BUTTON_THEME, FIELD} from 'constants/fields'
 import {
@@ -17,38 +17,33 @@ import {
 	useSearchParams,
 	useUpdate
 } from 'hooks'
+import {measurementUnits} from 'modules/database/helpers/options'
+import {ITemporaryListItem, IValidationData} from 'modules/products/interfaces/purchase.interface'
 import {FC, useEffect} from 'react'
 import {Controller, useFieldArray, useForm} from 'react-hook-form'
 import {temporaryItemSchema} from 'helpers/yup'
-import {cleanParams, decimalToInteger, decimalToNumber, decimalToPrice, getSelectValue} from 'utilities/common'
-import {IValidationData, TemporaryListItem} from 'interfaces/products.interface'
+import {cleanParams, decimalToNumber, getSelectValue} from 'utilities/common'
 import {ISelectOption} from 'interfaces/form.interface'
 import {getDate} from 'utilities/date'
 import {Plus} from 'assets/icons'
 import {useTranslation} from 'react-i18next'
 import {showMessage} from 'utilities/alert'
-import styles from './styles.module.scss'
 import {ISearchParams} from 'interfaces/params.interface'
 
 
 interface IProperties {
 	clientId?: number | string
 	refetchTemporaryList?: () => void
-	detail?: boolean
 }
 
-const Index: FC<IProperties> = ({clientId, refetchTemporaryList, detail: retrieve = false}) => {
+const Index: FC<IProperties> = ({clientId, refetchTemporaryList}) => {
 	const {t} = useTranslation()
 	const {
-		addParams,
 		removeParams,
-		paramsObject: {updateId = undefined, type = 'all'}
+		paramsObject: {updateId = undefined}
 	} = useSearchParams()
 
-	const {data: types = []} = useData<ISelectOption[]>('product-types/select', !retrieve)
-	const {data: products = []} = useData<ISelectOption[]>('products/select', true, {
-		type: type === 'all' ? undefined : type
-	})
+	const {data: products = []} = useData<ISelectOption[]>('products/select')
 
 	const {
 		handleSubmit,
@@ -62,7 +57,6 @@ const Index: FC<IProperties> = ({clientId, refetchTemporaryList, detail: retriev
 		mode: 'onTouched',
 		defaultValues: {
 			price: '',
-			package_quantity: '',
 			unit_quantity: '',
 			serial_numbers: [],
 			product: undefined,
@@ -78,7 +72,7 @@ const Index: FC<IProperties> = ({clientId, refetchTemporaryList, detail: retriev
 	const {
 		data: detail,
 		isPending: isDetailLoading
-	} = useDetail<TemporaryListItem>(retrieve ? 'purchase-items/detail/' : 'temporary/detail/', updateId)
+	} = useDetail<ITemporaryListItem>('temporary/detail/', updateId)
 
 	const {
 		data: validationData,
@@ -93,8 +87,7 @@ const Index: FC<IProperties> = ({clientId, refetchTemporaryList, detail: retriev
 				expiry_date: detail.expiry_date ? getDate(detail.expiry_date) : getDate(),
 				price: detail.price,
 				serial_numbers: detail.serial_numbers || [],
-				unit_quantity: detail?.product?.is_serial ? detail.serial_numbers?.length?.toString() || '0' : detail.product?.measure?.value_type == 'int' ? decimalToNumber(detail.unit_quantity) : detail.unit_quantity,
-				package_quantity: detail.package_quantity?.toString() || '0'
+				unit_quantity: detail?.product?.is_serial ? detail.serial_numbers?.length?.toString() || '0' : measurementUnits.find(i => i.id == detail.product?.measure)?.type == 'int' ? decimalToNumber(detail.unit_quantity) : detail.unit_quantity
 			})
 		}
 	}, [detail])
@@ -104,7 +97,6 @@ const Index: FC<IProperties> = ({clientId, refetchTemporaryList, detail: retriev
 			reset((prevValues) => ({
 				...prevValues,
 				price: '',
-				package_quantity: validationData?.package ? '' : '0',
 				unit_quantity: validationData?.is_serial ? '0' : '',
 				serial_numbers: [],
 				expiry_date: validationData?.expiry ? '' : getDate()
@@ -117,14 +109,13 @@ const Index: FC<IProperties> = ({clientId, refetchTemporaryList, detail: retriev
 		if (!updateId) {
 			reset({
 				price: '',
-				package_quantity: '',
 				unit_quantity: '',
 				serial_numbers: [],
 				product: undefined,
 				expiry_date: ''
 			})
 		}
-	}, [type, updateId])
+	}, [updateId])
 
 
 	const {fields, append, remove} = useFieldArray({
@@ -133,105 +124,85 @@ const Index: FC<IProperties> = ({clientId, refetchTemporaryList, detail: retriev
 	})
 
 	return (
-		<>
-			<div className={styles.title}>
-				{t('Add product')}
-			</div>
-
-			<HR style={{margin: '1.5rem 0'}}/>
-
-			<Form
-				onSubmit={handleSubmit((data) => {
-						if (!clientId) {
-							showMessage('Client ID required')
-						} else if (updateId) {
-							const newData = {
-								product: data?.product,
-								expiry_date: validationData?.expiry ? data?.expiry_date : null,
-								price: data?.price,
-								serial_numbers: validationData?.is_serial ? data?.serial_numbers : null,
-								unit_quantity: validationData?.is_serial ? null : data?.unit_quantity,
-								package_quantity: validationData?.package ? data?.package_quantity : null,
-								supplier: clientId
-							}
-							update(cleanParams(newData as ISearchParams)).then(async () => {
-								removeParams('updateId', 'type')
-								reset({
-									price: '',
-									package_quantity: '',
-									unit_quantity: '',
-									serial_numbers: [],
-									product: undefined,
-									expiry_date: ''
-								})
-								refetchTemporaryList?.()
-							})
-						} else {
-							const newData = {
-								product: data?.product,
-								expiry_date: validationData?.expiry ? data?.expiry_date : null,
-								price: data?.price,
-								serial_numbers: validationData?.is_serial ? data?.serial_numbers : null,
-								unit_quantity: validationData?.is_serial ? null : data?.unit_quantity,
-								package_quantity: validationData?.package ? data?.package_quantity : null,
-								supplier: clientId
-							}
-							mutateAsync(cleanParams(newData as ISearchParams)).then(async () => {
-								reset({
-									price: '',
-									package_quantity: '',
-									unit_quantity: '',
-									serial_numbers: [],
-									product: undefined,
-									expiry_date: ''
-								})
-								refetchTemporaryList?.()
-							})
+		<Form
+			onSubmit={handleSubmit((data) => {
+					if (!clientId) {
+						showMessage('Client ID required')
+					} else if (updateId) {
+						const newData = {
+							product: data?.product,
+							expiry_date: validationData?.expiry ? data?.expiry_date : null,
+							price: data?.price,
+							serial_numbers: validationData?.is_serial ? data?.serial_numbers : null,
+							unit_quantity: validationData?.is_serial ? null : data?.unit_quantity,
+							supplier: clientId
 						}
+						update(cleanParams(newData as ISearchParams)).then(async () => {
+							removeParams('updateId', 'modal')
+							reset({
+								price: '',
+								unit_quantity: '',
+								serial_numbers: [],
+								product: undefined,
+								expiry_date: ''
+							})
+							refetchTemporaryList?.()
+						})
+					} else {
+						const newData = {
+							product: data?.product,
+							expiry_date: validationData?.expiry ? data?.expiry_date : null,
+							price: data?.price,
+							serial_numbers: validationData?.is_serial ? data?.serial_numbers : null,
+							unit_quantity: validationData?.is_serial ? null : data?.unit_quantity,
+							supplier: clientId
+						}
+						mutateAsync(cleanParams(newData as ISearchParams)).then(async () => {
+							reset({
+								price: '',
+								unit_quantity: '',
+								serial_numbers: [],
+								product: undefined,
+								expiry_date: ''
+							})
+							removeParams('modal')
+							refetchTemporaryList?.()
+						})
 					}
-				)}
-			>
-				<div className="grid gap-lg">
-					<div className="span-12">
-						<Select
-							id="types"
-							label="Product type"
-							isDisabled={!!updateId || retrieve}
-							options={[{value: 'all', label: 'All'}, ...types]}
-							value={getSelectValue([{value: 'all', label: 'All'}, ...types], type)}
-							defaultValue={getSelectValue([{value: 'all', label: 'All'}, ...types], type)}
-							handleOnChange={(e) => addParams({type: e?.toString()})}
-						/>
-					</div>
+				}
+			)}
+		>
+			<div className="grid gap-lg">
+				<div className="span-12">
+					<Controller
+						name="product"
+						control={control}
+						render={({field: {value, ref, onChange, onBlur}}) => (
+							<Select
+								ref={ref}
+								id="product"
+								label="Product"
+								onBlur={onBlur}
+								options={products}
+								isDisabled={!!updateId}
+								error={errors.product?.message}
+								value={getSelectValue(products, value)}
+								defaultValue={getSelectValue(products, value)}
+								handleOnChange={(e) => onChange(e as string)}
+							/>
+						)}
+					/>
+				</div>
 
-					<div className="span-12">
-						<Controller
-							name="product"
-							control={control}
-							render={({field: {value, ref, onChange, onBlur}}) => (
-								<Select
-									ref={ref}
-									id="product"
-									label="Product"
-									onBlur={onBlur}
-									options={products}
-									isDisabled={!!updateId || retrieve}
-									error={errors.product?.message}
-									value={getSelectValue(products, value)}
-									defaultValue={getSelectValue(products, value)}
-									handleOnChange={(e) => onChange(e as string)}
-								/>
-							)}
-						/>
-					</div>
 
-					{
-						(isValidationDataFetching) ?
-							<Loader/> : validationData ?
-								<>
+				{
+					(isValidationDataFetching) ?
+						<Loader/> : validationData ?
+							<>
+								<div className="span-12 flex gap-lg">
 									{
 										validationData.expiry &&
-										<div className="span-12">
+										<div className="flex-1">
 											<Controller
 												name="expiry_date"
 												control={control}
@@ -239,7 +210,6 @@ const Index: FC<IProperties> = ({clientId, refetchTemporaryList, detail: retriev
 													<MaskInput
 														id="expiry_date"
 														label="Expiry date"
-														disabled={retrieve}
 														placeholder={getDate()}
 														mask="99.99.9999"
 														error={errors?.expiry_date?.message}
@@ -250,43 +220,18 @@ const Index: FC<IProperties> = ({clientId, refetchTemporaryList, detail: retriev
 										</div>
 									}
 
-									{
-										validationData.package &&
-										<div className="span-12">
-											<Controller
-												control={control}
-												name="package_quantity"
-												render={({field}) => (
-													<NumberFormattedInput
-														id="package_quantity"
-														maxLength={validationData.package?.measure?.value_type == 'int' ? 5 : 8}
-														disableGroupSeparators={false}
-														disabled={retrieve}
-														allowDecimals={validationData.package?.measure?.value_type == 'float'}
-														label={`${t('Package quantity')} (${t('item per package', {
-															count: validationData?.package?.measure?.value_type == 'int' ? decimalToInteger(validationData?.package?.quantity || 0) as unknown as number : decimalToPrice(validationData?.package?.quantity) as unknown as number,
-															measure: validationData?.package?.measure?.name ?? ''
-														})})`}
-														error={errors?.package_quantity?.message}
-														{...field}
-													/>
-												)}
-											/>
-										</div>
-									}
-
-									<div className="span-6">
+									<div className="flex-1">
 										<Controller
 											control={control}
 											name="unit_quantity"
 											render={({field}) => (
 												<NumberFormattedInput
 													id="unit_quantity"
-													maxLength={validationData?.measure?.value_type == 'int' ? 6 : 9}
+													maxLength={measurementUnits?.find(i => i.id == validationData?.measure)?.type == 'int' ? 6 : 9}
 													disableGroupSeparators={false}
-													disabled={validationData.is_serial || retrieve}
-													allowDecimals={validationData?.measure?.value_type == 'float'}
-													label={validationData?.measure?.value_type == 'int' ? t('Count') + ' ' + `(${validationData?.measure.name})` : t('Quantity') + ' ' + `(${validationData?.measure.name})`}
+													disabled={validationData.is_serial}
+													allowDecimals={measurementUnits?.find(i => i.id == validationData?.measure)?.type == 'float'}
+													label={measurementUnits?.find(i => i.id == validationData?.measure)?.type == 'int' ? t('Count') + ' ' + `(${t(measurementUnits?.find(i => i.id == validationData?.measure)?.label?.toString() || '')})` : t('Quantity') + ' ' + `(${(measurementUnits?.find(i => i.id == validationData?.measure)?.label?.toString() || '')})`}
 													error={errors?.unit_quantity?.message}
 													{...field}
 												/>
@@ -294,7 +239,7 @@ const Index: FC<IProperties> = ({clientId, refetchTemporaryList, detail: retriev
 										/>
 									</div>
 
-									<div className="span-6">
+									<div className="flex-1">
 										<Controller
 											control={control}
 											name="price"
@@ -304,7 +249,6 @@ const Index: FC<IProperties> = ({clientId, refetchTemporaryList, detail: retriev
 													maxLength={12}
 													disableGroupSeparators={false}
 													allowDecimals={true}
-													disabled={retrieve}
 													label="Price"
 													error={errors?.price?.message}
 													{...field}
@@ -312,13 +256,15 @@ const Index: FC<IProperties> = ({clientId, refetchTemporaryList, detail: retriev
 											)}
 										/>
 									</div>
+								</div>
 
-									{
-										validationData.is_serial &&
-										<>
+								{
+									validationData.is_serial &&
+									<>
+										<div className="grid span-12 gap-lg">
 											{
 												fields?.map((field, index) => (
-													<div className="span-12" key={field.id}>
+													<div className="span-6" key={field.id}>
 														<Input
 															id={`serial_numbers.${index}`}
 															label={t('Product serial number', {index: index + 1})}
@@ -326,67 +272,49 @@ const Index: FC<IProperties> = ({clientId, refetchTemporaryList, detail: retriev
 																setValue('unit_quantity', String(fields?.length - 1))
 																remove(index)
 															}}
-															disabled={retrieve}
 															error={errors.serial_numbers?.[index]?.message}
 															{...register(`serial_numbers.${index}`)}
 														/>
 													</div>
 												))
 											}
+										</div>
+										<div className="span-12 flex gap-lg">
+											<Button
+												theme={BUTTON_THEME.OUTLINE}
+												type="button"
+												disabled={(watch('serial_numbers')?.length !== 0 && watch('serial_numbers')?.[(watch('serial_numbers')?.length ?? 1) - 1]?.toString()?.trim() === '')}
+												icon={<Plus/>}
+												onClick={() => {
+													setValue('unit_quantity', String(fields?.length + 1))
+													append('')
+												}}
+											>
+												Add series
+											</Button>
+											<FileUploader
+												type="txt"
+												handleOnChange={(arr) => setValue('serial_numbers', Array.isArray(arr) ? arr : [])}
+												value={undefined}
+												id="series"
+											/>
+										</div>
+									</>
 
-											<div className="span-12">
-												<Button
-													theme={BUTTON_THEME.OUTLINE}
-													type="button"
-													disabled={(watch('serial_numbers')?.length !== 0 && watch('serial_numbers')?.[(watch('serial_numbers')?.length ?? 1) - 1]?.toString()?.trim() === '') || retrieve}
-													icon={<Plus/>}
-													onClick={() => {
-														setValue('unit_quantity', String(fields?.length + 1))
-														append('')
-													}}
-												>
-													Add series
-												</Button>
-											</div>
-										</>
-									}
-								</> :
-								null
-					}
-				</div>
-
-				{
-					!retrieve &&
-					<Button
-						type={FIELD.SUBMIT}
-						disabled={isAdding || isUpdating || retrieve || isValidationDataLoading || isValidationDataFetching || !validationData || (validationData?.is_serial && !watch('serial_numbers')?.length)}
-					>
-						{updateId ? 'Edit' : 'Save'}
-					</Button>
+								}
+							</> :
+							null
 				}
+			</div>
 
-				{
-					updateId &&
-					<Button
-						theme={BUTTON_THEME.DANGER}
-						type={FIELD.BUTTON}
-						onClick={() => {
-							removeParams('updateId', 'type')
-							reset({
-								price: '',
-								package_quantity: '',
-								unit_quantity: '',
-								serial_numbers: [],
-								product: undefined,
-								expiry_date: ''
-							})
-						}}
-					>
-						Cancel
-					</Button>
-				}
-			</Form>
-		</>
+			<Button
+				type={FIELD.SUBMIT}
+				style={{marginTop: 'auto'}}
+				disabled={isAdding || isUpdating || isValidationDataLoading || isValidationDataFetching || !validationData || (validationData?.is_serial && !watch('serial_numbers')?.length)}
+			>
+				{updateId ? 'Edit' : 'Save'}
+			</Button>
+		</Form>
 	)
 }
 

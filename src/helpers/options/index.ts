@@ -13,8 +13,8 @@ export const currencyOptions: ISelectOption[] = [
 	{value: 'USD', label: 'Dollar', code: '$'},
 	{value: 'UZS', label: 'Sum', code: 'sum'},
 	{value: 'P2P', label: 'Click', code: 'sum'},
-	{value: 'TRANSFER', label: 'Transfer', code: 'sum'},
-	{value: 'RUB', label: 'Ruble', code: 'ruble'}
+	{value: 'TRANSFER', label: 'Transfer', code: 'sum'}
+	// {value: 'RUB', label: 'Ruble', code: 'ruble'}
 ]
 
 export const regionsOptions: ISelectOption[] = [
@@ -76,17 +76,6 @@ export const regionsOptions: ISelectOption[] = [
 	}
 ]
 
-// PRODUCTS
-const productExchangeTabOptions = [
-	{
-		label: 'Making income',
-		value: 'purchase'
-	},
-	{
-		label: 'Sale',
-		value: 'sale'
-	}
-]
 
 const seriesOptions: ISelectOption[] = [
 	{label: 'Yes', value: true},
@@ -94,6 +83,5 @@ const seriesOptions: ISelectOption[] = [
 ]
 
 export {
-	seriesOptions,
-	productExchangeTabOptions
+	seriesOptions
 }

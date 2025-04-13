@@ -7,12 +7,13 @@ import {useTranslation} from 'react-i18next'
 const useData = <T>(
 	endpoint: string,
 	enabled: boolean = true,
-	params?: ISearchParams
+	params?: ISearchParams,
+	keys: (string | number)[] = []
 ) => {
 	const {i18n} = useTranslation()
 
 	return useQuery<T, Error>({
-		queryKey: [endpoint, params, i18n.language],
+		queryKey: [endpoint, params, i18n.language, ...keys],
 		queryFn: () => CommonService.getData<T>(endpoint, params),
 		enabled
 	})

@@ -9,8 +9,8 @@ export const databaseTabs: ISelectOption[] = [
 	{label: 'Expense types', value: 'expenseTypes'},
 	{label: 'Price types', value: 'priceTypes'},
 	{label: 'Measurement units', value: 'measurementUnits'},
-	{label: 'Product types', value: 'productTypes'},
-	{label: 'Packages', value: 'packages'}
+	{label: 'Product types', value: 'productTypes'}
+	// {label: 'Packages', value: 'packages'}
 ]
 
 export const measurementUnits: IMeasurementUnitDetail[] = [

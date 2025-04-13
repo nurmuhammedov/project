@@ -13,6 +13,7 @@ import AlertItem from './AlertItem'
 import EditModal from './EditModal'
 import Checkbox  from './Checkbox'
 import PageInfo from './PageInfo'
+import Info from './Info'
 import CardTab from './CardTab'
 import Router from './Router'
 import Loader from './LoaderBlock'
@@ -29,6 +30,7 @@ export * from './layouts'
 
 export {
 	HorizontalTab,
+	Info,
 	TemporaryItem,
 	DeleteButton,
 	DetailButton,

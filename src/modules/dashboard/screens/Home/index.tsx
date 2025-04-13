@@ -4,7 +4,7 @@ import {BUTTON_THEME} from 'constants/fields'
 import ExchangesHistory from 'modules/dashboard/components/ExchangesHistory'
 import ProductsExchange from 'modules/dashboard/components/ProductsExchange'
 import {useNavigate} from 'react-router-dom'
-import Currencies from 'modules/dashboard/components/Currencies'
+// import Currencies from 'modules/dashboard/components/Currencies'
 
 
 const Index = () => {
@@ -22,10 +22,10 @@ const Index = () => {
 					</Button>
 					<Button
 						theme={BUTTON_THEME.DANGER_OUTLINE}
-						onClick={() => navigate('product-exchange?tab=sale')}
+						onClick={() => navigate('product-exchange')}
 						icon={<Cart/>}
 					>
-						Product exchange
+						Trade
 					</Button>
 					<Button
 						theme={BUTTON_THEME.DANGER_OUTLINE}
@@ -37,9 +37,9 @@ const Index = () => {
 				</div>
 			</PageTitle>
 			<div className="grid gap-lg">
-				<div className="grid gap-lg space-12">
-					<Currencies className="span-3"/>
-				</div>
+				{/*<div className="grid gap-lg space-12">*/}
+				{/*	<Currencies className="span-3"/>*/}
+				{/*</div>*/}
 				<div className="grid gap-lg space-12">
 					<ExchangesHistory className="span-6"/>
 					<ProductsExchange className="span-6"/>

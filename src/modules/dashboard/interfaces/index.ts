@@ -4,13 +4,14 @@ import {IIDName} from 'interfaces/configuration.interface'
 export interface IDailyCurrency {
 	readonly id: number
 	rate: string
-	base_currency: IIDName
-	target_currency: IIDName
+	base_currency: string
+	target_currency: string
 	created_at: string
+	updated_at: string
 }
 
 export interface IBalance {
-	currency: IIDName
+	currency: string
 	amount: string
 }
 
@@ -18,13 +19,12 @@ export interface ICustomerShortData {
 	readonly id: number
 	store: IIDName
 	price_type: IIDName
-	currency: IIDName
+	currency: string
 	balances: IBalance[]
 }
 
 export interface IRate {
-	id: number;
-	name: string;
+	id: string;
 	rate: number;
 }
 
@@ -35,9 +35,9 @@ export interface ITransaction {
 
 
 export interface IRecord {
-	store_currency: IIDName;
+	store_currency: string;
 	store_amount: string;
-	customer_currency: IIDName;
+	customer_currency: string;
 	customer_amount: string;
 	change: string;
 }
@@ -46,7 +46,7 @@ export interface ITransactionDetail {
 	id: number;
 	store: IIDName;
 	customer: IIDName;
-	currency: IIDName;
+	currency: string;
 	service_type: IIDName;
 	type: number;
 	amount: string;
@@ -62,8 +62,8 @@ export interface IBalanceChange {
 	customer: IIDName;
 	type: number;
 	created_at: string;
-	store_currency: IIDName;
-	customer_currency: IIDName;
+	store_currency: string;
+	customer_currency: string;
 	change: string;
 }
 

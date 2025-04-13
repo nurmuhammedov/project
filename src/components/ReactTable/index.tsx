@@ -34,15 +34,14 @@ interface ITableOptions<T extends object> extends TableOptions<T>, ICustomProps 
 	data: T[];
 }
 
-const Index = <T extends object & { id: string | number }>({
-	                                                           columns,
-	                                                           data,
-	                                                           isLoading,
-	                                                           className,
-	                                                           screen = true,
-	                                                           spacing = false,
-	                                                           handleRow
-                                                           }: ITableOptions<T>) => {
+const Index = <T extends object>({
+	                                 columns,
+	                                 data,
+	                                 isLoading,
+	                                 className,
+	                                 screen = true,
+	                                 spacing = false
+                                 }: ITableOptions<T>) => {
 	const {
 		getTableProps,
 		getTableBodyProps,
@@ -105,7 +104,6 @@ const Index = <T extends object & { id: string | number }>({
 									prepareRow(row)
 									return (
 										<tr
-											onClick={() => handleRow?.(row.original.id)}
 											className={classes.row}
 											{...row.getRowProps()}
 											key={index}
