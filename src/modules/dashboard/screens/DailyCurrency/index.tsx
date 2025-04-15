@@ -16,7 +16,7 @@ import {
 	Select
 } from 'components'
 import {BUTTON_THEME, FIELD} from 'constants/fields'
-import {currencyOptions} from 'helpers/options'
+import {currencyOptions} from 'constants/options'
 import {useAdd, useDetail, usePaginatedData, usePagination, useSearchParams, useUpdate} from 'hooks'
 import {dailyCurrencySchema} from 'modules/dashboard/helpers/yup'
 import {IDailyCurrency} from 'modules/dashboard/interfaces'

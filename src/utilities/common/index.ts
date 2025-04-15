@@ -1,4 +1,4 @@
-import {currencyOptions} from 'helpers/options'
+import {currencyOptions} from 'constants/options'
 import {IBalance, ITransaction} from 'modules/dashboard/interfaces'
 import {ISearchParams} from 'interfaces/params.interface'
 import {ISelectOption} from 'interfaces/form.interface'

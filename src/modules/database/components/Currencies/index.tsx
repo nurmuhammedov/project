@@ -1,6 +1,6 @@
 import {Search} from 'assets/icons'
 import {ISelectOption} from 'interfaces/form.interface'
-import {currencyOptions} from 'helpers/options'
+import {currencyOptions} from 'constants/options'
 import {useTranslation} from 'react-i18next'
 import {Card, Input, ReactTable} from 'components'
 import {Column} from 'react-table'

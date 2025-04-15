@@ -1,4 +1,4 @@
-import {currencyOptions} from 'helpers/options'
+import {currencyOptions} from 'constants/options'
 import {ITransaction} from 'modules/dashboard/interfaces'
 
 

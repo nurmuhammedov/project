@@ -10,7 +10,7 @@ import {
 	ReactTable,
 	Select
 } from 'components'
-import {currencyOptions} from 'helpers/options'
+import {currencyOptions} from 'constants/options'
 import {ISelectOption} from 'interfaces/form.interface'
 import {ICustomerShortData} from 'modules/dashboard/interfaces'
 import {measurementUnits} from 'modules/database/helpers/options'

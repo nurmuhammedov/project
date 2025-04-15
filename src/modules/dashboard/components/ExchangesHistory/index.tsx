@@ -1,4 +1,4 @@
-import {currencyOptions} from 'helpers/options'
+import {currencyOptions} from 'constants/options'
 import {IExchange} from 'modules/clients/interfaces'
 import {exchangeOptions} from 'modules/dashboard/helpers/options'
 import {useTranslation} from 'react-i18next'

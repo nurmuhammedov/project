@@ -7,7 +7,7 @@ import {
 	Pagination,
 	Badge
 } from 'components'
-import {currencyOptions} from 'helpers/options'
+import {currencyOptions} from 'constants/options'
 import {IBalanceChange} from 'modules/dashboard/interfaces'
 import {useMemo} from 'react'
 import {Column} from 'react-table'

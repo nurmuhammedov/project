@@ -17,7 +17,7 @@ import {
 	DetailButton
 } from 'components'
 import {FIELD} from 'constants/fields'
-import {currencyOptions, regionsOptions} from 'helpers/options'
+import {currencyOptions, regionsOptions} from 'constants/options'
 import {
 	useAdd, useData,
 	useDetail,

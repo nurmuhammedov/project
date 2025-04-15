@@ -5,7 +5,7 @@ import {SelectIcon} from 'assets/icons'
 import styles from './styles.module.scss'
 import ReactPaginate from 'react-paginate'
 import {getSelectValue} from 'utilities/common'
-import {paginationOptions} from 'helpers/options'
+import {paginationOptions} from 'constants/options'
 
 
 interface IProps {
