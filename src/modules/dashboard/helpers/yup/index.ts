@@ -51,6 +51,7 @@ export const currencyExchangeSchema = yup.object().shape({
 		.required('This field is required'),
 	currency: yup.string().trim().required('This field is required'),
 	first_amount: yup.string().trim().required('This field is required'),
+	total: yup.string().trim().optional().nullable().transform(value => Number(value) ? value : '0'),
 	type: yup.number().required('This field is required'),
 	description: yup
 		.string()

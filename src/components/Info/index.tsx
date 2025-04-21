@@ -15,7 +15,7 @@ const Index: FC<IProperties> = ({title = '', text = null}) => {
 			<p>{t(title)}:</p>
 			{
 				text &&
-				<span>{text}</span>
+				<div className={styles.text} dangerouslySetInnerHTML={{__html: text}}></div>
 			}
 		</div>
 	)

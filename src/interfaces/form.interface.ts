@@ -38,6 +38,7 @@ export interface ISelectOption {
 	label: string | number | boolean;
 	icon?: React.ReactNode;
 	code?: string;
+	is_main?: boolean;
 	color?: string;
 }
 

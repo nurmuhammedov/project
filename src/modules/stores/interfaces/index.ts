@@ -5,6 +5,7 @@ export interface IStoreDetail {
 	readonly id: number;
 	name: string;
 	created_at: string;
+	is_main: boolean;
 	exchange_type: 'money' | 'product' | 'both';
 }
 

@@ -12,5 +12,6 @@ export interface IProductDetail {
 	name: string;
 	code: number;
 	is_serial: boolean;
+	expiry: boolean;
 	barcodes: string[];
 }

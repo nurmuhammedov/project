@@ -1,12 +1,14 @@
 .root {
   display: flex;
   gap: .5rem;
+  align-items: flex-start;
+  justify-content: center;
 
-  span {
+  .text {
     color: var(--dark-slate) !important;
   }
 
-  p, span {
+  p, .text {
     color: var(--light-gray-2);
     font-family: Golos, Arial, Helvetica, sans-serif;
     font-size: 1.125rem;

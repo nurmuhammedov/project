@@ -21,7 +21,7 @@ import {
 	ReactTable,
 	EditButton,
 	DeleteModal,
-	DeleteButton, Checkbox
+	DeleteButton
 } from 'components'
 import {InferType} from 'yup'
 
@@ -95,10 +95,10 @@ const ProductTypes = () => {
 				Header: t('Name'),
 				accessor: 'name'
 			},
-			{
-				Header: t('Expiry deadline'),
-				accessor: (row) => row?.expiry ? t('Exist') : t('No')
-			},
+			// {
+			// 	Header: t('Expiry deadline'),
+			// 	accessor: (row) => row?.expiry ? t('Exist') : t('No')
+			// },
 			{
 				Header: t('Date added'),
 				accessor: row => formatDate(row.created_at)
@@ -162,13 +162,13 @@ const ProductTypes = () => {
 						error={addErrors?.name?.message}
 						{...registerAdd('name')}
 					/>
-					<div className="span-12">
-						<Checkbox
-							id="expiryAdd"
-							title="Is there expiry date?"
-							{...registerAdd('expiry')}
-						/>
-					</div>
+					{/*<div className="span-12">*/}
+					{/*	<Checkbox*/}
+					{/*		id="expiryAdd"*/}
+					{/*		title="Is there expiry_date?"*/}
+					{/*		{...registerAdd('expiry')}*/}
+					{/*	/>*/}
+					{/*</div>*/}
 					<Button style={{marginTop: 'auto'}} type={FIELD.SUBMIT} disabled={isAdding}>
 						Save
 					</Button>
@@ -192,13 +192,13 @@ const ProductTypes = () => {
 						error={editErrors?.name?.message}
 						{...registerEdit('name')}
 					/>
-					<div className="span-12">
-						<Checkbox
-							id="expiryEdit"
-							title="Is there expiry date?"
-							{...registerEdit('expiry')}
-						/>
-					</div>
+					{/*<div className="span-12">*/}
+					{/*	<Checkbox*/}
+					{/*		id="expiryEdit"*/}
+					{/*		title="Is there expiry_date?"*/}
+					{/*		{...registerEdit('expiry')}*/}
+					{/*	/>*/}
+					{/*</div>*/}
 					<Button style={{marginTop: 'auto'}} type={FIELD.SUBMIT} disabled={isUpdating}>
 						Edit
 					</Button>

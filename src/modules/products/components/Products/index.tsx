@@ -68,6 +68,7 @@ const Products = () => {
 		defaultValues: {
 			name: '',
 			is_serial: false,
+			expiry: false,
 			barcodes: [],
 			type: undefined,
 			country: undefined,
@@ -117,6 +118,10 @@ const Products = () => {
 				accessor: (row: IProductDetail) => (row.is_serial ? t('With a series') : t('Without a series'))
 			},
 			{
+				Header: t('Expiry deadline'),
+				accessor: (row) => row?.expiry ? t('Exist') : t('No')
+			},
+			{
 				Header: t('Actions'),
 				accessor: (row: IProductDetail) => (
 					<div className="flex items-start gap-lg">
@@ -141,6 +146,7 @@ const Products = () => {
 		defaultValues: {
 			name: '',
 			is_serial: false,
+			expiry: false,
 			barcodes: [],
 			type: undefined,
 			country: undefined,
@@ -168,6 +174,7 @@ const Products = () => {
 			resetEdit({
 				name: detail.name,
 				is_serial: detail.is_serial,
+				expiry: detail.expiry,
 				barcodes: detail.barcodes || [],
 				type: detail.type?.id as number,
 				country: detail.country?.id as number || undefined,
@@ -290,13 +297,21 @@ const Products = () => {
 							/>
 						</div>
 
-						<div className="span-12">
+						<div className="span-2">
 							<Checkbox
 								id="seriesAdd"
 								title="Series?"
 								{...registerAdd('is_serial')}
 							/>
 						</div>
+						<div className="span-6">
+							<Checkbox
+								id="expiryAdd"
+								title="Is there expiry date?"
+								{...registerAdd('expiry')}
+							/>
+						</div>
+
 						{
 							addBarcodeFields?.map((_field, index) => (
 								<Input
@@ -428,11 +443,18 @@ const Products = () => {
 							/>
 						</div>
 
-						<div className="span-12">
+						<div className="span-2">
 							<Checkbox
 								id="seriesEdit"
 								title="Series?"
 								{...registerEdit('is_serial')}
+							/>
+						</div>
+						<div className="span-6">
+							<Checkbox
+								id="expiryEdit"
+								title="Is there expiry date?"
+								{...registerEdit('expiry')}
 							/>
 						</div>
 

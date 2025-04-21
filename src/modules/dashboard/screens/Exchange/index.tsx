@@ -99,7 +99,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false, expanse = false}) => 
 
 		reset({
 			customer: customerId ? Number(customerId) : undefined,
-			store: storeId ? Number(storeId) : undefined,
+			store: storeId ? Number(storeId) : stores?.find((store) => store?.is_main)?.value as unknown as number ?? undefined,
 			records: [],
 			currency: undefined,
 			first_amount: '0',
@@ -113,6 +113,15 @@ const Index: FC<IProperties> = ({detail: retrieve = false, expanse = false}) => 
 			setValue('currency', customer?.currency)
 		}
 	}, [customer])
+
+	useEffect(() => {
+		if (stores?.length && !isStoresLoading && stores?.find((store) => store?.is_main)?.value) {
+			reset((prevValues: InferType<typeof currencyExchangeSchema>) => ({
+				...prevValues,
+				store: stores?.find((store) => store?.is_main)?.value as unknown as number ?? undefined
+			}))
+		}
+	}, [stores])
 
 	useEffect(() => {
 		if (watch('currency') && !retrieve) {
@@ -331,7 +340,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false, expanse = false}) => 
 											id="currency"
 											label="Currency"
 											onBlur={onBlur}
-											isDisabled={retrieve}
+											isDisabled={true}
 											options={currencyOptions}
 											error={errors.currency?.message}
 											value={getSelectValue(currencyOptions, value)}
@@ -348,6 +357,24 @@ const Index: FC<IProperties> = ({detail: retrieve = false, expanse = false}) => 
 									disabled={retrieve}
 									error={errors?.description?.message}
 									{...register(`description`)}
+								/>
+							</div>
+							<div className="flex-1">
+								<Controller
+									control={control}
+									name="total"
+									render={({field}) => (
+										<NumberFormattedInput
+											{...field}
+											id="total"
+											maxLength={15}
+											disableGroupSeparators={false}
+											allowDecimals={true}
+											disabled={retrieve}
+											label={`${t('Total')}`}
+											error={errors?.total?.message}
+										/>
+									)}
 								/>
 							</div>
 						</div>
@@ -399,12 +426,12 @@ const Index: FC<IProperties> = ({detail: retrieve = false, expanse = false}) => 
 													render={({field}) => (
 														<NumberFormattedInput
 															{...field}
-															onChange={event => {
-																const storeAmount = parseFloat(event || '0')
-																setValue(`records.${index}.customer_amount`, convertCurrency(storeAmount, 'toStore', watch(`records.${index}.store_currency`), transactions)?.toString()
-																)
-																field.onChange(event as string)
-															}}
+															// onChange={event => {
+															// 	const storeAmount = parseFloat(event || '0')
+															// 	setValue(`records.${index}.customer_amount`, convertCurrency(storeAmount, 'toStore', watch(`records.${index}.store_currency`), transactions)?.toString()
+															// 	)
+															// 	field.onChange(event as string)
+															// }}
 															id={`records.${index}.store_amount`}
 															maxLength={15}
 															disableGroupSeparators={false}
@@ -412,6 +439,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false, expanse = false}) => 
 															disabled={retrieve}
 															label={`${t(findName(currencyOptions, watch(`records.${index}.store_currency`)))} (${t('Checkout')?.toLowerCase()})`}
 															error={errors?.records?.[index]?.store_amount?.message}
+															onDoubleClick={() => handleDoubleClick(index, 'store_amount')}
 														/>
 													)}
 												/>
@@ -442,7 +470,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false, expanse = false}) => 
 															disabled={retrieve}
 															label={`${t(findName(currencyOptions, watch(`currency`)))} (${t('Customer')?.toLowerCase()})`}
 															error={errors?.records?.[index]?.customer_amount?.message}
-															// onDoubleClick={() => handleDoubleClick(index, 'customer_amount')}
+															onDoubleClick={() => handleDoubleClick(index, 'customer_amount')}
 														/>
 													)}
 												/>

@@ -40,10 +40,10 @@ const Index: FC<IProperties> = ({clientId, refetchTemporaryList}) => {
 	const {t} = useTranslation()
 	const {
 		removeParams,
-		paramsObject: {updateId = undefined}
+		paramsObject: {updateId = undefined, modal = undefined}
 	} = useSearchParams()
 
-	const {data: products = []} = useData<ISelectOption[]>('products/select')
+	const {data: products = []} = useData<ISelectOption[]>('products/select', modal == 'product' || modal == 'edit')
 
 	const {
 		handleSubmit,
@@ -57,7 +57,7 @@ const Index: FC<IProperties> = ({clientId, refetchTemporaryList}) => {
 		mode: 'onTouched',
 		defaultValues: {
 			price: '',
-			unit_quantity: '',
+			unit_quantity: '1',
 			serial_numbers: [],
 			product: undefined,
 			expiry_date: ''
@@ -87,7 +87,8 @@ const Index: FC<IProperties> = ({clientId, refetchTemporaryList}) => {
 				expiry_date: detail.expiry_date ? getDate(detail.expiry_date) : getDate(),
 				price: detail.price,
 				serial_numbers: detail.serial_numbers || [],
-				unit_quantity: detail?.product?.is_serial ? detail.serial_numbers?.length?.toString() || '0' : measurementUnits.find(i => i.id == detail.product?.measure)?.type == 'int' ? decimalToNumber(detail.unit_quantity) : detail.unit_quantity
+				// unit_quantity: detail?.product?.is_serial ? detail.serial_numbers?.length?.toString() || '1' : measurementUnits.find(i => i.id == detail.product?.measure)?.type == 'int' ? decimalToNumber(detail.unit_quantity) : detail.unit_quantity
+				unit_quantity: measurementUnits.find(i => i.id == detail.product?.measure)?.type == 'int' ? decimalToNumber(detail.unit_quantity) : detail.unit_quantity
 			})
 		}
 	}, [detail])
@@ -97,9 +98,9 @@ const Index: FC<IProperties> = ({clientId, refetchTemporaryList}) => {
 			reset((prevValues) => ({
 				...prevValues,
 				price: '',
-				unit_quantity: validationData?.is_serial ? '0' : '',
+				unit_quantity: validationData?.is_serial ? '1' : '1',
 				serial_numbers: [],
-				expiry_date: validationData?.expiry ? '' : getDate()
+				expiry_date: getDate()
 			}))
 		}
 	}, [validationData])
@@ -133,11 +134,11 @@ const Index: FC<IProperties> = ({clientId, refetchTemporaryList}) => {
 							product: data?.product,
 							expiry_date: validationData?.expiry ? data?.expiry_date : null,
 							price: data?.price,
-							serial_numbers: validationData?.is_serial ? data?.serial_numbers : null,
-							unit_quantity: validationData?.is_serial ? null : data?.unit_quantity,
+							serial_numbers: validationData?.is_serial ? data?.serial_numbers ?? [] : [],
+							unit_quantity: data?.unit_quantity,
 							supplier: clientId
 						}
-						update(cleanParams(newData as ISearchParams)).then(async () => {
+						update(cleanParams(newData as unknown as ISearchParams)).then(async () => {
 							removeParams('updateId', 'modal')
 							reset({
 								price: '',
@@ -153,11 +154,11 @@ const Index: FC<IProperties> = ({clientId, refetchTemporaryList}) => {
 							product: data?.product,
 							expiry_date: validationData?.expiry ? data?.expiry_date : null,
 							price: data?.price,
-							serial_numbers: validationData?.is_serial ? data?.serial_numbers : null,
-							unit_quantity: validationData?.is_serial ? null : data?.unit_quantity,
+							serial_numbers: validationData?.is_serial ? data?.serial_numbers ?? [] : [],
+							unit_quantity: data?.unit_quantity,
 							supplier: clientId
 						}
-						mutateAsync(cleanParams(newData as ISearchParams)).then(async () => {
+						mutateAsync(cleanParams(newData as unknown as ISearchParams)).then(async () => {
 							reset({
 								price: '',
 								unit_quantity: '',
@@ -209,7 +210,6 @@ const Index: FC<IProperties> = ({clientId, refetchTemporaryList}) => {
 													id="unit_quantity"
 													maxLength={measurementUnits?.find(i => i.id == validationData?.measure)?.type == 'int' ? 6 : 9}
 													disableGroupSeparators={false}
-													disabled={validationData.is_serial}
 													allowDecimals={measurementUnits?.find(i => i.id == validationData?.measure)?.type == 'float'}
 													label={measurementUnits?.find(i => i.id == validationData?.measure)?.type == 'int' ? t('Count') + ' ' + `(${t(measurementUnits?.find(i => i.id == validationData?.measure)?.label?.toString() || '')})` : t('Quantity') + ' ' + `(${(measurementUnits?.find(i => i.id == validationData?.measure)?.label?.toString() || '')})`}
 													error={errors?.unit_quantity?.message}
@@ -269,7 +269,7 @@ const Index: FC<IProperties> = ({clientId, refetchTemporaryList}) => {
 															id={`serial_numbers.${index}`}
 															label={t('Product serial number', {index: index + 1})}
 															handleDelete={() => {
-																setValue('unit_quantity', String(fields?.length - 1))
+																// setValue('unit_quantity', String(fields?.length - 1))
 																remove(index)
 															}}
 															error={errors.serial_numbers?.[index]?.message}
@@ -286,7 +286,7 @@ const Index: FC<IProperties> = ({clientId, refetchTemporaryList}) => {
 												disabled={(watch('serial_numbers')?.length !== 0 && watch('serial_numbers')?.[(watch('serial_numbers')?.length ?? 1) - 1]?.toString()?.trim() === '')}
 												icon={<Plus/>}
 												onClick={() => {
-													setValue('unit_quantity', String(fields?.length + 1))
+													// setValue('unit_quantity', String(fields?.length + 1))
 													append('')
 												}}
 											>
@@ -310,7 +310,7 @@ const Index: FC<IProperties> = ({clientId, refetchTemporaryList}) => {
 			<Button
 				type={FIELD.SUBMIT}
 				style={{marginTop: 'auto'}}
-				disabled={isAdding || isUpdating || isValidationDataLoading || isValidationDataFetching || !validationData || (validationData?.is_serial && !watch('serial_numbers')?.length)}
+				disabled={isAdding || isUpdating || isValidationDataLoading || isValidationDataFetching || !validationData}
 			>
 				{updateId ? 'Edit' : 'Save'}
 			</Button>

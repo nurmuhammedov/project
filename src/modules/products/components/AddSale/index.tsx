@@ -26,6 +26,7 @@ import {useTranslation} from 'react-i18next'
 import {showMessage} from 'utilities/alert'
 import {ISearchParams} from 'interfaces/params.interface'
 import {getSelectOptionsByKey} from 'utilities/select'
+import {InferType} from 'yup'
 
 
 interface IProperties {
@@ -35,13 +36,12 @@ interface IProperties {
 
 const Index: FC<IProperties> = ({clientId, refetchTemporaryList}) => {
 	const {t} = useTranslation()
-	const {data: stores = []} = useData<ISelectOption[]>('stores/select')
 	const {
 		removeParams,
-		paramsObject: {updateId = undefined}
+		paramsObject: {updateId = undefined, modal = undefined}
 	} = useSearchParams()
 
-	const {data: products = []} = useData<ISelectOption[]>('products/select')
+	const {data: products = []} = useData<ISelectOption[]>('products/select', modal == 'product' || modal == 'edit')
 
 	const {
 		handleSubmit,
@@ -62,6 +62,7 @@ const Index: FC<IProperties> = ({clientId, refetchTemporaryList}) => {
 		resolver: yupResolver(temporarySaleItemSchema)
 	})
 
+	const {data: stores = [], isPending: isStoreLoading} = useData<ISelectOption[]>('stores/select', !!watch('product'))
 
 	const {mutateAsync, isPending: isAdding} = useAdd('sale-temporary/create')
 	const {mutateAsync: update, isPending: isUpdating} = useUpdate('sale-temporary/update/', updateId)
@@ -87,7 +88,8 @@ const Index: FC<IProperties> = ({clientId, refetchTemporaryList}) => {
 				price: detail.price,
 				store: detail?.store?.id ?? undefined,
 				serial_numbers: detail.serial_numbers || [],
-				unit_quantity: detail?.product?.is_serial ? detail.serial_numbers?.length?.toString() || '0' : measurementUnits.find(i => i.id == detail.product?.measure)?.type == 'int' ? decimalToNumber(detail.unit_quantity) : detail.unit_quantity
+				// unit_quantity: detail?.product?.is_serial ? detail.serial_numbers?.length?.toString() || '1' : measurementUnits.find(i => i.id == detail.product?.measure)?.type == 'int' ? decimalToNumber(detail.unit_quantity) : detail.unit_quantity
+				unit_quantity: measurementUnits.find(i => i.id == detail.product?.measure)?.type == 'int' ? decimalToNumber(detail.unit_quantity) : detail.unit_quantity
 			})
 		}
 	}, [detail])
@@ -97,7 +99,7 @@ const Index: FC<IProperties> = ({clientId, refetchTemporaryList}) => {
 			reset((prevValues) => ({
 				...prevValues,
 				price: '',
-				unit_quantity: validationData?.is_serial ? '0' : '',
+				unit_quantity: validationData?.is_serial ? '1' : '1',
 				serial_numbers: [],
 				expiry_date: validationData?.expiry ? '' : getDate()
 			}))
@@ -117,7 +119,14 @@ const Index: FC<IProperties> = ({clientId, refetchTemporaryList}) => {
 		}
 	}, [updateId])
 
-	console.log(errors)
+	useEffect(() => {
+		if (stores?.length && !isStoreLoading && stores?.find((store) => store?.is_main)?.value) {
+			reset((prevValues: InferType<typeof temporarySaleItemSchema>) => ({
+				...prevValues,
+				store: stores?.find((store) => store?.is_main)?.value as unknown as number ?? undefined
+			}))
+		}
+	}, [stores])
 
 	return (
 		<Form
@@ -131,7 +140,7 @@ const Index: FC<IProperties> = ({clientId, refetchTemporaryList}) => {
 							price: data?.price,
 							serial_numbers: validationData?.is_serial ? data?.serial_numbers : null,
 							store: data?.store ?? null,
-							unit_quantity: validationData?.is_serial ? null : data?.unit_quantity,
+							unit_quantity: data?.unit_quantity,
 							customer: clientId
 						}
 						update(cleanParams(newData as ISearchParams)).then(async () => {
@@ -153,7 +162,7 @@ const Index: FC<IProperties> = ({clientId, refetchTemporaryList}) => {
 							price: data?.price,
 							store: data?.store ?? null,
 							serial_numbers: validationData?.is_serial ? data?.serial_numbers : null,
-							unit_quantity: validationData?.is_serial ? null : data?.unit_quantity,
+							unit_quantity: data?.unit_quantity,
 							customer: clientId
 						}
 						mutateAsync(cleanParams(newData as ISearchParams)).then(async () => {
@@ -228,7 +237,7 @@ const Index: FC<IProperties> = ({clientId, refetchTemporaryList}) => {
 													id="unit_quantity"
 													maxLength={measurementUnits?.find(i => i.id == validationData?.measure)?.type == 'int' ? 6 : 9}
 													disableGroupSeparators={false}
-													disabled={validationData.is_serial}
+													// disabled={validationData.is_serial}
 													allowDecimals={measurementUnits?.find(i => i.id == validationData?.measure)?.type == 'float'}
 													label={measurementUnits?.find(i => i.id == validationData?.measure)?.type == 'int' ? t('Count') + ' ' + `(${t(measurementUnits?.find(i => i.id == validationData?.measure)?.label?.toString() || '')})` : t('Quantity') + ' ' + `(${(measurementUnits?.find(i => i.id == validationData?.measure)?.label?.toString() || '')})`}
 													error={errors?.unit_quantity?.message}
@@ -277,7 +286,7 @@ const Index: FC<IProperties> = ({clientId, refetchTemporaryList}) => {
 														defaultValue={getSelectValue(getSelectOptionsByKey(series, 'serial'), value)}
 														handleOnChange={(e) => {
 															const value = e as string[]
-															setValue('unit_quantity', String(value?.length || '0'))
+															// setValue('unit_quantity', String(value?.length || '0'))
 															onChange(value as string[])
 														}}
 													/>
@@ -302,7 +311,8 @@ const Index: FC<IProperties> = ({clientId, refetchTemporaryList}) => {
 			<Button
 				type={FIELD.SUBMIT}
 				style={{marginTop: 'auto'}}
-				disabled={isAdding || isUpdating || isValidationDataLoading || isValidationDataFetching || !validationData || (validationData?.is_serial && !watch('serial_numbers')?.length)}
+				// disabled={isAdding || isUpdating || isValidationDataLoading || isValidationDataFetching || !validationData || (validationData?.is_serial && !watch('serial_numbers')?.length)}
+				disabled={isAdding || isUpdating || isValidationDataLoading || isValidationDataFetching || !validationData}
 			>
 				{updateId ? 'Edit' : 'Save'}
 			</Button>

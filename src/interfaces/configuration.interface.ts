@@ -17,6 +17,7 @@ interface IMenuItem {
 interface IListResponse<T> {
 	count: number
 	num_pages: number
+	totalPages: number
 	results: T
 }
 

@@ -61,10 +61,19 @@ export function getBalanceAsString(arr: IBalance[], t: TFunction<'translation', 
 		return decimalToPrice(0)
 	}
 
-	return arr
-		.map((item: IBalance) => `${decimalToPrice(item?.amount)} ${t(findName(currencyOptions, item?.currency) || '')?.toLowerCase()}`)
-		.join(';  ')
+	const orderedArr = currencyOptions
+		.map(option => arr.find(item => item.currency === option.value))
+		.filter((item): item is IBalance => !!item)
+
+	return orderedArr
+		.map((item: IBalance) => {
+			const amountStr = decimalToPrice(item?.amount)
+			const currencyName = t(findName(currencyOptions, item?.currency) || '')?.toLowerCase()
+			return `${amountStr} ${currencyName}`
+		})
+		.join('</br>')
 }
+
 
 export function convertCurrency(amount: number, direction: 'toStore' | 'fromStore', storeCurrencyId: string, rates: ITransaction[]): number {
 	const storeCurrency = rates.find(r => r?.store_currency?.id == storeCurrencyId)
