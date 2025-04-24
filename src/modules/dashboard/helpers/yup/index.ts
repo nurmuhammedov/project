@@ -31,7 +31,7 @@ export const currencyExchangeSchema = yup.object().shape({
 							return !(!this.parent.store_amount && !!customer_amount)
 						}
 					)
-					.transform(value => Number(value) ? value : null),
+					.transform(value => value ? value : null),
 				customer_amount: yup
 					.string()
 					.trim()
@@ -45,7 +45,7 @@ export const currencyExchangeSchema = yup.object().shape({
 							return !(!this.parent.customer_amount && !!store_amount)
 						}
 					)
-					.transform(value => Number(value) ? value : null)
+					.transform(value => value ? value : null)
 			})
 		)
 		.required('This field is required'),

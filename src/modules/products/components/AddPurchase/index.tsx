@@ -294,7 +294,7 @@ const Index: FC<IProperties> = ({clientId, refetchTemporaryList}) => {
 											</Button>
 											<FileUploader
 												type="txt"
-												handleOnChange={(arr) => setValue('serial_numbers', Array.isArray(arr) ? Array.from(new Set([...(watch('serial_numbers') || []), ...arr])) : [])}
+												handleOnChange={(arr) => setValue('serial_numbers', Array.isArray(arr) ? Array.from(new Set(arr)) : [])}
 												value={undefined}
 												id="series"
 											/>

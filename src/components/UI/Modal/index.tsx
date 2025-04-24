@@ -54,7 +54,7 @@ const Modal = (
 
 	return (
 		createPortal(
-			<FocusLock autoFocus={true} disabled={!visible}>
+			<FocusLock  disabled={!visible}>
 				<MD
 					visible={visible}
 					onClose={noop}

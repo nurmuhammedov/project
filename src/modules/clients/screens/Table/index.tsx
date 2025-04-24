@@ -40,9 +40,9 @@ import {InferType} from 'yup'
 const DEFAULT_FORM_VALUES = {
 	name: '',
 	phone_number: '',
-	region: undefined,
+	region: 10,
+	currency: 'USD',
 	address: '',
-	currency: undefined,
 	store: undefined,
 	price_type: undefined
 }
@@ -56,8 +56,14 @@ const Index = () => {
 		removeParams,
 		paramsObject: {updateId = undefined, modal = undefined}
 	} = useSearchParams()
-	const {data: stores = []} = useData<ISelectOption[]>('stores/select', modal === 'customer' || modal === 'edit')
-	const {data: priceTypes = []} = useData<ISelectOption[]>('price-types/select', modal === 'customer' || modal === 'edit')
+	const {
+		data: stores = [],
+		isPending: isStoresLoading
+	} = useData<ISelectOption[]>('stores/select', modal === 'customer' || modal === 'edit')
+	const {
+		data: priceTypes = [],
+		isPending: isPriceTypesLoading
+	} = useData<ISelectOption[]>('price-types/select', modal === 'customer' || modal === 'edit')
 
 	const {mutateAsync: addCustomer, isPending: isAdding} = useAdd('customers')
 	const {mutateAsync: updateCustomer, isPending: isUpdating} = useUpdate('customers/', updateId, 'patch')
@@ -77,10 +83,11 @@ const Index = () => {
 		handleSubmit: handleAddSubmit,
 		register: registerAdd,
 		reset: resetAdd,
+		setFocus,
 		control: controlAdd,
 		formState: {errors: addErrors}
 	} = useForm<InferType<typeof customerSchema>>({
-		mode: 'onTouched',
+		mode: 'onSubmit',
 		defaultValues: DEFAULT_FORM_VALUES,
 		resolver: yupResolver(customerSchema)
 	})
@@ -92,10 +99,36 @@ const Index = () => {
 		control: controlEdit,
 		formState: {errors: editErrors}
 	} = useForm<InferType<typeof customerSchema>>({
-		mode: 'onTouched',
+		mode: 'onSubmit',
 		defaultValues: DEFAULT_FORM_VALUES,
 		resolver: yupResolver(customerSchema)
 	})
+
+	useEffect(() => {
+		if (stores?.length && !isStoresLoading && stores?.find((store) => store?.is_main)?.value) {
+			resetAdd((prevValues: InferType<typeof customerSchema>) => ({
+				...prevValues,
+				store: stores?.find((store) => store?.is_main)?.value as unknown as number ?? undefined
+			}))
+		}
+	}, [stores])
+
+	useEffect(() => {
+		if (priceTypes?.length && !isPriceTypesLoading && priceTypes?.[0]?.value) {
+			resetAdd((prevValues: InferType<typeof customerSchema>) => ({
+				...prevValues,
+				price_type: priceTypes?.[0]?.value as unknown as number ?? undefined
+			}))
+		}
+	}, [priceTypes])
+
+	useEffect(() => {
+		if (modal == 'customer') {
+			setTimeout(() => {
+				setFocus('name')
+			}, 0)
+		}
+	}, [modal])
 
 	const columns: Column<ICustomerDetail>[] = useMemo(
 		() => [
@@ -115,10 +148,10 @@ const Index = () => {
 				Header: t('Store'),
 				accessor: row => row.store?.name
 			},
-			{
-				Header: t('Client code'),
-				accessor: row => row.code
-			},
+			// {
+			// 	Header: t('Client code'),
+			// 	accessor: row => row.code
+			// },
 			{
 				Header: t('Phone number'),
 				accessor: row => row.phone_number
@@ -174,12 +207,39 @@ const Index = () => {
 				<Pagination totalPages={totalPages}/>
 			</Card>
 
-			<Modal title="Add a new client" id="customer" style={{height: '40rem', width: '60rem'}}>
+			<Modal
+				title="Add a new client"
+				id="customer"
+				style={{height: '40rem', width: '60rem'}}
+				onClose={() => {
+					removeParams('modal')
+					resetAdd((prevValues: InferType<typeof customerSchema>) => ({
+						...prevValues,
+						store: stores?.find((store) => store?.is_main)?.value as unknown as number ?? undefined,
+						price_type: priceTypes?.[0]?.value as unknown as number ?? undefined,
+						region: 10,
+						currency: 'USD',
+						name: '',
+						phone_number: '',
+						address: ''
+					}))
+				}}
+			>
 				<Form
 					onSubmit={handleAddSubmit((data) =>
 						addCustomer(data).then(async () => {
-							resetAdd()
-							removeParams('modal')
+							setFocus('name')
+							resetAdd((prevValues: InferType<typeof customerSchema>) => ({
+								...prevValues,
+								store: stores?.find((store) => store?.is_main)?.value as unknown as number ?? undefined,
+								price_type: priceTypes?.[0]?.value as unknown as number ?? undefined,
+								region: 10,
+								currency: 'USD',
+								name: '',
+								phone_number: '',
+								address: ''
+							}))
+							// removeParams('modal')
 							await refetch()
 						})
 					)}

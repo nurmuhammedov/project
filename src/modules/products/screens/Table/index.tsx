@@ -1,5 +1,5 @@
 import {Box, Cart, Plus} from 'assets/icons'
-import {Button, HorizontalTab, PageTitle} from 'components'
+import {Button, PageTitle} from 'components'
 import {useSearchParams} from 'hooks'
 import {ISelectOption} from 'interfaces/form.interface'
 import ProductWarehouse from 'modules/products/components/Products'
@@ -33,11 +33,11 @@ const Index = () => {
 					</Button>
 				</div>
 			</PageTitle>
-			<HorizontalTab
-				tabs={tabOptions}
-				fallbackValue={tabOptions[0]?.value}
-				style={{marginTop: '1rem', marginBottom: '1rem'}}
-			/>
+			{/*<HorizontalTab*/}
+			{/*	tabs={tabOptions}*/}
+			{/*	fallbackValue={tabOptions[0]?.value}*/}
+			{/*	style={{marginTop: '1rem', marginBottom: '1rem'}}*/}
+			{/*/>*/}
 			{
 				tab === 'products' ? <ProductWarehouse/> :
 					null

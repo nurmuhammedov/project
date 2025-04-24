@@ -35,6 +35,7 @@ export interface IPriceTypeDetail {
 	id: number;
 	name: string;
 	created_at: string;
+	is_main: boolean;
 }
 
 export interface IProductTypeDetail {

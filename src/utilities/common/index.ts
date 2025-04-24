@@ -71,7 +71,7 @@ export function getBalanceAsString(arr: IBalance[], t: TFunction<'translation', 
 			const currencyName = t(findName(currencyOptions, item?.currency) || '')?.toLowerCase()
 			return `${amountStr} ${currencyName}`
 		})
-		.join('</br>')
+		.join(';</br>')
 }
 
 
@@ -91,6 +91,8 @@ export function convertCurrency(amount: number, direction: 'toStore' | 'fromStor
 	return parseFloat(result.toFixed(2))
 }
 
-export function findName(arr: ISelectOption[], id: number | string | null | undefined): string {
-	return arr.find(item => item?.value == id)?.label?.toString() || ''
+export function findName(arr: ISelectOption[], id: number | string | null | undefined, label: string = 'label'): string {
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-expect-error
+	return arr.find(item => item?.value == id)?.[label]?.toString() || ''
 }

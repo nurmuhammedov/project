@@ -25,7 +25,7 @@ import {
 	EditButton,
 	Pagination,
 	DeleteModal,
-	DeleteButton, Checkbox
+	DeleteButton, Checkbox, FileUploader
 } from 'components'
 
 import {
@@ -61,10 +61,12 @@ const Products = () => {
 		register: registerAdd,
 		reset: resetAdd,
 		control: controlAdd,
+		setValue: setValueAdd,
 		watch: watchAdd,
+		setFocus,
 		formState: {errors: addErrors}
 	} = useForm({
-		mode: 'onTouched',
+		mode: 'onSubmit',
 		defaultValues: {
 			name: '',
 			is_serial: false,
@@ -73,7 +75,7 @@ const Products = () => {
 			type: undefined,
 			country: undefined,
 			brand: undefined,
-			measure: undefined
+			measure: 'nb'
 		},
 		resolver: yupResolver(productSchema)
 	})
@@ -139,10 +141,11 @@ const Products = () => {
 		register: registerEdit,
 		reset: resetEdit,
 		control: controlEdit,
+		setValue: setValueEdit,
 		watch: watchEdit,
 		formState: {errors: editErrors}
 	} = useForm({
-		mode: 'onTouched',
+		mode: 'onSubmit',
 		defaultValues: {
 			name: '',
 			is_serial: false,
@@ -151,7 +154,7 @@ const Products = () => {
 			type: undefined,
 			country: undefined,
 			brand: undefined,
-			measure: undefined
+			measure: 'nb'
 		},
 		resolver: yupResolver(productSchema)
 	})
@@ -184,6 +187,14 @@ const Products = () => {
 		}
 	}, [detail])
 
+	useEffect(() => {
+		if (modal === 'product') {
+			setTimeout(() => {
+				setFocus('name')
+			}, 0)
+		}
+	}, [modal])
+
 	return (
 		<>
 			<Card screen={true} className="span-9 gap-2xl">
@@ -201,12 +212,38 @@ const Products = () => {
 				<Pagination totalPages={totalPages}/>
 			</Card>
 
-			<Modal title="Add a new product" id="product" style={{height: '45rem', width: '60rem'}}>
+			<Modal
+				title="Add a new product"
+				id="product"
+				style={{height: '45rem', width: '60rem'}}
+				onClose={() => {
+					resetAdd({
+						name: '',
+						is_serial: false,
+						expiry: false,
+						barcodes: [],
+						type: undefined,
+						country: undefined,
+						brand: undefined,
+						measure: 'nb'
+					})
+					removeParams('modal')
+				}}
+			>
 				<Form
 					onSubmit={handleAddSubmit((data) =>
 						mutateAsync(data).then(async () => {
-							resetAdd()
-							removeParams('modal')
+							// removeParams('modal')
+							resetAdd({
+								name: '',
+								is_serial: false,
+								expiry: false,
+								barcodes: [],
+								type: undefined,
+								country: undefined,
+								brand: undefined,
+								measure: 'nb'
+							})
 							await refetch()
 						})
 					)}
@@ -221,6 +258,25 @@ const Products = () => {
 							/>
 						</div>
 						<div className="span-6">
+							<Controller
+								name="measure"
+								control={controlAdd}
+								render={({field: {value, ref, onChange, onBlur}}) => (
+									<Select
+										ref={ref}
+										id="measureAdd"
+										label="Measure unit"
+										options={getSelectOptionsByKey(measurementUnits as unknown as ISearchParams[], 'name')}
+										onBlur={onBlur}
+										error={addErrors.measure?.message}
+										value={getSelectValue(getSelectOptionsByKey(measurementUnits as unknown as ISearchParams[], 'name'), value)}
+										defaultValue={getSelectValue(getSelectOptionsByKey(measurementUnits as unknown as ISearchParams[], 'name'), value)}
+										handleOnChange={(e) => onChange(e as string)}
+									/>
+								)}
+							/>
+						</div>
+						<div className="span-4">
 							<Controller
 								name="type"
 								control={controlAdd}
@@ -253,25 +309,6 @@ const Products = () => {
 										error={addErrors.brand?.message}
 										value={getSelectValue(brands, value)}
 										defaultValue={getSelectValue(brands, value)}
-										handleOnChange={(e) => onChange(e as string)}
-									/>
-								)}
-							/>
-						</div>
-						<div className="span-4">
-							<Controller
-								name="measure"
-								control={controlAdd}
-								render={({field: {value, ref, onChange, onBlur}}) => (
-									<Select
-										ref={ref}
-										id="measureAdd"
-										label="Measure unit"
-										options={getSelectOptionsByKey(measurementUnits as unknown as ISearchParams[], 'name')}
-										onBlur={onBlur}
-										error={addErrors.measure?.message}
-										value={getSelectValue(getSelectOptionsByKey(measurementUnits as unknown as ISearchParams[], 'name'), value)}
-										defaultValue={getSelectValue(getSelectOptionsByKey(measurementUnits as unknown as ISearchParams[], 'name'), value)}
 										handleOnChange={(e) => onChange(e as string)}
 									/>
 								)}
@@ -312,20 +349,24 @@ const Products = () => {
 							/>
 						</div>
 
-						{
-							addBarcodeFields?.map((_field, index) => (
-								<Input
-									id={`barcodes.${index}.add`}
-									label={`Barcode`}
-									handleDelete={() => addBarcodeRemove(index)}
-									error={addErrors.barcodes?.[index]?.message}
-									{...registerAdd(`barcodes.${index}`)}
-								/>
-							))
-						}
+						<div className="span-12 grid gap-lg">
+							{
+								addBarcodeFields?.map((_field, index) => (
+									<div className="span-4">
+										<Input
+											id={`barcodes.${index}.add`}
+											label={`${index + 1}-${t('Barcode')?.toLowerCase()}`}
+											handleDelete={() => addBarcodeRemove(index)}
+											error={addErrors.barcodes?.[index]?.message}
+											{...registerAdd(`barcodes.${index}`)}
+										/>
+									</div>
+								))
+							}
+						</div>
 					</div>
 
-					<div>
+					<div className="span-12 flex gap-lg">
 						<Button
 							theme={BUTTON_THEME.OUTLINE}
 							type="button"
@@ -335,6 +376,12 @@ const Products = () => {
 						>
 							Add barcode
 						</Button>
+						<FileUploader
+							type="txt"
+							handleOnChange={(arr) => setValueAdd('barcodes', Array.isArray(arr) ? Array.from(new Set(arr)) : [])}
+							value={undefined}
+							id="series"
+						/>
 					</div>
 
 					<Button style={{marginTop: 'auto'}} type={FIELD.SUBMIT} disabled={isAdding}>
@@ -356,7 +403,6 @@ const Products = () => {
 				>
 
 					<div className="grid gap-lg">
-
 						<div className="span-6">
 							<Input
 								id="nameEdit"
@@ -366,6 +412,26 @@ const Products = () => {
 							/>
 						</div>
 						<div className="span-6">
+							<Controller
+								name="measure"
+								control={controlEdit}
+								render={({field: {value, ref, onChange, onBlur}}) => (
+									<Select
+										ref={ref}
+										id="measureEdit"
+										isDisabled={true}
+										label="Measure unit"
+										options={getSelectOptionsByKey(measurementUnits as unknown as ISearchParams[], 'name')}
+										onBlur={onBlur}
+										error={editErrors.measure?.message}
+										value={getSelectValue(getSelectOptionsByKey(measurementUnits as unknown as ISearchParams[], 'name'), value)}
+										defaultValue={getSelectValue(getSelectOptionsByKey(measurementUnits as unknown as ISearchParams[], 'name'), value)}
+										handleOnChange={(e) => onChange(e as string)}
+									/>
+								)}
+							/>
+						</div>
+						<div className="span-4">
 							<Controller
 								name="type"
 								control={controlEdit}
@@ -405,26 +471,6 @@ const Products = () => {
 						</div>
 						<div className="span-4">
 							<Controller
-								name="measure"
-								control={controlEdit}
-								render={({field: {value, ref, onChange, onBlur}}) => (
-									<Select
-										ref={ref}
-										id="measureEdit"
-										isDisabled={true}
-										label="Measure unit"
-										options={getSelectOptionsByKey(measurementUnits as unknown as ISearchParams[], 'name')}
-										onBlur={onBlur}
-										error={editErrors.measure?.message}
-										value={getSelectValue(getSelectOptionsByKey(measurementUnits as unknown as ISearchParams[], 'name'), value)}
-										defaultValue={getSelectValue(getSelectOptionsByKey(measurementUnits as unknown as ISearchParams[], 'name'), value)}
-										handleOnChange={(e) => onChange(e as string)}
-									/>
-								)}
-							/>
-						</div>
-						<div className="span-4">
-							<Controller
 								name="country"
 								control={controlEdit}
 								render={({field: {value, ref, onChange, onBlur}}) => (
@@ -457,21 +503,24 @@ const Products = () => {
 								{...registerEdit('expiry')}
 							/>
 						</div>
-
-						{
-							editBarcodeFields?.map((_field, index) => (
-								<Input
-									id={`barcodes.${index}.edit`}
-									label={`Barcode`}
-									handleDelete={() => editBarcodeRemove(index)}
-									error={editErrors.barcodes?.[index]?.message}
-									{...registerEdit(`barcodes.${index}`)}
-								/>
-							))
-						}
+						<div className="span-12 grid gap-lg">
+							{
+								editBarcodeFields?.map((_field, index) => (
+									<div className="span-4">
+										<Input
+											id={`barcodes.${index}.edit`}
+											label={`${index + 1}-${t('Barcode')?.toLowerCase()}`}
+											handleDelete={() => editBarcodeRemove(index)}
+											error={editErrors.barcodes?.[index]?.message}
+											{...registerEdit(`barcodes.${index}`)}
+										/>
+									</div>
+								))
+							}
+						</div>
 					</div>
 
-					<div>
+					<div className="span-12 flex gap-lg">
 						<Button
 							type="button"
 							onClick={() => editBarcodeAppend('')}
@@ -481,6 +530,12 @@ const Products = () => {
 						>
 							Add barcode
 						</Button>
+						<FileUploader
+							type="txt"
+							handleOnChange={(arr) => setValueEdit('barcodes', Array.isArray(arr) ? Array.from(new Set(arr)) : [])}
+							value={undefined}
+							id="series"
+						/>
 					</div>
 					<Button style={{marginTop: 'auto'}} type={FIELD.SUBMIT} disabled={isUpdating}>
 						Edit

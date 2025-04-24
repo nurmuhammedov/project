@@ -64,16 +64,18 @@ export const isNotFutureDate = date.test('isNotFutureDate', 'Date must be less t
 // PRODUCTS
 const productSchema = yup.object().shape({
 	name: yup.string().trim().required('This field is required'),
-	is_serial: yup.boolean().required('This field is required'),
-	type: yup.number().required('This field is required'),
+	is_serial: yup.boolean().default(false).optional().nullable().transform(value => value ? value : false),
+	type: yup.number().optional().nullable().transform(value => value ? value : null),
 	// package: yup.number().nullable(),
-	country: yup.number().nullable(),
-	expiry: yup.boolean().nullable().default(false),
+	country: yup.number().optional().nullable().transform(value => value ? value : null),
+	expiry: yup.boolean().default(false).optional().nullable().transform(value => value ? value : false),
 	barcodes: yup
 		.array()
+		.optional()
+		.nullable()
 		.of(yup.string().trim().required('This field is required'))
-		.nullable(),
-	brand: yup.number().required('This field is required'),
+		.transform(value => value ? value : null),
+	brand: yup.number().optional().nullable().transform(value => value ? value : null),
 	measure: yup.string().trim().required('This field is required')
 })
 

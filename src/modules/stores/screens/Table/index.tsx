@@ -24,7 +24,7 @@ import {
 	Pagination,
 	ReactTable,
 	EditButton,
-	DetailButton,
+	// DetailButton,
 	Select, PageTitle, Checkbox
 } from 'components'
 import {InferType} from 'yup'
@@ -40,7 +40,7 @@ const Stores = () => {
 	const {page, pageSize} = usePagination()
 	const {t} = useTranslation()
 	const {
-		paramsObject: {updateId = undefined},
+		paramsObject: {updateId = undefined, modal = undefined},
 		addParams,
 		removeParams
 	} = useSearchParams()
@@ -68,6 +68,7 @@ const Stores = () => {
 		handleSubmit: handleAddSubmit,
 		register: registerAdd,
 		reset: resetAdd,
+		setFocus,
 		control: controlAdd,
 		formState: {errors: addErrors}
 	} = useForm<InferType<typeof storeSchema>>({
@@ -118,7 +119,7 @@ const Stores = () => {
 				accessor: 'name'
 			},
 			{
-				Header: t('Base currency'),
+				Header: t('Main'),
 				accessor: row => <div>
 					<Checkbox
 						id={row.id as unknown as string}
@@ -145,7 +146,7 @@ const Stores = () => {
 				accessor: row => (
 					<div className="flex items-start gap-lg">
 						<EditButton id={row.id}/>
-						<DetailButton id={row.id}/>
+						{/*<DetailButton id={row.id}/>*/}
 					</div>
 				)
 			}
@@ -158,6 +159,14 @@ const Stores = () => {
 			resetEdit(detail)
 		}
 	}, [detail])
+
+	useEffect(() => {
+		if (modal == 'store') {
+			setTimeout(() => {
+				setFocus('name')
+			}, 0)
+		}
+	}, [modal])
 
 	return (
 		<>
@@ -178,37 +187,54 @@ const Stores = () => {
 				</div>
 			</Card>
 
-			<Modal title="Add a new store" id="store" style={{height: '35rem'}}>
+			<Modal
+				onClose={() => {
+					resetAdd(DEFAULT_FORM_VALUES)
+					removeParams('modal')
+				}}
+				title="Add a new store"
+				id="store"
+				style={{height: '35rem'}}
+			>
 				<Form
 					onSubmit={handleAddSubmit((formData) =>
 						addStore(formData).then(async () => {
-							removeParams('modal')
+							// removeParams('modal')
+							setTimeout(() => {
+								setFocus('name')
+							}, 0)
 							resetAdd(DEFAULT_FORM_VALUES)
 							await refetch()
 						})
 					)}
 				>
-					<Input
-						id="name"
-						type={FIELD.TEXT}
-						label="Name"
-						error={addErrors?.name?.message}
-						{...registerAdd('name')}
-					/>
-					<Controller
-						name="exchange_type"
-						control={controlAdd}
-						render={({field}) => (
-							<Select
-								id="exchangeType"
-								options={storeTypes}
-								label="Type"
-								error={addErrors?.exchange_type?.message}
-								value={getSelectValue(storeTypes, field.value)}
-								handleOnChange={field.onChange}
+					<div className="grid span-12 gap-lg">
+						<div className="span-6">
+							<Input
+								id="name"
+								type={FIELD.TEXT}
+								label="Name"
+								error={addErrors?.name?.message}
+								{...registerAdd('name')}
 							/>
-						)}
-					/>
+						</div>
+						<div className="span-6">
+							<Controller
+								name="exchange_type"
+								control={controlAdd}
+								render={({field}) => (
+									<Select
+										id="exchangeType"
+										options={storeTypes}
+										label="Type"
+										error={addErrors?.exchange_type?.message}
+										value={getSelectValue(storeTypes, field.value)}
+										handleOnChange={field.onChange}
+									/>
+								)}
+							/>
+						</div>
+					</div>
 					<Button style={{marginTop: 'auto'}} type={FIELD.SUBMIT} disabled={isAdding}>Save</Button>
 				</Form>
 			</Modal>
@@ -223,27 +249,33 @@ const Stores = () => {
 						})
 					)}
 				>
-					<Input
-						id="name"
-						type={FIELD.TEXT}
-						label="Name"
-						error={editErrors?.name?.message}
-						{...registerEdit('name')}
-					/>
-					<Controller
-						name="exchange_type"
-						control={controlEdit}
-						render={({field}) => (
-							<Select
-								id="exchangeType"
-								options={storeTypes}
-								label="Type"
-								error={editErrors?.exchange_type?.message}
-								value={getSelectValue(storeTypes, field.value)}
-								handleOnChange={field.onChange}
+					<div className="grid span-12 gap-lg">
+						<div className="span-6">
+							<Input
+								id="name"
+								type={FIELD.TEXT}
+								label="Name"
+								error={editErrors?.name?.message}
+								{...registerEdit('name')}
 							/>
-						)}
-					/>
+						</div>
+						<div className="span-6">
+							<Controller
+								name="exchange_type"
+								control={controlEdit}
+								render={({field}) => (
+									<Select
+										id="exchangeType"
+										options={storeTypes}
+										label="Type"
+										error={editErrors?.exchange_type?.message}
+										value={getSelectValue(storeTypes, field.value)}
+										handleOnChange={field.onChange}
+									/>
+								)}
+							/>
+						</div>
+					</div>
 					<Button style={{marginTop: 'auto'}} type={FIELD.SUBMIT} disabled={isUpdating}>Edit</Button>
 				</Form>
 			</EditModal>

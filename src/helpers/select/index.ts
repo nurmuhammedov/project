@@ -74,13 +74,10 @@ const getSelectStyles = (error?: boolean, top?: boolean) => ({
 	}),
 	'clearIndicator': (base: CSSObjectWithLabel) => ({
 		...base,
-		padding: 0,
-		display: 'flex',
-		justifyContent: 'center',
-		alignItems: 'center',
+		padding: '0.1rem 0.15rem 0.1rem 0.1rem',
 		'& svg': {
 			'& path': {
-				strokeWidth: .01
+				fill: `var(--light-dark-opacity)`
 			}
 		}
 	}),

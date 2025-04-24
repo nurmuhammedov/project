@@ -141,7 +141,7 @@ const Countries = () => {
 				</div>
 			</Card>
 
-			<Modal title="Add new country" id="countries" style={{height: '25rem'}}>
+			<Modal title="Add new" id="countries" style={{height: '25rem'}}>
 				<Form
 					onSubmit={handleAddSubmit((formData: InferType<typeof countrySchema>) =>
 						addCountry(formData).then(async () => {
