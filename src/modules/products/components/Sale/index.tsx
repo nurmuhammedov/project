@@ -1,4 +1,3 @@
-import {Plus} from 'assets/icons'
 import {
 	Button,
 	Card,
@@ -7,7 +6,7 @@ import {
 	Form,
 	Input,
 	MaskInput,
-	Modal, PageTitle,
+	Modal,
 	ReactTable,
 	Select
 } from 'components'
@@ -26,7 +25,7 @@ import {getDate} from 'utilities/date'
 import {BUTTON_THEME, FIELD} from 'constants/fields'
 import {yupResolver} from '@hookform/resolvers/yup'
 import {useAdd, useData, useDetail, useSearchParams} from 'hooks'
-import {useNavigate, useParams} from 'react-router-dom'
+import {useParams} from 'react-router-dom'
 import {useTranslation} from 'react-i18next'
 import {FC, useEffect, useMemo} from 'react'
 import styles from '../Purchase/styles.module.scss'
@@ -40,11 +39,11 @@ interface IProperties {
 
 const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 	const {t} = useTranslation()
-	const {removeParams, addParams} = useSearchParams()
+	const {removeParams} = useSearchParams()
 	const {id: clientId = undefined, productId = undefined} = useParams()
 	const {mutateAsync, isPending: isAdding} = useAdd('sale/create')
 	const {data: clients = []} = useData<ISelectOption[]>('customers/select')
-	const navigate = useNavigate()
+	// const navigate = useNavigate()
 
 	const {
 		data: purchase,
@@ -97,8 +96,8 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 		register,
 		setValue,
 		handleSubmit,
-		setFocus,
-		trigger,
+		// setFocus,
+		// trigger,
 		formState: {errors}
 	} = useForm({
 		mode: 'onTouched',
@@ -155,34 +154,34 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 
 	return (
 		<>
-			<PageTitle
-				title={`${t('Making loss')}`}
-			>
-				<div className="flex align-center gap-lg">
-					<Button
-						onClick={() => navigate(-1)}
-						theme={BUTTON_THEME.DANGER_OUTLINE}
-					>
-						Back
-					</Button>
-					<Button
-						icon={<Plus/>}
-						theme={BUTTON_THEME.PRIMARY}
-						onClick={
-							async () => {
-								const isValid = await trigger(['customer'])
-								if (!isValid) {
-									setFocus('customer')
-								} else {
-									addParams({modal: 'product'})
-								}
-							}
-						}
-					>
-						Add product
-					</Button>
-				</div>
-			</PageTitle>
+			{/*<PageTitle*/}
+			{/*	title={`${t('Making loss')}`}*/}
+			{/*>*/}
+			{/*	<div className="flex align-center gap-lg">*/}
+			{/*		<Button*/}
+			{/*			onClick={() => navigate(-1)}*/}
+			{/*			theme={BUTTON_THEME.DANGER_OUTLINE}*/}
+			{/*		>*/}
+			{/*			Back*/}
+			{/*		</Button>*/}
+			{/*		<Button*/}
+			{/*			icon={<Plus/>}*/}
+			{/*			theme={BUTTON_THEME.PRIMARY}*/}
+			{/*			onClick={*/}
+			{/*				async () => {*/}
+			{/*					const isValid = await trigger(['customer'])*/}
+			{/*					if (!isValid) {*/}
+			{/*						setFocus('customer')*/}
+			{/*					} else {*/}
+			{/*						addParams({modal: 'product'})*/}
+			{/*					}*/}
+			{/*				}*/}
+			{/*			}*/}
+			{/*		>*/}
+			{/*			Add product*/}
+			{/*		</Button>*/}
+			{/*	</div>*/}
+			{/*</PageTitle>*/}
 			<div className={classNames(styles.root, 'grid gap-lg  flex-1')}>
 				<Card shadow={true} style={{padding: '2.25rem'}}>
 					<CardTab
