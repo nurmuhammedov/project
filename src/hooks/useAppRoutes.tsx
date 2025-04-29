@@ -1,3 +1,5 @@
+import useActions from 'hooks/useActions'
+import {useEffect} from 'react'
 import {Navigate, Outlet, useRoutes} from 'react-router-dom'
 import {routeByRole} from 'utilities/authentication'
 import {ROLE_LIST} from 'constants/roles'
@@ -14,12 +16,19 @@ import {
 	StoreDetail,
 	StoresTable,
 	Login,
-	Home, CurrencyExchangeHistory, ProductExchangeHistory
+	Home,
+	CurrencyExchangeHistory,
+	ProductExchangeHistory
 } from 'modules'
 
 
 function useAppRoutes() {
 	const {user} = useAppContext()
+	const {fetchStores} = useActions()
+
+	useEffect(() => {
+		fetchStores()
+	}, [])
 
 	const routes = {
 		[ROLE_LIST.ADMIN]: [

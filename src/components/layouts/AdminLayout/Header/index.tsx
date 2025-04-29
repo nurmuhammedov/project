@@ -1,7 +1,12 @@
+import {Select} from 'components/UI'
+import useActions from 'hooks/useActions'
+import useTypedSelector from 'hooks/useTypedSelector'
+import {interceptor} from 'libraries/index'
 import {useTranslation} from 'react-i18next'
+import {getSelectValue} from 'utilities/common'
 import styles from './styles.module.scss'
 import {useAppContext, useLogout, useSideMenu} from 'hooks'
-import {Logo, Logout, SelectIcon} from 'assets/icons'
+import {Logout, SelectIcon} from 'assets/icons'
 import NavItem from './NavItem'
 import classNames from 'classnames'
 import {useState} from 'react'
@@ -14,12 +19,30 @@ const Index = () => {
 	const [accountIsOpen, setAccountIsOpen] = useState(false)
 	const {user} = useAppContext()
 	const {handleLogout, isPending} = useLogout()
+	const {store, stores} = useTypedSelector(state => state.stores)
+	const {setStore} = useActions()
 
 	return (
 		<div className={styles.root}>
 			<div className={styles.logo}>
-				<Logo/>
-				<span>{t('Erp')}</span>
+				{/*<Logo/>*/}
+				{/*<span>{t('Erp')}</span>*/}
+				<Select
+					id="store"
+					options={(store && !stores?.length) ? [store, ...stores] : stores}
+					placeholder="Store"
+					value={getSelectValue((store && !stores?.length) ? [store, ...stores] : stores, store?.value)}
+					defaultValue={getSelectValue((store && !stores?.length) ? [store, ...stores] : stores, store?.value)}
+					handleOnChange={(e) => {
+						if (e) {
+							interceptor
+								.post(`stores/${Number(e)}/set-main`)
+								.then(() => {
+									setStore(Number(e))
+								})
+						}
+					}}
+				/>
 			</div>
 
 			<div className={styles.nav}>

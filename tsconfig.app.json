@@ -38,6 +38,7 @@
       "assets/*": ["assets/*"],
       "styles/*": ["styles/*"],
       "hooks/*": ["hooks/*"],
+      "store/*": ["store/*"],
       "i18n/*": ["i18n/*"],
     }
   },

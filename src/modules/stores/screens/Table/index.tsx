@@ -1,8 +1,6 @@
-import {interceptor} from 'libraries/index'
 import {Column} from 'react-table'
 import {FIELD} from 'constants/fields'
-import {useEffect, useMemo, useState} from 'react'
-import {showMessage} from 'utilities/alert'
+import {useEffect, useMemo} from 'react'
 import {formatDate} from 'utilities/date'
 import {Plus, Search} from 'assets/icons'
 import {useTranslation} from 'react-i18next'
@@ -25,7 +23,8 @@ import {
 	ReactTable,
 	EditButton,
 	// DetailButton,
-	Select, PageTitle, Checkbox
+	Select,
+	PageTitle
 } from 'components'
 import {InferType} from 'yup'
 
@@ -36,9 +35,9 @@ const DEFAULT_FORM_VALUES = {
 }
 
 const Stores = () => {
-	const [loader, setLoader] = useState(false)
 	const {page, pageSize} = usePagination()
 	const {t} = useTranslation()
+	// const {setStore} = useActions()
 	const {
 		paramsObject: {updateId = undefined, modal = undefined},
 		addParams,
@@ -89,20 +88,21 @@ const Stores = () => {
 		resolver: yupResolver(storeSchema)
 	})
 
-	const setBaseStore = (id: number) => {
-		setLoader(true)
-		if (!loader) {
-			interceptor
-				.post(`stores/${id}/set-main`)
-				.then(async () => {
-					showMessage('Successful', 'success')
-					await refetch()
-				})
-				.finally(async () => {
-					setLoader(false)
-				})
-		}
-	}
+	// const setBaseStore = (id: number) => {
+	// 	setLoader(true)
+	// 	if (!loader) {
+	// 		interceptor
+	// 			.post(`stores/${id}/set-main`)
+	// 			.then(async () => {
+	// 				setStore(Number(id))
+	// 				showMessage('Successful', 'success')
+	// 				await refetch()
+	// 			})
+	// 			.finally(async () => {
+	// 				setLoader(false)
+	// 			})
+	// 	}
+	// }
 
 	const columns: Column<IStoreDetail>[] = useMemo(
 		() => [
@@ -118,21 +118,21 @@ const Stores = () => {
 				Header: t('Name'),
 				accessor: 'name'
 			},
-			{
-				Header: t('Main'),
-				accessor: row => <div>
-					<Checkbox
-						id={row.id as unknown as string}
-						checked={row?.is_main}
-						disabled={row?.is_main || loader}
-						onChange={e => {
-							if (e.target.checked && !loader) {
-								setBaseStore(row.id)
-							}
-						}}
-					/>
-				</div>
-			},
+			// {
+			// 	Header: t('Main'),
+			// 	accessor: row => <div>
+			// 		<Checkbox
+			// 			id={row.id as unknown as string}
+			// 			checked={row?.is_main}
+			// 			disabled={row?.is_main || loader}
+			// 			onChange={e => {
+			// 				if (e.target.checked && !loader) {
+			// 					setBaseStore(row.id)
+			// 				}
+			// 			}}
+			// 		/>
+			// 	</div>
+			// },
 			{
 				Header: t('Type'),
 				accessor: row => t(storeTypes.find(i => i.value == row.exchange_type)?.label?.toString() ?? '')
@@ -151,7 +151,7 @@ const Stores = () => {
 				)
 			}
 		],
-		[page, pageSize, loader]
+		[page, pageSize]
 	)
 
 	useEffect(() => {

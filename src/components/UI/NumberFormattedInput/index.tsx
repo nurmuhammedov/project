@@ -1,7 +1,7 @@
 import styles from 'components/UI/Input/styles.module.css'
 import CurrencyInput from 'react-currency-input-field'
 import {useTranslation} from 'react-i18next'
-import {FocusEvent, forwardRef} from 'react'
+import React, {FocusEvent, forwardRef} from 'react'
 import {FIELD} from 'constants/fields'
 import {Input} from 'components'
 
@@ -20,6 +20,7 @@ interface IProps {
 	onChange?: (event: string) => void;
 	handleDelete?: () => void;
 	onDoubleClick?: () => void;
+	onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
 	onBlur?: (event: FocusEvent<HTMLInputElement>) => void;
 }
 
@@ -37,6 +38,7 @@ const Index = forwardRef<HTMLInputElement, IProps>(({
 	                                                    handleDelete,
 	                                                    disabled,
 	                                                    onChange,
+	                                                    onKeyDown,
 	                                                    ...props
                                                     }, ref) => {
 	const {t} = useTranslation()
@@ -57,6 +59,7 @@ const Index = forwardRef<HTMLInputElement, IProps>(({
 				className={styles.input}
 				disabled={disabled}
 				data-title="input"
+				onKeyDown={onKeyDown}
 				placeholder={placeholder ? t(placeholder) : t('Enter value')}
 				disableAbbreviations={true}
 				allowDecimals={allowDecimals}

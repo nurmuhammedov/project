@@ -26,6 +26,7 @@ import {
 	useSearchParams,
 	useUpdate
 } from 'hooks'
+import useTypedSelector from 'hooks/useTypedSelector'
 import {ISelectOption} from 'interfaces/form.interface'
 import {ICustomerDetail} from 'modules/clients/interfaces'
 import {customerSchema} from 'modules/clients/helpers/yup'
@@ -37,28 +38,18 @@ import {findName, getSelectValue} from 'utilities/common'
 import {InferType} from 'yup'
 
 
-const DEFAULT_FORM_VALUES = {
-	name: '',
-	phone_number: '',
-	region: 10,
-	currency: 'USD',
-	address: '',
-	store: undefined,
-	price_type: undefined
-}
-
-
 const Index = () => {
 	const {t} = useTranslation()
 	const {page, pageSize} = usePagination()
+	const {store} = useTypedSelector(state => state.stores)
+
 	const {
 		addParams,
 		removeParams,
 		paramsObject: {updateId = undefined, modal = undefined}
 	} = useSearchParams()
 	const {
-		data: stores = [],
-		isPending: isStoresLoading
+		data: stores = []
 	} = useData<ISelectOption[]>('stores/select', modal === 'customer' || modal === 'edit')
 	const {
 		data: priceTypes = [],
@@ -88,7 +79,15 @@ const Index = () => {
 		formState: {errors: addErrors}
 	} = useForm<InferType<typeof customerSchema>>({
 		mode: 'onSubmit',
-		defaultValues: DEFAULT_FORM_VALUES,
+		defaultValues: {
+			name: '',
+			phone_number: '',
+			region: undefined,
+			currency: 'USD',
+			address: '',
+			store: store?.value ? Number(store?.value) : undefined,
+			price_type: undefined
+		},
 		resolver: yupResolver(customerSchema)
 	})
 
@@ -100,18 +99,26 @@ const Index = () => {
 		formState: {errors: editErrors}
 	} = useForm<InferType<typeof customerSchema>>({
 		mode: 'onSubmit',
-		defaultValues: DEFAULT_FORM_VALUES,
+		defaultValues: {
+			name: '',
+			phone_number: '',
+			region: undefined,
+			currency: 'USD',
+			address: '',
+			store: store?.value ? Number(store?.value) : undefined,
+			price_type: undefined
+		},
 		resolver: yupResolver(customerSchema)
 	})
-
-	useEffect(() => {
-		if (stores?.length && !isStoresLoading && stores?.find((store) => store?.is_main)?.value) {
-			resetAdd((prevValues: InferType<typeof customerSchema>) => ({
-				...prevValues,
-				store: stores?.find((store) => store?.is_main)?.value as unknown as number ?? undefined
-			}))
-		}
-	}, [stores])
+	//
+	// useEffect(() => {
+	// 	if (stores?.length && !isStoresLoading && stores?.find((store) => store?.is_main)?.value) {
+	// 		resetAdd((prevValues: InferType<typeof customerSchema>) => ({
+	// 			...prevValues,
+	// 			store: stores?.find((store) => store?.is_main)?.value as unknown as number ?? undefined
+	// 		}))
+	// 	}
+	// }, [stores])
 
 	useEffect(() => {
 		if (priceTypes?.length && !isPriceTypesLoading && priceTypes?.[0]?.value) {
@@ -215,9 +222,9 @@ const Index = () => {
 					removeParams('modal')
 					resetAdd((prevValues: InferType<typeof customerSchema>) => ({
 						...prevValues,
-						store: stores?.find((store) => store?.is_main)?.value as unknown as number ?? undefined,
+						store: store?.value ? Number(store?.value) : undefined as unknown as number,
 						price_type: priceTypes?.[0]?.value as unknown as number ?? undefined,
-						region: 10,
+						region: undefined,
 						currency: 'USD',
 						name: '',
 						phone_number: '',
@@ -231,9 +238,9 @@ const Index = () => {
 							setFocus('name')
 							resetAdd((prevValues: InferType<typeof customerSchema>) => ({
 								...prevValues,
-								store: stores?.find((store) => store?.is_main)?.value as unknown as number ?? undefined,
+								store: store?.value ? Number(store?.value) : undefined as unknown as number,
 								price_type: priceTypes?.[0]?.value as unknown as number ?? undefined,
-								region: 10,
+								region: undefined,
 								currency: 'USD',
 								name: '',
 								phone_number: '',

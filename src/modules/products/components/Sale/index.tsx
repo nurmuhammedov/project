@@ -183,7 +183,10 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 			{/*	</div>*/}
 			{/*</PageTitle>*/}
 			<div className={classNames(styles.root, 'grid gap-lg  flex-1')}>
-				<Card shadow={true} style={{padding: '2.25rem'}}>
+				<Card
+					shadow={true}
+					style={{padding: '.5rem 1.5rem 1.5rem'}}
+				>
 					<CardTab
 						disabled={retrieve}
 						style={{marginBottom: '1.5rem'}}

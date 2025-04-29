@@ -19,10 +19,9 @@
 }
 .root .footer {
   display: flex;
-  flex: 1;
-  align-items: flex-end;
-  justify-content: space-between;
+  flex-direction: column;
   gap: 1rem;
+  margin-top: auto;
 }
 .root .footer .price-wrapper {
   flex: 1 0 0;

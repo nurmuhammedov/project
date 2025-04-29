@@ -20,7 +20,7 @@ import {
 import {measurementUnits} from 'modules/database/helpers/options'
 import {temporaryItemSchema} from 'modules/products/helpers/yup'
 import {ITemporaryListItem, IValidationData} from 'modules/products/interfaces/purchase.interface'
-import {FC, useEffect} from 'react'
+import React, {FC, useEffect} from 'react'
 import {Controller, useForm} from 'react-hook-form'
 import {cleanParams, decimalToNumber, getSelectValue} from 'utilities/common'
 import {ISelectOption} from 'interfaces/form.interface'
@@ -124,56 +124,65 @@ const Index: FC<IProperties> = ({clientId, refetchTemporaryList}) => {
 	// 	name: 'serial_numbers' as never
 	// })
 
-	return (
-		<Form
-			onSubmit={
-				handleSubmit((data) => {
-						if (!clientId) {
-							showMessage('Client ID required')
-						} else if (updateId) {
-							const newData = {
-								product: data?.product,
-								expiry_date: validationData?.expiry ? data?.expiry_date : null,
-								price: data?.price,
-								serial_numbers: validationData?.is_serial ? data?.serial_numbers ?? [] : [],
-								unit_quantity: data?.unit_quantity,
-								supplier: clientId
-							}
-							update(cleanParams(newData as unknown as ISearchParams)).then(async () => {
-								removeParams('updateId', 'modal')
-								reset({
-									price: '',
-									unit_quantity: '',
-									serial_numbers: [],
-									product: undefined,
-									expiry_date: ''
-								})
-								refetchTemporaryList?.()
-							})
-						} else {
-							const newData = {
-								product: data?.product,
-								expiry_date: validationData?.expiry ? data?.expiry_date : null,
-								price: data?.price,
-								serial_numbers: validationData?.is_serial ? data?.serial_numbers ?? [] : [],
-								unit_quantity: data?.unit_quantity,
-								supplier: clientId
-							}
-							mutateAsync(cleanParams(newData as unknown as ISearchParams)).then(async () => {
-								reset({
-									price: '',
-									unit_quantity: '',
-									serial_numbers: [],
-									product: undefined,
-									expiry_date: ''
-								})
-								removeParams('modal')
-								refetchTemporaryList?.()
-							})
-						}
+	const onSubmit = () => {
+		handleSubmit((data) => {
+				if (!clientId) {
+					showMessage('Client ID required')
+				} else if (updateId) {
+					const newData = {
+						product: data?.product,
+						expiry_date: validationData?.expiry ? data?.expiry_date : null,
+						price: data?.price,
+						serial_numbers: validationData?.is_serial ? data?.serial_numbers ?? [] : [],
+						unit_quantity: data?.unit_quantity,
+						supplier: clientId
 					}
-				)}
-		>
+					update(cleanParams(newData as unknown as ISearchParams)).then(async () => {
+						removeParams('updateId', 'modal')
+						reset({
+							price: '',
+							unit_quantity: '',
+							serial_numbers: [],
+							product: undefined,
+							expiry_date: ''
+						})
+						refetchTemporaryList?.()
+					})
+				} else {
+					const newData = {
+						product: data?.product,
+						expiry_date: validationData?.expiry ? data?.expiry_date : null,
+						price: data?.price,
+						serial_numbers: validationData?.is_serial ? data?.serial_numbers ?? [] : [],
+						unit_quantity: data?.unit_quantity,
+						supplier: clientId
+					}
+					mutateAsync(cleanParams(newData as unknown as ISearchParams)).then(async () => {
+						reset({
+							price: '',
+							unit_quantity: '',
+							serial_numbers: [],
+							product: undefined,
+							expiry_date: ''
+						})
+						removeParams('modal')
+						refetchTemporaryList?.()
+					})
+				}
+			}
+		)()
+	}
+
+	const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+		console.log(e?.key)
+		console.log(errors)
+		if (e.key === 'Enter') {
+			onSubmit()
+		}
+	}
+
+	return (
+		<Form onSubmit={() => onSubmit()}>
 			<div className="grid gap-lg">
 				<div className="span-3">
 					<Controller
@@ -192,10 +201,10 @@ const Index: FC<IProperties> = ({clientId, refetchTemporaryList}) => {
 								defaultValue={getSelectValue(products, value)}
 								handleOnChange={(e) => onChange(e as string)}
 							/>
-						)}
+						)
+						}
 					/>
 				</div>
-
 
 				{
 					(isValidationDataFetching) ?
@@ -212,9 +221,10 @@ const Index: FC<IProperties> = ({clientId, refetchTemporaryList}) => {
 												id="unit_quantity"
 												maxLength={measurementUnits?.find(i => i.id == validationData?.measure)?.type == 'int' ? 6 : 9}
 												disableGroupSeparators={false}
-												allowDecimals={measurementUnits?.find(i => i.id == validationData?.measure)?.type == 'float'}
 												label={measurementUnits?.find(i => i.id == validationData?.measure)?.type == 'int' ? t('Count') + ' ' + `(${t(measurementUnits?.find(i => i.id == validationData?.measure)?.label?.toString() || '')})` : t('Quantity') + ' ' + `(${(measurementUnits?.find(i => i.id == validationData?.measure)?.label?.toString() || '')})`}
+												allowDecimals={measurementUnits?.find(i => i.id == validationData?.measure)?.type == 'float'}
 												error={errors?.unit_quantity?.message}
+												onKeyDown={handleKeyDown}
 												{...field}
 											/>
 										)}
@@ -232,6 +242,7 @@ const Index: FC<IProperties> = ({clientId, refetchTemporaryList}) => {
 												disableGroupSeparators={false}
 												allowDecimals={true}
 												label="Price"
+												onKeyDown={handleKeyDown}
 												error={errors?.price?.message}
 												{...field}
 											/>

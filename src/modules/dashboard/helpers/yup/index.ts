@@ -1,4 +1,3 @@
-import {exchangeOptions} from 'modules/dashboard/helpers/options'
 import * as yup from 'yup'
 
 
@@ -59,12 +58,12 @@ export const currencyExchangeSchema = yup.object().shape({
 		.optional()
 		.nullable()
 		.transform((value) => (value ? value : null)),
-	service_type: yup
-		.number()
-		.when('type', {
-			is: (value: number) => value == exchangeOptions[2]?.value,
-			then: (schema) => schema.required('This field is required'),
-			otherwise: (schema) => schema.optional().nullable().transform(value => value ? value : null)
-		})
+	// service_type: yup
+	// 	.number()
+	// 	.when('type', {
+	// 		is: (value: number) => value == exchangeOptions[2]?.value,
+	// 		then: (schema) => schema.required('This field is required'),
+	// 		otherwise: (schema) => schema.optional().nullable().transform(value => value ? value : null)
+	// 	})
 })
 
