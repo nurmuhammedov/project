@@ -189,7 +189,6 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 				>
 					<CardTab
 						disabled={retrieve}
-						style={{marginBottom: '1.5rem'}}
 						fallbackValue={productExchangeTabOptions[1]?.value}
 						tabs={productExchangeTabOptions}
 					/>

@@ -196,7 +196,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 					!retrieve &&
 					<CardTab
 						disabled={retrieve}
-						style={{marginBottom: '1.5rem'}}
+						style={{marginBottom: '1rem'}}
 						fallbackValue={currencyExchangeOptions[0]?.value}
 						tabs={currencyExchangeOptions}
 					/>

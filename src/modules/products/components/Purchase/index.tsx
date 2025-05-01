@@ -1,23 +1,21 @@
 import {
 	Button,
 	Card,
-	CardTab, DeleteButton, EditButton,
+	CardTab, DeleteModal,
 	Input,
 	MaskInput,
-	NumberFormattedInput, ReactTable,
+	NumberFormattedInput,
 	Select
 } from 'components'
 import {currencyOptions} from 'constants/options'
 import useTypedSelector from 'hooks/useTypedSelector'
 import {ISelectOption} from 'interfaces/form.interface'
 import {ICustomerShortData} from 'modules/dashboard/interfaces'
-import {measurementUnits} from 'modules/database/helpers/options'
 import AddPurchase from 'modules/products/components/AddPurchase'
 import {productExchangeTabOptions} from 'modules/products/helpers/options'
 import {purchaseItemSchema} from 'modules/products/helpers/yup'
 import {IPurchaseItem, ITemporaryListItem} from 'modules/products/interfaces/purchase.interface'
-import {Column} from 'react-table'
-import {decimalToInteger, decimalToPrice, findName, getSelectValue, sumDecimals} from 'utilities/common'
+import {decimalToPrice, findName, getSelectValue, sumDecimals} from 'utilities/common'
 import {Controller, useForm} from 'react-hook-form'
 import {getDate} from 'utilities/date'
 import {FIELD} from 'constants/fields'
@@ -25,11 +23,9 @@ import {yupResolver} from '@hookform/resolvers/yup'
 import {useAdd, useData, useDetail, useSearchParams} from 'hooks'
 import {useParams} from 'react-router-dom'
 import {useTranslation} from 'react-i18next'
-import {FC, useEffect, useMemo} from 'react'
-import {InferType} from 'yup'
+import {FC, useEffect} from 'react'
 import styles from './styles.module.scss'
 import classNames from 'classnames'
-import HR from 'components/HR'
 
 
 interface IProperties {
@@ -39,7 +35,7 @@ interface IProperties {
 const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 	const {t} = useTranslation()
 	const {removeParams} = useSearchParams()
-	const {id: clientId = undefined, productId = undefined} = useParams()
+	const {productId = undefined} = useParams()
 	const {mutateAsync, isPending: isAdding} = useAdd('purchase/create')
 	const {store} = useTypedSelector(state => state.stores)
 	// const {data: stores = []} = useData<ISelectOption[]>('stores/select')
@@ -50,57 +46,18 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 		isPending: isPurchaseLoading
 	} = useDetail<IPurchaseItem>('purchase/detail/', productId, !!(productId && retrieve))
 
-	const columns: Column<ITemporaryListItem>[] = useMemo(
-		() => [
-			{
-				Header: t('№'),
-				accessor: (_, index: number) => (index + 1),
-				style: {
-					width: '3rem',
-					textAlign: 'center'
-				}
-			},
-			{
-				Header: t('Name'),
-				accessor: row => `${row?.product?.name} (${row?.product?.brand?.name || ''})`
-			},
-			{
-				Header: t('Price'),
-				accessor: row => decimalToPrice(row.price)
-			},
-			{
-				Header: t('Total'),
-				accessor: row => `${decimalToInteger(row?.total_quantity)} ${t(measurementUnits.find(i => i.id == row.product.measure)?.label?.toString() || '')}`
-			},
-			{
-				Header: `${t('Total')} ${t('Price')?.toLowerCase()}`,
-				accessor: row => decimalToPrice(row.total_price)
-			},
-			{
-				Header: t('Actions'),
-				accessor: row => (
-					<div className="flex items-start gap-lg">
-						<EditButton id={row.id}/>
-						<DeleteButton id={row.id}/>
-					</div>
-				)
-			}
-		],
-		[]
-	)
-
 	const {
 		watch,
 		reset,
 		control,
 		register,
-		setValue,
+		// setValue,
 		handleSubmit,
-		// trigger,
+		trigger,
 		setFocus,
 		formState: {errors}
 	} = useForm({
-		mode: 'onTouched',
+		mode: 'onSubmit',
 		defaultValues: {
 			cost_currency: undefined,
 			cost_amount: '',
@@ -108,7 +65,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 			store: store?.value ? Number(store?.value) : undefined,
 			price_type: undefined,
 			currency: undefined,
-			supplier: clientId ? Number(clientId) : undefined,
+			supplier: undefined,
 			purchase_date: getDate()
 		},
 		resolver: yupResolver(purchaseItemSchema)
@@ -146,10 +103,16 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 			setTimeout(() => {
 				setFocus('supplier')
 			}, 0)
-			reset((prevValues: InferType<typeof purchaseItemSchema>) => ({
-				...prevValues,
-				store: store?.value as unknown as number ?? undefined
-			}))
+			reset({
+				cost_currency: undefined,
+				cost_amount: '',
+				comment: '',
+				store: store?.value ? Number(store?.value) : undefined,
+				price_type: undefined,
+				currency: undefined,
+				supplier: undefined,
+				purchase_date: getDate()
+			})
 		}
 	}, [store?.value])
 
@@ -168,11 +131,6 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 			}))
 		}
 	}, [purchase])
-
-	// useEffect(() => {
-	//
-	// }, [watch('store')])
-
 
 	return (
 		<>
@@ -215,7 +173,6 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 					<div className="span-12">
 						<CardTab
 							disabled={retrieve}
-							style={{marginBottom: '1.5rem'}}
 							fallbackValue={productExchangeTabOptions[0]?.value}
 							tabs={productExchangeTabOptions}
 						/>
@@ -252,7 +209,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 								render={({field: {value, ref, onChange, onBlur}}) => (
 									<Select
 										ref={ref}
-										isDisabled={!!clientId || retrieve}
+										isDisabled={retrieve}
 										id="supplier"
 										label="Customer"
 										onBlur={onBlur}
@@ -312,23 +269,6 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 
 						<div className="flex-3">
 							<Controller
-								name="purchase_date"
-								control={control}
-								render={({field}) => (
-									<MaskInput
-										id="purchase_date"
-										disabled={retrieve}
-										label="Date"
-										placeholder={getDate()}
-										mask="99.99.9999"
-										error={errors?.purchase_date?.message}
-										{...field}
-									/>
-								)}
-							/>
-						</div>
-						<div className="flex-3">
-							<Controller
 								name="cost_currency"
 								control={control}
 								render={({field: {value, ref, onChange, onBlur}}) => (
@@ -366,6 +306,23 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 								)}
 							/>
 						</div>
+						<div className="flex-3">
+							<Controller
+								name="purchase_date"
+								control={control}
+								render={({field}) => (
+									<MaskInput
+										id="purchase_date"
+										disabled={retrieve}
+										label="Date"
+										placeholder={getDate()}
+										mask="99.99.9999"
+										error={errors?.purchase_date?.message}
+										{...field}
+									/>
+								)}
+							/>
+						</div>
 
 						<div className="flex-4">
 							<Input
@@ -379,15 +336,22 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 					</div>
 
 					<div className="span-12">
-						<AddPurchase clientId={watch('supplier')} refetchTemporaryList={refetchTemporaryList}/>
+						<AddPurchase
+							clientId={watch('supplier')}
+							trigger={trigger}
+							focus={setFocus}
+							temporaryList={temporaryList}
+							isTemporaryListFetching={isTemporaryListFetching}
+							refetchTemporaryList={refetchTemporaryList}
+						/>
 					</div>
 
-					<div className="span-12" style={{paddingBottom: '.5rem'}}>
-						<div className={styles.title}>{t('Products')}</div>
-						<HR style={{marginBottom: '1rem'}}/>
-						<ReactTable columns={columns} data={temporaryList} isLoading={isTemporaryListFetching}/>
-						<HR style={{marginBottom: '1rem'}}/>
-					</div>
+					{/*<div className="span-12" style={{paddingBottom: '.5rem'}}>*/}
+					{/*	<div className={styles.title}>{t('Products')}</div>*/}
+					{/*	<HR style={{marginBottom: '1rem'}}/>*/}
+					{/*	<ReactTable columns={columns} data={temporaryList} isLoading={isTemporaryListFetching}/>*/}
+					{/*	<HR style={{marginBottom: '1rem'}}/>*/}
+					{/*</div>*/}
 				</div>
 
 				<div className={styles.footer}>
@@ -422,9 +386,18 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 										...data,
 										temporary_items: temporaryList?.map(i => i?.id)
 									}).then(async () => {
-										await refetchTemporaryList()
 										removeParams('updateId', 'type')
-										setValue('comment', '')
+										reset({
+											cost_currency: undefined,
+											cost_amount: '',
+											comment: '',
+											store: store?.value ? Number(store?.value) : undefined,
+											price_type: undefined,
+											currency: undefined,
+											supplier: undefined,
+											purchase_date: getDate()
+										})
+										await refetchTemporaryList()
 									})
 								})}
 							disabled={isAdding || temporaryList?.length < 1}
@@ -443,14 +416,14 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 			{/*	<AddPurchase clientId={watch('supplier')} refetchTemporaryList={refetchTemporaryList}/>*/}
 			{/*</EditModal>*/}
 
-			{/*{*/}
-			{/*	!retrieve &&*/}
-			{/*	<DeleteModal*/}
-			{/*		endpoint="temporary/delete/"*/}
-			{/*		onDelete={() => refetchTemporaryList()}*/}
-			{/*		removedParams={['updateId', 'type']}*/}
-			{/*	/>*/}
-			{/*}*/}
+			{
+				!retrieve &&
+				<DeleteModal
+					endpoint="temporary/delete/"
+					onDelete={() => refetchTemporaryList()}
+					removedParams={['updateId', 'type']}
+				/>
+			}
 		</>
 	)
 }

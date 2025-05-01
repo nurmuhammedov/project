@@ -213,5 +213,6 @@
   "Only .jpg, .png, .jpeg files are accepted": "Faqat .jpg, .png, .jpeg kengaytmali fayllar qabul qilinadi",
   "Only .txt files are accepted": "Faqat .txt kengaytmali fayllar qabul qilinadi",
   "File successfully accepted": "fayli muvaffaqiyatli yuklandi",
-  "Loading...": "yuklanmoqda"
+  "Loading...": "yuklanmoqda",
+  "Serial number already exist": "{{number}} seria raqami mavjud"
 }

@@ -4,14 +4,18 @@ import styles from './styles.module.scss'
 
 
 interface IProperties {
-	id: string | number
+	id?: string | number
 	withSlash?: boolean
+	onDelete?: () => void
 }
 
-const Index = ({id, withSlash = false}: IProperties) => {
+const Index = ({id, withSlash = false, onDelete}: IProperties) => {
 	const {addParams} = useSearchParams()
 	return (
-		<div className={styles.root} onClick={() => addParams({modal: 'delete', deleteId: withSlash ? `${id}/` : id})}>
+		<div
+			className={styles.root}
+			onClick={() => onDelete ? onDelete() : addParams({modal: 'delete', deleteId: withSlash ? `${id}/` : id})}
+		>
 			<Delete/>
 		</div>
 	)

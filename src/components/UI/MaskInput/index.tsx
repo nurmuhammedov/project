@@ -2,7 +2,7 @@ import classes from 'components/UI/Input/styles.module.css'
 import {useTranslation} from 'react-i18next'
 import InputMask from 'react-input-mask'
 import {Input} from 'components'
-import {ChangeEvent, FocusEvent, forwardRef} from 'react'
+import React, {ChangeEvent, FocusEvent, forwardRef} from 'react'
 
 
 interface IProperties {
@@ -14,6 +14,7 @@ interface IProperties {
 	mask?: string
 	disabled?: boolean
 	onChange: (value: ChangeEvent<HTMLInputElement>) => void
+	onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
 	onBlur: (event: FocusEvent<HTMLInputElement>) => void;
 }
 
@@ -26,6 +27,7 @@ const Index = forwardRef<HTMLInputElement, IProperties>(({
 	                                                         disabled,
 	                                                         value,
 	                                                         onChange,
+	                                                         onKeyDown,
 	                                                         onBlur
                                                          }, ref) => {
 	const {t} = useTranslation()
@@ -47,6 +49,7 @@ const Index = forwardRef<HTMLInputElement, IProperties>(({
 				value={value}
 				onChange={onChange}
 				onBlur={onBlur}
+				onKeyDown={onKeyDown}
 				mask={mask}
 				placeholder={t(placeholder)}
 				inputRef={ref}

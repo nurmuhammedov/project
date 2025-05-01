@@ -19,6 +19,7 @@ const Index = forwardRef<HTMLInputElement | HTMLTextAreaElement, IField>(
 			handleIcon,
 			disabled = false,
 			children,
+			className,
 			label,
 			error,
 			icon,
@@ -30,7 +31,7 @@ const Index = forwardRef<HTMLInputElement | HTMLTextAreaElement, IField>(
 		const {t} = useTranslation()
 
 		return (
-			<div className={classNames(styles.root, {
+			<div className={classNames(styles.root, className, {
 				[styles.error]: error,
 				[styles.icon]: icon,
 				[styles.delete]: handleDelete,

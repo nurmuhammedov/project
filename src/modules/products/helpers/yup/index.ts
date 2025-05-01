@@ -7,8 +7,11 @@ export const temporaryItemSchema = yup.object().shape({
 	price: yup.string().trim().required('This field is required'),
 	serial_numbers: yup
 		.array()
-		.of(yup.string().trim().required('This field is required'))
-		.nullable(),
+		.default([])
+		.optional()
+		.nullable()
+		.of(yup.string().trim().optional().nullable().transform(value => value ? value : ''))
+		.transform(value => (value && Array.isArray(value)) ? value : []),
 	product: yup.number().required('This field is required'),
 	expiry_date: date
 })
