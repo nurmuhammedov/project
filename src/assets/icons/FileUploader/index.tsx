@@ -1,7 +1,7 @@
 import {CSSProperties} from 'react'
 
 
-const Index = ({style}: { style: CSSProperties }) => {
+const Index = ({style}: { style?: CSSProperties }) => {
 	return (
 		<svg
 			style={{maxWidth: '1rem', minWidth: '1rem', width: '100%', height: 'auto', ...style}}

@@ -21,7 +21,7 @@ export const temporarySaleItemSchema = yup.object().shape({
 	price: yup.string().trim().required('This field is required'),
 	serial_numbers: yup.array().required('This field is required'),
 	product: yup.number().required('This field is required'),
-	store: yup.number().transform(v => v ? v : undefined).required('This field is required')
+	// store: yup.number().transform(v => v ? v : undefined).required('This field is required')
 })
 
 

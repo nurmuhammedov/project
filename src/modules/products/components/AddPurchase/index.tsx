@@ -1,10 +1,10 @@
 import {yupResolver} from '@hookform/resolvers/yup'
-import {FileUploader, Plus} from 'assets/icons'
+import {FileUploader as FileUploaderIcon, Plus} from 'assets/icons'
 import {
 	// Button,
 	// Input,
 	MaskInput,
-	// FileUploader,
+	FileUploader,
 	Form,
 	Select,
 	NumberFormattedInput,
@@ -112,7 +112,7 @@ const Index: FC<IProperties> = ({
 		reset,
 		// register,
 		control,
-		// setValue,
+		setValue,
 		setFocus,
 		formState: {errors}
 	} = useForm({
@@ -345,12 +345,12 @@ const Index: FC<IProperties> = ({
 													render={({field}) => (
 														<NumberFormattedInput
 															id="unit_quantity"
-															maxLength={measurementUnits?.find(i => i.id == validationData?.measure)?.type == 'int' ? 6 : 9}
 															disableGroupSeparators={false}
-															label={measurementUnits?.find(i => i.id == validationData?.measure)?.type == 'int' ? t('Count') + ' ' + `(${t(measurementUnits?.find(i => i.id == validationData?.measure)?.label?.toString() || '')})` : t('Quantity') + ' ' + `(${(measurementUnits?.find(i => i.id == validationData?.measure)?.label?.toString() || '')})`}
 															allowDecimals={measurementUnits?.find(i => i.id == validationData?.measure)?.type == 'float'}
-															error={errors?.unit_quantity?.message}
+															maxLength={measurementUnits?.find(i => i.id == validationData?.measure)?.type == 'int' ? 6 : 9}
 															onKeyDown={handleKeyDown}
+															error={errors?.unit_quantity?.message}
+															label={measurementUnits?.find(i => i.id == validationData?.measure)?.type == 'int' ? t('Count') + ' ' + `(${t(measurementUnits?.find(i => i.id == validationData?.measure)?.label?.toString() || '')})` : t('Quantity') + ' ' + `(${(measurementUnits?.find(i => i.id == validationData?.measure)?.label?.toString() || '')})`}
 															{...field}
 														/>
 													)}
@@ -464,33 +464,42 @@ const Index: FC<IProperties> = ({
 									id="serial_numbers"
 									label="Series"
 									disabled={!validationData?.is_serial}
-									// handleDelete={() => {
-									// setValue('unit_quantity', String(fields?.length - 1))
-									// remove(index)
-									// }}
 									value={series}
 									onChange={(e) => {
 										setSeries(e.target.value)
 									}}
 									onKeyDown={handleSeriesKeyDown}
 								/>
-								<div className="gap-md flex">
+								<div className="gap-md flex align-end">
 									<Button
 										style={{marginTop: 'auto'}}
-										// disabled={isAdding || isUpdating || isValidationDataLoading || isValidationDataFetching || !validationData}
+										disabled={!series?.trim()}
 										icon={<Plus/>}
 										mini={true}
-									>
-										{/*{updateId ? 'Edit' : 'Save'}*/}
-									</Button>
-									<Button
-										style={{marginTop: 'auto'}}
-										// disabled={isAdding || isUpdating || isValidationDataLoading || isValidationDataFetching || !validationData}
-										icon={<FileUploader style={{maxWidth: '1.2rem'}}/>}
-										mini={true}
-									>
-										{/*{updateId ? 'Edit' : 'Save'}*/}
-									</Button>
+										onClick={() => {
+											if (series.trim() == '') return
+											const serialNumbers = watch('serial_numbers')
+											if (!serialNumbers?.includes(series?.trim()?.toString())) {
+												append(series)
+												setSeries('')
+											} else {
+												showMessage(t('Serial number already exist', {number: series?.trim()?.toString()}))
+											}
+										}}
+									/>
+									<FileUploader
+										content={
+											<Button
+												style={{marginTop: 'auto'}}
+												icon={<FileUploaderIcon style={{maxWidth: '1.2rem'}}/>}
+												mini={true}
+											/>
+										}
+										type="txt"
+										handleOnChange={(arr) => setValue('serial_numbers', Array.isArray(arr) ? Array.from(new Set(arr)) : [])}
+										value={undefined}
+										id="series"
+									/>
 								</div>
 							</div>
 							<div className="span-12"
@@ -512,14 +521,6 @@ const Index: FC<IProperties> = ({
 					</div>
 				}
 			</div>
-
-			{/*<Button*/}
-			{/*	type={FIELD.SUBMIT}*/}
-			{/*	style={{marginTop: 'auto'}}*/}
-			{/*	disabled={isAdding || isUpdating || isValidationDataLoading || isValidationDataFetching || !validationData}*/}
-			{/*>*/}
-			{/*	{updateId ? 'Edit' : 'Save'}*/}
-			{/*</Button>*/}
 		</Form>
 	)
 }

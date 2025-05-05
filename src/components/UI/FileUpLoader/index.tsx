@@ -1,4 +1,4 @@
-import {useCallback, useEffect, forwardRef, useState} from 'react'
+import {useCallback, useEffect, forwardRef, useState, ReactNode} from 'react'
 import {useDropzone, FileWithPath} from 'react-dropzone'
 import styles from './styles.module.scss'
 import {useTranslation} from 'react-i18next'
@@ -18,6 +18,7 @@ interface FileUploaderProps {
 	multi?: boolean
 	id: string
 	label?: string
+	content?: ReactNode
 	error?: string
 	type?: 'pdf' | 'image' | 'txt'
 }
@@ -27,6 +28,7 @@ const Index = forwardRef<HTMLInputElement, FileUploaderProps>(({
 	                                                               onChange,
 	                                                               handleOnChange,
 	                                                               value,
+	                                                               content,
 	                                                               label,
 	                                                               error,
 	                                                               id,
@@ -251,25 +253,29 @@ const Index = forwardRef<HTMLInputElement, FileUploaderProps>(({
 									<div className={styles.icon} onClick={() => handleDownload(value.file)}>
 										<Download/>
 									</div>
-								</div> :
-								<div className={styles.input} {...getRootProps()}>
-									<input ref={ref} {...getInputProps()} onBlur={onBlur}/>
-									<FileUploader/>
-									{
-										(isLoading && !isDeleteLoading) ?
-											(
-												<p><span>{percentage}% - {t('Loading...')}</span></p>
-											) : isDragActive ?
+								</div> : content ?
+									<div {...getRootProps()}>
+										<input ref={ref} {...getInputProps()} onBlur={onBlur}/>
+										{content}
+									</div> :
+									<div className={styles.input} {...getRootProps()}>
+										<input ref={ref} {...getInputProps()} onBlur={onBlur}/>
+										<FileUploader/>
+										{
+											(isLoading && !isDeleteLoading) ?
 												(
-													<p>{t('Drop your files')} 📂</p>
-												) :
-												(
-													<p>
-														<span>{t('Upload a file')}</span> ({type === 'pdf' ? '.pdf' : type === 'txt' ? '.txt' : '.jpg, .png, .jpeg'} - {t('up to 10 mb')})
-													</p>
-												)
-									}
-								</div>
+													<p><span>{percentage}% - {t('Loading...')}</span></p>
+												) : isDragActive ?
+													(
+														<p>{t('Drop your files')} 📂</p>
+													) :
+													(
+														<p>
+															<span>{t('Upload a file')}</span> ({type === 'pdf' ? '.pdf' : type === 'txt' ? '.txt' : '.jpg, .png, .jpeg'} - {t('up to 10 mb')})
+														</p>
+													)
+										}
+									</div>
 					}
 				</div>
 			</Input>

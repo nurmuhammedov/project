@@ -1,12 +1,16 @@
 import {yupResolver} from '@hookform/resolvers/yup'
+import {FileUploader as FileUploaderIcon, Plus} from 'assets/icons'
 import {
 	Button,
-	Form,
 	Select,
 	NumberFormattedInput,
-	Loader, FileUploader
+	Loader,
+	FileUploader,
+	ReactTable,
+	EditButton,
+	DeleteButton, Input
 } from 'components'
-import {FIELD} from 'constants/fields'
+import HR from 'components/HR'
 import {
 	useAdd,
 	useData,
@@ -14,34 +18,89 @@ import {
 	useSearchParams,
 	useUpdate
 } from 'hooks'
+import useTypedSelector from 'hooks/useTypedSelector'
 import {measurementUnits} from 'modules/database/helpers/options'
-import {temporarySaleItemSchema} from 'modules/products/helpers/yup'
+import styles from 'modules/products/components/Purchase/styles.module.scss'
+import {saleItemSchema, temporarySaleItemSchema} from 'modules/products/helpers/yup'
 import {ITemporaryListItem, IValidationData} from 'modules/products/interfaces/purchase.interface'
-import {FC, useEffect} from 'react'
-import {Controller, useForm} from 'react-hook-form'
-import {cleanParams, decimalToNumber, getSelectValue} from 'utilities/common'
-import {ISelectOption} from 'interfaces/form.interface'
-import {getDate} from 'utilities/date'
-import {useTranslation} from 'react-i18next'
+import React, {FC, useEffect, useMemo, useState} from 'react'
+import {Controller, useFieldArray, useForm, UseFormSetFocus, UseFormTrigger} from 'react-hook-form'
+import {Column} from 'react-table'
 import {showMessage} from 'utilities/alert'
+import {cleanParams, decimalToInteger, decimalToNumber, decimalToPrice, getSelectValue} from 'utilities/common'
+import {ISelectOption} from 'interfaces/form.interface'
+import {useTranslation} from 'react-i18next'
 import {ISearchParams} from 'interfaces/params.interface'
-import {getSelectOptionsByKey} from 'utilities/select'
 import {InferType} from 'yup'
 
 
 interface IProperties {
-	clientId?: number | string
-	refetchTemporaryList?: () => void
+	clientId?: number | string;
+	refetchTemporaryList?: () => void;
+	focus?: UseFormSetFocus<InferType<typeof saleItemSchema>>;
+	isTemporaryListFetching: boolean;
+	temporaryList: ITemporaryListItem[];
+	trigger?: UseFormTrigger<InferType<typeof saleItemSchema>>;
+	currency?: string | number;
+	priceType?: string | number;
 }
 
-const Index: FC<IProperties> = ({clientId, refetchTemporaryList}) => {
+const Index: FC<IProperties> = ({
+	                                clientId,
+	                                refetchTemporaryList,
+	                                trigger,
+	                                focus,
+	                                temporaryList,
+	                                isTemporaryListFetching
+                                }) => {
 	const {t} = useTranslation()
+	const [series, setSeries] = useState('')
+	const {store} = useTypedSelector(state => state.stores)
 	const {
 		removeParams,
-		paramsObject: {updateId = undefined, modal = undefined}
+		paramsObject: {updateId = undefined}
 	} = useSearchParams()
 
-	const {data: products = []} = useData<ISelectOption[]>('products/select', modal == 'product' || modal == 'edit')
+	const {data: products = []} = useData<ISelectOption[]>('products/select')
+
+	const columns: Column<ITemporaryListItem>[] = useMemo(
+		() => [
+			{
+				Header: t('№'),
+				accessor: (_, index: number) => (index + 1),
+				style: {
+					width: '3rem',
+					textAlign: 'center'
+				}
+			},
+			{
+				Header: t('Name'),
+				accessor: row => `${row?.product?.name}${row?.product?.brand?.name ? ` (${row?.product?.brand?.name || ''})` : ''}`
+			},
+			{
+				Header: t('Price'),
+				accessor: row => decimalToPrice(row.price)
+			},
+			{
+				Header: t('Total'),
+				accessor: row => `${decimalToInteger(row?.total_quantity)} ${t(measurementUnits.find(i => i.id == row.product.measure)?.label?.toString() || '')}`
+			},
+			{
+				Header: `${t('Total')} ${t('Price')?.toLowerCase()}`,
+				accessor: row => decimalToPrice(row.total_price)
+			},
+			{
+				Header: t('Actions'),
+				accessor: row => (
+					<div className="flex items-start gap-lg">
+						<EditButton id={row.id}/>
+						<DeleteButton id={row.id}/>
+					</div>
+				)
+			}
+		],
+		[t, refetchTemporaryList]
+	)
 
 	const {
 		handleSubmit,
@@ -49,23 +108,57 @@ const Index: FC<IProperties> = ({clientId, refetchTemporaryList}) => {
 		reset,
 		control,
 		setValue,
+		setFocus: setFormFocus,
 		formState: {errors}
 	} = useForm({
-		mode: 'onTouched',
+		mode: 'onSubmit',
 		defaultValues: {
 			price: '',
-			unit_quantity: '',
+			unit_quantity: '1',
 			serial_numbers: [],
-			product: undefined,
-			store: undefined
+			product: undefined
 		},
 		resolver: yupResolver(temporarySaleItemSchema)
 	})
 
-	const {data: stores = [], isPending: isStoreLoading} = useData<ISelectOption[]>('stores/select', !!watch('product'))
 
-	const {mutateAsync, isPending: isAdding} = useAdd('sale-temporary/create')
-	const {mutateAsync: update, isPending: isUpdating} = useUpdate('sale-temporary/update/', updateId)
+	const {append, remove} = useFieldArray({
+		control,
+		name: 'serial_numbers' as never
+	})
+
+	const seriesColumns: Column<{ name: string, id: number | string }>[] = useMemo(
+		() => [
+			{
+				Header: t('№'),
+				accessor: (_, index: number) => `${(index + 1)})`,
+				style: {
+					width: '1rem',
+					textAlign: 'center'
+				}
+			},
+			{
+				Header: t('Name'),
+				accessor: row => `${row?.name}`
+			},
+			{
+				Header: t('Actions'),
+				accessor: row => (
+					<div className="flex items-start gap-lg">
+						<DeleteButton onDelete={() => remove(Number(row.id))}/>
+					</div>
+				),
+				style: {
+					width: '3rem'
+				}
+			}
+		],
+		[]
+	)
+
+
+	const {mutateAsync} = useAdd('sale-temporary/create')
+	const {mutateAsync: update} = useUpdate('sale-temporary/update/', updateId)
 
 	const {
 		data: detail,
@@ -73,250 +166,286 @@ const Index: FC<IProperties> = ({clientId, refetchTemporaryList}) => {
 	} = useDetail<ITemporaryListItem>('sale-temporary/detail/', updateId)
 
 	const {
+		data: productCount
+	} = useDetail<{ quantity: number }>(`products/${watch('product')}/`, 'residue', !!watch('product'))
+
+	const {
 		data: validationData,
 		isPending: isValidationDataLoading,
 		isFetching: isValidationDataFetching
 	} = useDetail<IValidationData>('products/val-data/', watch('product'))
 
-	const {data: series = []} = useData<ISearchParams[]>(`products/free-serial/select/${watch('product')}`, !!watch('product') && !!watch('store') && !!validationData?.is_serial, {store: watch('store')})
-
 	useEffect(() => {
 		if (detail && !isDetailLoading) {
 			reset({
 				product: detail.product.id,
-				// expiry_date: detail.expiry_date ? getDate(detail.expiry_date) : getDate(),
 				price: detail.price,
-				store: detail?.store?.id ?? undefined,
 				serial_numbers: detail.serial_numbers || [],
-				// unit_quantity: detail?.product?.is_serial ? detail.serial_numbers?.length?.toString() || '1' : measurementUnits.find(i => i.id == detail.product?.measure)?.type == 'int' ? decimalToNumber(detail.unit_quantity) : detail.unit_quantity
-				unit_quantity: measurementUnits.find(i => i.id == detail.product?.measure)?.type == 'int' ? decimalToNumber(detail.unit_quantity) : detail.unit_quantity
+				unit_quantity: measurementUnits.find(i => i.id == detail.product?.measure)?.type == 'int'
+					? decimalToNumber(detail.unit_quantity)
+					: detail.unit_quantity
 			})
 		}
-	}, [detail])
+	}, [detail, isDetailLoading])
 
 	useEffect(() => {
-		if (validationData && !isValidationDataLoading && !updateId) {
+		if (validationData && !isValidationDataLoading) {
 			reset((prevValues) => ({
 				...prevValues,
 				price: '',
-				unit_quantity: validationData?.is_serial ? '1' : '1',
-				serial_numbers: [],
-				expiry_date: validationData?.expiry ? '' : getDate()
+				unit_quantity: '1',
+				serial_numbers: []
 			}))
 		}
-	}, [validationData])
-
+	}, [validationData, isValidationDataLoading])
 
 	useEffect(() => {
 		if (!updateId) {
 			reset({
 				price: '',
-				unit_quantity: '',
+				unit_quantity: '1',
 				serial_numbers: [],
-				product: undefined,
-				store: undefined
+				product: undefined
 			})
 		}
 	}, [updateId])
 
 	useEffect(() => {
-		if (stores?.length && !isStoreLoading && stores?.find((store) => store?.is_main)?.value) {
-			reset((prevValues: InferType<typeof temporarySaleItemSchema>) => ({
-				...prevValues,
-				store: stores?.find((store) => store?.is_main)?.value as unknown as number ?? undefined
-			}))
+		if (clientId) {
+			setTimeout(() => {
+				setFormFocus('product')
+			}, 0)
 		}
-	}, [stores])
+	}, [clientId])
+
+	const onSubmit = () => {
+		handleSubmit((data) => {
+				if (!clientId) {
+					trigger?.(['customer'])
+					focus?.('customer')
+				} else if (updateId) {
+					const newData = {
+						product: data?.product,
+						price: data?.price,
+						serial_numbers: validationData?.is_serial ? data?.serial_numbers ?? [] : [],
+						store: store?.value,
+						unit_quantity: data?.unit_quantity,
+						customer: clientId
+					}
+					update(cleanParams(newData as unknown as ISearchParams)).then(async () => {
+						removeParams('updateId')
+						reset({price: '', unit_quantity: '', serial_numbers: [], product: undefined})
+						setTimeout(() => { setFormFocus('product') }, 0)
+						refetchTemporaryList?.()
+					})
+				} else {
+					const newData = {
+						product: data?.product,
+						price: data?.price,
+						store: store?.value,
+						serial_numbers: validationData?.is_serial ? data?.serial_numbers ?? [] : [],
+						unit_quantity: data?.unit_quantity,
+						customer: clientId
+					}
+					mutateAsync(cleanParams(newData as unknown as ISearchParams)).then(async () => {
+						reset({price: '', unit_quantity: '', serial_numbers: [], product: undefined})
+						setTimeout(() => { setFormFocus('product') }, 0)
+						refetchTemporaryList?.()
+					})
+				}
+			}
+		)()
+	}
+
+	const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+		if (e.key === 'Enter') {
+			e.preventDefault()
+			onSubmit()
+		}
+	}
+
+	const handleSeriesKeyDown = (e: unknown) => {
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-expect-error
+		if (e?.key === 'Enter') {
+			if (series.trim()?.toString() == '') return
+			const serialNumbers = watch('serial_numbers')
+			if (!serialNumbers?.includes(series?.trim()?.toString())) {
+				append(series)
+				setSeries('')
+			} else {
+				showMessage(t('Serial number already exist', {number: series?.trim()?.toString()}))
+			}
+		}
+	}
 
 	return (
-		<Form
-			onSubmit={handleSubmit((data) => {
-					if (!clientId) {
-						showMessage('Client ID required')
-					} else if (updateId) {
-						const newData = {
-							product: data?.product,
-							// expiry_date: validationData?.expiry ? data?.expiry_date : null,
-							price: data?.price,
-							serial_numbers: validationData?.is_serial ? data?.serial_numbers : null,
-							store: data?.store ?? null,
-							unit_quantity: data?.unit_quantity,
-							customer: clientId
-						}
-						update(cleanParams(newData as ISearchParams)).then(async () => {
-							removeParams('updateId', 'modal')
-							reset({
-								price: '',
-								unit_quantity: '',
-								serial_numbers: [],
-								product: undefined,
-								store: undefined
-								// expiry_date: ''
-							})
-							refetchTemporaryList?.()
-						})
-					} else {
-						const newData = {
-							product: data?.product,
-							// expiry_date: validationData?.expiry ? data?.expiry_date : null,
-							price: data?.price,
-							store: data?.store ?? null,
-							serial_numbers: validationData?.is_serial ? data?.serial_numbers : null,
-							unit_quantity: data?.unit_quantity,
-							customer: clientId
-						}
-						mutateAsync(cleanParams(newData as ISearchParams)).then(async () => {
-							reset({
-								price: '',
-								unit_quantity: '',
-								serial_numbers: [],
-								product: undefined,
-								store: undefined
-								// expiry_date: ''
-							})
-							removeParams('modal')
-							refetchTemporaryList?.()
-						})
-					}
-				}
-			)}
-		>
-			<div className="grid gap-lg">
-				<div className="span-12">
-					<Controller
-						name="product"
-						control={control}
-						render={({field: {value, ref, onChange, onBlur}}) => (
-							<Select
-								ref={ref}
-								id="product"
-								label="Product"
-								onBlur={onBlur}
-								options={products}
-								isDisabled={!!updateId}
-								error={errors.product?.message}
-								value={getSelectValue(products, value)}
-								defaultValue={getSelectValue(products, value)}
-								handleOnChange={(e) => onChange(e as string)}
+		<div className="grid gap-lg">
+			<div className={validationData?.is_serial ? 'span-9 grid gap-lg' : 'grid span-12 gap-lg'}>
+
+				<div className="grid gap-lg">
+
+
+					<div className="flex gap-lg span-12">
+						<div className="flex-5">
+							<Controller
+								name="product"
+								control={control}
+								render={({field: {value, ref, onChange, onBlur}}) => (
+									<Select
+										ref={ref}
+										id="product"
+										label={`${t('Product')}${productCount?.quantity ? ` (${t('Total')?.toLowerCase()} - ${productCount?.quantity})` : ''}`}
+										onBlur={onBlur}
+										options={products}
+										isDisabled={!!updateId}
+										error={errors.product?.message}
+										value={getSelectValue(products, value)}
+										defaultValue={getSelectValue(products, value)}
+										handleOnChange={(e) => onChange(e as string)}
+									/>
+								)
+								}
 							/>
-						)}
-					/>
-				</div>
+						</div>
 
-				{
-					(isValidationDataFetching) ?
-						<Loader/> : validationData ?
+						{isValidationDataFetching ? (
+							<div style={{flex: '7'}}>
+								<Loader/>
+							</div>
+						) : validationData ? (
 							<>
-								<div className="span-12 flex gap-lg">
-									<div className="flex-1">
-										<Controller
-											name="store"
-											control={control}
-											render={({field: {value, ref, onChange, onBlur}}) => (
-												<Select
-													ref={ref}
-													id="store"
-													label="Store"
-													options={stores}
-													onBlur={onBlur}
-													error={errors.store?.message}
-													value={getSelectValue(stores, value)}
-													defaultValue={getSelectValue(stores, value)}
-													handleOnChange={(e) => onChange(e as string)}
-												/>
-											)}
-										/>
-									</div>
-
-									<div className="flex-1">
-										<Controller
-											control={control}
-											name="unit_quantity"
-											render={({field}) => (
-												<NumberFormattedInput
-													id="unit_quantity"
-													maxLength={measurementUnits?.find(i => i.id == validationData?.measure)?.type == 'int' ? 6 : 9}
-													disableGroupSeparators={false}
-													// disabled={validationData.is_serial}
-													allowDecimals={measurementUnits?.find(i => i.id == validationData?.measure)?.type == 'float'}
-													label={measurementUnits?.find(i => i.id == validationData?.measure)?.type == 'int' ? t('Count') + ' ' + `(${t(measurementUnits?.find(i => i.id == validationData?.measure)?.label?.toString() || '')})` : t('Quantity') + ' ' + `(${(measurementUnits?.find(i => i.id == validationData?.measure)?.label?.toString() || '')})`}
-													error={errors?.unit_quantity?.message}
-													{...field}
-												/>
-											)}
-										/>
-									</div>
-
-									<div className="flex-1">
-										<Controller
-											control={control}
-											name="price"
-											render={({field}) => (
-												<NumberFormattedInput
-													id="price"
-													maxLength={12}
-													disableGroupSeparators={false}
-													allowDecimals={true}
-													label="Price"
-													error={errors?.price?.message}
-													{...field}
-												/>
-											)}
-										/>
-									</div>
+								<div className="flex-4">
+									<Controller
+										control={control}
+										name="unit_quantity"
+										render={({field}) => (
+											<NumberFormattedInput
+												id="unit_quantity"
+												disableGroupSeparators={false}
+												allowDecimals={measurementUnits?.find(i => i.id == validationData?.measure)?.type == 'float'}
+												maxLength={measurementUnits?.find(i => i.id == validationData?.measure)?.type == 'int' ? 6 : 9}
+												onKeyDown={handleKeyDown}
+												error={errors?.unit_quantity?.message}
+												label={measurementUnits?.find(i => i.id == validationData?.measure)?.type == 'int' ? t('Count') + ` (${t(measurementUnits?.find(i => i.id == validationData?.measure)?.label?.toString() || '')})` : t('Quantity') + ` (${t(measurementUnits?.find(i => i.id == validationData?.measure)?.label?.toString() || '')})`}
+												{...field}
+											/>
+										)}
+									/>
 								</div>
 
-								{
-									validationData.is_serial &&
-									<>
-										<div className="grip span-12 gap-lg">
-											<Controller
-												name="serial_numbers"
-												control={control}
-												render={({field: {value, ref, onChange, onBlur}}) => (
-													<Select
-														ref={ref}
-														id="serial_numbers"
-														label="Series"
-														onBlur={onBlur}
-														options={getSelectOptionsByKey(series, 'serial')}
-														isMulti={true}
-														error={errors.serial_numbers?.message}
-														value={getSelectValue(getSelectOptionsByKey(series, 'serial'), value)}
-														defaultValue={getSelectValue(getSelectOptionsByKey(series, 'serial'), value)}
-														handleOnChange={(e) => {
-															const value = e as string[]
-															// setValue('unit_quantity', String(value?.length || '0'))
-															onChange(value as string[])
-														}}
-													/>
-												)}
+								<div className="flex-4">
+									<Controller
+										control={control}
+										name="price"
+										render={({field}) => (
+											<NumberFormattedInput
+												id="price"
+												maxLength={12}
+												disableGroupSeparators={false}
+												allowDecimals={true}
+												label={t('Price')}
+												onKeyDown={handleKeyDown}
+												error={errors?.price?.message}
+												{...field}
 											/>
-										</div>
-										<div className="span-12 flex gap-lg">
-											<FileUploader
-												type="txt"
-												handleOnChange={(arr) => setValue('serial_numbers', Array.isArray(arr) ? Array.from(new Set([...(watch('serial_numbers') || []), ...(arr?.filter(item => series?.map(i => i?.serial).includes(item)) || [])])) : [])}
-												value={undefined}
-												id="series"
-											/>
-										</div>
-									</>
-								}
-							</> :
-							null
-				}
-			</div>
+										)}
+									/>
+								</div>
 
-			<Button
-				type={FIELD.SUBMIT}
-				style={{marginTop: 'auto'}}
-				// disabled={isAdding || isUpdating || isValidationDataLoading || isValidationDataFetching || !validationData || (validationData?.is_serial && !watch('serial_numbers')?.length)}
-				disabled={isAdding || isUpdating || isValidationDataLoading || isValidationDataFetching || !validationData}
-			>
-				{updateId ? 'Edit' : 'Save'}
-			</Button>
-		</Form>
+								{/*<div className="flex-1 flex items-end">*/}
+								{/*	<Button*/}
+								{/*		icon={<Plus/>}*/}
+								{/*		type="button"*/}
+								{/*		onClick={onSubmit}*/}
+								{/*		disabled={!watch('product') || (validationData?.is_serial && !watch('serial_numbers')?.length)}*/}
+								{/*	>*/}
+								{/*		{updateId ? t('Edit') : t('Add')}*/}
+								{/*	</Button>*/}
+								{/*</div>*/}
+							</>
+						) : (
+							<div style={{flex: '7'}}></div>
+						)}
+					</div>
+
+				</div>
+
+				<div className="span-12">
+					<div className={styles.title}>{t('Products')}</div>
+					<HR style={{marginBottom: '1rem'}}/>
+					<ReactTable columns={columns} data={temporaryList} isLoading={isTemporaryListFetching}/>
+					<HR style={{marginBottom: '1rem'}}/>
+				</div>
+
+			</div>
+			{
+				validationData?.is_serial &&
+				<div className="span-3">
+					<div className="grid gap-lg">
+						<div className="flex gap-lg span-12">
+							<Input
+								className="flex-1"
+								id="serial_numbers"
+								label="Series"
+								disabled={!validationData?.is_serial}
+								value={series}
+								onChange={(e) => {
+									setSeries(e.target.value)
+								}}
+								onKeyDown={handleSeriesKeyDown}
+							/>
+							<div className="gap-md flex align-end">
+								<Button
+									style={{marginTop: 'auto'}}
+									disabled={!series?.trim()}
+									icon={<Plus/>}
+									mini={true}
+									onClick={() => {
+										if (series.trim() == '') return
+										const serialNumbers = watch('serial_numbers')
+										if (!serialNumbers?.includes(series?.trim()?.toString())) {
+											append(series)
+											setSeries('')
+										} else {
+											showMessage(t('Serial number already exist', {number: series?.trim()?.toString()}))
+										}
+									}}
+								/>
+								<FileUploader
+									content={
+										<Button
+											style={{marginTop: 'auto'}}
+											icon={<FileUploaderIcon style={{maxWidth: '1.2rem'}}/>}
+											mini={true}
+										/>
+									}
+									type="txt"
+									handleOnChange={(arr) => setValue('serial_numbers', Array.isArray(arr) ? Array.from(new Set(arr)) : [])}
+									value={undefined}
+									id="series"
+								/>
+							</div>
+						</div>
+						<div className="span-12"
+						     style={{maxHeight: '25rem', overflowY: 'auto'}}>
+							<div className={styles.title}>{t('Series')}</div>
+							<HR style={{marginBottom: '1rem'}}/>
+							<ReactTable
+								columns={seriesColumns}
+								data={
+									watch('serial_numbers')?.filter(i => !!i)?.map((i, index) => ({
+										name: String(i),
+										id: index
+									})) || []
+								}
+							/>
+							<HR style={{marginBottom: '1rem'}}/>
+						</div>
+					</div>
+				</div>
+			}
+		</div>
 	)
 }
 
