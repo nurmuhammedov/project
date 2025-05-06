@@ -14,8 +14,9 @@
         th {
           padding: .75rem;
           text-align: start;
-          border: none;
+          //border: none;
           color: var(--slate-gray);
+          border: 1px solid var(--light-gray-2);
           font-family: Golos, Arial, Helvetica, sans-serif;
           font-size: 1rem;
           font-style: normal;
@@ -32,6 +33,8 @@
         //cursor: pointer;
 
         td {
+          border: 1px solid var(--light-gray-2);
+
           padding: 1.25rem 0.75rem;
           //text-align: center;
           max-width: 15rem;
@@ -44,7 +47,7 @@
         }
 
         &:nth-child(even) {
-          background: var(--light-gray-1);
+          //background: var(--light-gray-1);
         }
 
         //&:hover {

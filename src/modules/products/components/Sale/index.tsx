@@ -15,7 +15,7 @@ import AddSale from 'modules/products/components/AddSale'
 import {productExchangeTabOptions} from 'modules/products/helpers/options'
 import {saleItemSchema} from 'modules/products/helpers/yup'
 import {IPurchaseItem, ITemporaryListItem} from 'modules/products/interfaces/purchase.interface'
-import {decimalToPrice, getSelectValue, sumDecimals} from 'utilities/common'
+import {decimalToInteger, decimalToPrice, getSelectValue, sumDecimals} from 'utilities/common'
 import {Controller, useForm} from 'react-hook-form'
 import {getDate} from 'utilities/date'
 import {BUTTON_THEME, FIELD} from 'constants/fields'
@@ -241,24 +241,12 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 							isTemporaryListFetching={isTemporaryListFetching}
 							refetchTemporaryList={refetchTemporaryList}
 							currency={watch('currency')}
-							priceType={watch('price_type')}
 						/>
 					</div>
 
 				</div>
 
 				<div className={styles.footer}>
-					<div className={styles['price-wrapper']}>
-						<div className={styles.price}>
-							<p>{t('Products')}:</p>
-							{
-								retrieve ?
-									<span>{decimalToPrice(sumDecimals(saleDetail?.items?.map(i => i?.total_price ?? '0.00') ?? []))} {t(currencyOptions?.find(i => i?.value == saleDetail?.currency)?.label?.toString() || '')?.toLowerCase() ?? ''}</span> :
-									<span>{decimalToPrice(sumDecimals(temporaryList?.map(i => i?.total_price ?? '0.00') ?? []))} {t(currencyOptions?.find(i => i?.value == watch('currency'))?.label?.toString() || '')?.toLowerCase() ?? ''}</span>
-							}
-						</div>
-					</div>
-
 
 					{
 						!retrieve &&
@@ -288,6 +276,25 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 							{t(productExchangeTabOptions[1]?.label)}
 						</Button>
 					}
+
+					<div className={styles['price-wrapper']}>
+						<div className={styles.price}>
+							<p>{`${t('Total')} ${t('Count')?.toLowerCase()}`}:</p>
+							{
+								retrieve ?
+									<span>{decimalToInteger(sumDecimals(saleDetail?.items?.map(i => i?.unit_quantity ?? '0.00') ?? []))}</span> :
+									<span>{decimalToInteger((sumDecimals(temporaryList?.map(i => i?.unit_quantity ?? '0.00') ?? [])))}</span>
+							}
+						</div>
+						<div className={styles.price}>
+							<p>{t('Products')}:</p>
+							{
+								retrieve ?
+									<span>{decimalToPrice(sumDecimals(saleDetail?.items?.map(i => i?.total_price ?? '0.00') ?? []))} {t(currencyOptions?.find(i => i?.value == saleDetail?.currency)?.label?.toString() || '')?.toLowerCase() ?? ''}</span> :
+									<span>{decimalToPrice(sumDecimals(temporaryList?.map(i => i?.total_price ?? '0.00') ?? []))} {t(currencyOptions?.find(i => i?.value == watch('currency'))?.label?.toString() || '')?.toLowerCase() ?? ''}</span>
+							}
+						</div>
+					</div>
 				</div>
 			</Card>
 

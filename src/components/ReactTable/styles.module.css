@@ -13,8 +13,8 @@
 .root table thead tr th {
   padding: 0.75rem;
   text-align: start;
-  border: none;
   color: var(--slate-gray);
+  border: 1px solid var(--light-gray-2);
   font-family: Golos, Arial, Helvetica, sans-serif;
   font-size: 1rem;
   font-style: normal;
@@ -25,6 +25,7 @@
   transition: color 0.15s ease-in-out;
 }
 .root table tbody tr td {
+  border: 1px solid var(--light-gray-2);
   padding: 1.25rem 0.75rem;
   max-width: 15rem;
   color: var(--dark-slate);
@@ -34,10 +35,6 @@
   font-weight: 500;
   line-height: 150%;
 }
-.root table tbody tr:nth-child(even) {
-  background: var(--light-gray-1);
-}
-
 .empty table {
   height: 100%;
 }

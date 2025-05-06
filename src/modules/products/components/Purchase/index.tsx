@@ -1,7 +1,7 @@
 import {
 	Button,
 	Card,
-	CardTab, DeleteModal,
+	CardTab, Checkbox, DeleteModal,
 	Input,
 	MaskInput,
 	NumberFormattedInput,
@@ -15,7 +15,7 @@ import AddPurchase from 'modules/products/components/AddPurchase'
 import {productExchangeTabOptions} from 'modules/products/helpers/options'
 import {purchaseItemSchema} from 'modules/products/helpers/yup'
 import {IPurchaseItem, ITemporaryListItem} from 'modules/products/interfaces/purchase.interface'
-import {decimalToPrice, findName, getSelectValue, sumDecimals} from 'utilities/common'
+import {decimalToInteger, decimalToPrice, findName, getSelectValue, sumDecimals} from 'utilities/common'
 import {Controller, useForm} from 'react-hook-form'
 import {getDate} from 'utilities/date'
 import {FIELD} from 'constants/fields'
@@ -63,7 +63,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 			cost_amount: '',
 			comment: '',
 			store: store?.value ? Number(store?.value) : undefined,
-			price_type: undefined,
+			// price_type: undefined,
 			currency: undefined,
 			supplier: undefined,
 			purchase_date: getDate()
@@ -72,7 +72,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 	})
 	const {data: clients = []} = useData<ISelectOption[]>('customers/select', !!watch('store'), {store: watch('store')})
 
-	const {data: priceTypes = []} = useData<ISelectOption[]>('price-types/select', !!watch('supplier'))
+	// const {data: priceTypes = []} = useData<ISelectOption[]>('price-types/select', !!watch('supplier'))
 
 	const {
 		data: temporaryList = [],
@@ -108,7 +108,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 				cost_amount: '',
 				comment: '',
 				store: store?.value ? Number(store?.value) : undefined,
-				price_type: undefined,
+				// price_type: undefined,
 				currency: undefined,
 				supplier: undefined,
 				purchase_date: getDate()
@@ -246,66 +246,72 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 						</div>
 
 
-						<div className="flex-3">
-							<Controller
-								name="price_type"
-								control={control}
-								render={({field: {value, ref, onChange, onBlur}}) => (
-									<Select
-										ref={ref}
-										id="price_type"
-										label="Price type"
-										options={priceTypes}
-										onBlur={onBlur}
-										isDisabled={retrieve}
-										error={errors.price_type?.message}
-										value={getSelectValue(priceTypes, value)}
-										defaultValue={getSelectValue(priceTypes, value)}
-										handleOnChange={(e) => onChange(e as string)}
-									/>
-								)}
-							/>
-						</div>
+						{/*<div className="flex-3">*/}
+						{/*	<Controller*/}
+						{/*		name="price_type"*/}
+						{/*		control={control}*/}
+						{/*		render={({field: {value, ref, onChange, onBlur}}) => (*/}
+						{/*			<Select*/}
+						{/*				ref={ref}*/}
+						{/*				id="price_type"*/}
+						{/*				label="Price type"*/}
+						{/*				options={priceTypes}*/}
+						{/*				onBlur={onBlur}*/}
+						{/*				isDisabled={retrieve}*/}
+						{/*				error={errors.price_type?.message}*/}
+						{/*				value={getSelectValue(priceTypes, value)}*/}
+						{/*				defaultValue={getSelectValue(priceTypes, value)}*/}
+						{/*				handleOnChange={(e) => onChange(e as string)}*/}
+						{/*			/>*/}
+						{/*		)}*/}
+						{/*	/>*/}
+						{/*</div>*/}
 
-						<div className="flex-3">
-							<Controller
-								name="cost_currency"
-								control={control}
-								render={({field: {value, ref, onChange, onBlur}}) => (
-									<Select
-										ref={ref}
-										id="cost_currency"
-										label="Expense currency"
-										options={currencyOptions}
-										onBlur={onBlur}
-										isDisabled={retrieve}
-										error={errors.cost_currency?.message}
-										value={getSelectValue(currencyOptions, value)}
-										defaultValue={getSelectValue(currencyOptions, value)}
-										handleOnChange={(e) => onChange(e as string)}
+						{
+							!!watch('isExpanseExist') &&
+							<>
+								<div className="flex-3">
+									<Controller
+										name="cost_currency"
+										control={control}
+										render={({field: {value, ref, onChange, onBlur}}) => (
+											<Select
+												ref={ref}
+												id="cost_currency"
+												label="Expense currency"
+												options={currencyOptions}
+												onBlur={onBlur}
+												isDisabled={retrieve}
+												error={errors.cost_currency?.message}
+												value={getSelectValue(currencyOptions, value)}
+												defaultValue={getSelectValue(currencyOptions, value)}
+												handleOnChange={(e) => onChange(e as string)}
+											/>
+										)}
 									/>
-								)}
-							/>
-						</div>
+								</div>
 
-						<div className="flex-3">
-							<Controller
-								control={control}
-								name="cost_amount"
-								render={({field}) => (
-									<NumberFormattedInput
-										id="cost_amount"
-										maxLength={13}
-										disableGroupSeparators={false}
-										disabled={retrieve}
-										allowDecimals={true}
-										label={watch('cost_currency') ? t('Expense quantity in', {currency: t(findName(currencyOptions, watch('cost_currency'))).toLowerCase() ?? ''}) : 'Expense quantity'}
-										error={errors?.cost_amount?.message}
-										{...field}
+								<div className="flex-3">
+									<Controller
+										control={control}
+										name="cost_amount"
+										render={({field}) => (
+											<NumberFormattedInput
+												id="cost_amount"
+												maxLength={13}
+												disableGroupSeparators={false}
+												disabled={retrieve}
+												allowDecimals={true}
+												label={watch('cost_currency') ? t('Expense quantity in', {currency: t(findName(currencyOptions, watch('cost_currency'))).toLowerCase() ?? ''}) : 'Expense quantity'}
+												error={errors?.cost_amount?.message}
+												{...field}
+											/>
+										)}
 									/>
-								)}
-							/>
-						</div>
+								</div>
+
+							</>
+						}
 						<div className="flex-3">
 							<Controller
 								name="purchase_date"
@@ -333,6 +339,13 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 								{...register(`comment`)}
 							/>
 						</div>
+						<div className="flex-1 flex align-end">
+							<Checkbox
+								id="isExpanseExist"
+								title="Expense"
+								{...register('isExpanseExist')}
+							/>
+						</div>
 					</div>
 
 					<div className="span-12">
@@ -355,26 +368,6 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 				</div>
 
 				<div className={styles.footer}>
-					<div className={styles['price-wrapper']}>
-						<div className={styles.price}>
-							<p>{t('Products')}:</p>
-							{
-								retrieve ?
-									<span>{decimalToPrice(sumDecimals(purchase?.items?.map(i => i?.total_price ?? '0.00') ?? []))} {t(currencyOptions?.find(i => i?.value == purchase?.currency)?.label?.toString() || '')?.toLowerCase() ?? ''}</span> :
-									<span>{decimalToPrice(sumDecimals(temporaryList?.map(i => i?.total_price ?? '0.00') ?? []))} {t(currencyOptions?.find(i => i?.value == watch('currency'))?.label?.toString() || '')?.toLowerCase() ?? ''}</span>
-							}
-						</div>
-						<div className={styles.price}>
-							<p>{t('Expense quantity')}:</p>
-							{
-								retrieve ?
-									<span>{decimalToPrice(purchase?.cost_amount || '0')} {t(currencyOptions?.find(i => i?.value == purchase?.cost_currency)?.label?.toString() || '')?.toLowerCase() ?? ''}</span> :
-									<span>{decimalToPrice(watch('cost_amount') || '0')} {t(currencyOptions?.find(i => i?.value == watch('cost_currency'))?.label?.toString() || '')?.toLowerCase() ?? ''}</span>
-							}
-						</div>
-					</div>
-
-
 					{
 						!retrieve &&
 						<Button
@@ -392,7 +385,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 											cost_amount: '',
 											comment: '',
 											store: store?.value ? Number(store?.value) : undefined,
-											price_type: undefined,
+											// price_type: undefined,
 											currency: undefined,
 											supplier: undefined,
 											purchase_date: getDate()
@@ -405,6 +398,33 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 							{t(productExchangeTabOptions[0]?.label)}
 						</Button>
 					}
+
+					<div className={styles['price-wrapper']}>
+						<div className={styles.price}>
+							<p>{`${t('Total')} ${t('Count')?.toLowerCase()}`}:</p>
+							{
+								retrieve ?
+									<span>{decimalToInteger(sumDecimals(purchase?.items?.map(i => i?.unit_quantity ?? '0.00') ?? []))}</span> :
+									<span>{decimalToInteger((sumDecimals(temporaryList?.map(i => i?.unit_quantity ?? '0.00') ?? [])))}</span>
+							}
+						</div>
+						<div className={styles.price}>
+							<p>{t('Products')}:</p>
+							{
+								retrieve ?
+									<span>{decimalToPrice(sumDecimals(purchase?.items?.map(i => i?.total_price ?? '0.00') ?? []))} {t(currencyOptions?.find(i => i?.value == purchase?.currency)?.label?.toString() || '')?.toLowerCase() ?? ''}</span> :
+									<span>{decimalToPrice(sumDecimals(temporaryList?.map(i => i?.total_price ?? '0.00') ?? []))} {t(currencyOptions?.find(i => i?.value == watch('currency'))?.label?.toString() || '')?.toLowerCase() ?? ''}</span>
+							}
+						</div>
+						<div className={styles.price}>
+							<p>{t('Expense quantity')}:</p>
+							{
+								retrieve ?
+									<span>{decimalToPrice(purchase?.cost_amount || '0')} {t(currencyOptions?.find(i => i?.value == purchase?.cost_currency)?.label?.toString() || '')?.toLowerCase() ?? ''}</span> :
+									<span>{decimalToPrice(watch('cost_amount') || '0')} {t(currencyOptions?.find(i => i?.value == watch('cost_currency'))?.label?.toString() || '')?.toLowerCase() ?? ''}</span>
+							}
+						</div>
+					</div>
 				</div>
 			</Card>
 

@@ -42,7 +42,7 @@ interface IProperties {
 	temporaryList: ITemporaryListItem[];
 	trigger?: UseFormTrigger<InferType<typeof saleItemSchema>>;
 	currency?: string | number;
-	priceType?: string | number;
+	// priceType?: string | number;
 }
 
 const Index: FC<IProperties> = ({

@@ -20,7 +20,7 @@ export const temporarySaleItemSchema = yup.object().shape({
 	unit_quantity: yup.string().trim().required('This field is required'),
 	price: yup.string().trim().required('This field is required'),
 	serial_numbers: yup.array().required('This field is required'),
-	product: yup.number().required('This field is required'),
+	product: yup.number().required('This field is required')
 	// store: yup.number().transform(v => v ? v : undefined).required('This field is required')
 })
 
@@ -28,11 +28,20 @@ export const temporarySaleItemSchema = yup.object().shape({
 export const purchaseItemSchema = yup.object().shape({
 	store: yup.number().required('This field is required'),
 	supplier: yup.number().required('This field is required'),
-	price_type: yup.number().required('This field is required'),
+	// price_type: yup.number().required('This field is required'),
 	currency: yup.string().trim().required('This field is required'),
 	purchase_date: isNotFutureDate,
-	cost_amount: yup.string().trim().required('This field is required'),
-	cost_currency: yup.string().trim().required('This field is required'),
+	isExpanseExist: yup.boolean().nullable().default(false),
+	cost_amount: yup.string().trim().when('isExpanseExist', {
+		is: false,
+		then: schema => schema.nullable().transform(() => null),
+		otherwise: schema => schema.required('This field is required')
+	}),
+	cost_currency: yup.string().trim().when('isExpanseExist', {
+		is: false,
+		then: schema => schema.nullable().transform(() => null),
+		otherwise: schema => schema.required('This field is required')
+	}),
 	comment: yup.string().transform(value => value ? String(value) : '').trim().nullable()
 })
 
