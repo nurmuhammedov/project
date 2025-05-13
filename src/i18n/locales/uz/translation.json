@@ -214,5 +214,9 @@
   "Only .txt files are accepted": "Faqat .txt kengaytmali fayllar qabul qilinadi",
   "File successfully accepted": "fayli muvaffaqiyatli yuklandi",
   "Loading...": "yuklanmoqda",
-  "Serial number already exist": "{{number}} seria raqami mavjud"
+  "Serial number already exist": "{{number}} seria raqami mavjud",
+  "Parties": "Partiya",
+  "Template": "Shablon",
+  "Export": "Eksport",
+  "Import": "Import"
 }

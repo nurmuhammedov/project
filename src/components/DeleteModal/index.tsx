@@ -27,7 +27,7 @@ const Index = ({title = 'Should it really be deleted?', endpoint, onDelete, remo
 				<Button
 					style={{flex: 1}}
 					disabled={isPending}
-					onClick={() => mutateAsync().then(() => {
+					onClick={() => mutateAsync(0).then(() => {
 						removeParams('modal', 'deleteId', 'page', 'limit', ...removedParams)
 						onDelete?.()
 					})}

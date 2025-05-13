@@ -14,7 +14,8 @@ import {
 	Form,
 	Select,
 	PageTitle,
-	DetailButton
+	DetailButton,
+	FileUploader
 } from 'components'
 import {FIELD} from 'constants/fields'
 import {currencyOptions, regionsOptions} from 'constants/options'
@@ -30,18 +31,22 @@ import useTypedSelector from 'hooks/useTypedSelector'
 import {ISelectOption} from 'interfaces/form.interface'
 import {ICustomerDetail} from 'modules/clients/interfaces'
 import {customerSchema} from 'modules/clients/helpers/yup'
-import {useEffect, useMemo} from 'react'
+import {useEffect, useMemo, useState} from 'react'
 import {Controller, useForm} from 'react-hook-form'
 import {useTranslation} from 'react-i18next'
 import {Column} from 'react-table'
 import {findName, getSelectValue} from 'utilities/common'
 import {InferType} from 'yup'
+import {interceptor} from 'libraries/index'
+import {showMessage} from 'utilities/alert'
 
 
 const Index = () => {
-	const {t} = useTranslation()
 	const {page, pageSize} = usePagination()
 	const {store} = useTypedSelector(state => state.stores)
+	const {t} = useTranslation()
+	const [isXMLLoading, setIsXMLLoading] = useState<boolean>(false)
+	const [exelLoader, setIsLoading] = useState<boolean>(false)
 
 	const {
 		addParams,
@@ -205,9 +210,131 @@ const Index = () => {
 			<Card screen={true} className="span-9 gap-2xl">
 				<div className="flex justify-between align-center">
 					<Input id="search" icon={<Search/>} placeholder="Search" radius={true} style={{width: 400}}/>
-					<Button icon={<Plus/>} onClick={() => addParams({modal: 'customer'})}>
-						Add a new client
-					</Button>
+					<div className="flex items-center gap-lg">
+						<Button icon={<Plus/>} onClick={() => addParams({modal: 'customer'})}>
+							Add a new client
+						</Button>
+						<Button
+							style={{marginTop: 'auto'}}
+							disabled={isXMLLoading}
+							// icon={<FileUploaderIcon style={{maxWidth: '1.2rem', transform: 'rotate(180deg)'}}/>}
+							onClick={() => {
+								setIsXMLLoading(true)
+								interceptor.get(`customers/download/template`, {
+									responseType: 'blob'
+								}).then(res => {
+									const blob = new Blob([res.data])
+									const link = document.createElement('a')
+									link.href = window.URL.createObjectURL(blob)
+									link.download = `${t(`${t('Customers')}`)}.xlsx`
+									link.click()
+								}).finally(() => {
+									setIsXMLLoading(false)
+								})
+							}}
+							mini={true}
+						>
+							Template
+						</Button>
+						<Button
+							style={{marginTop: 'auto'}}
+							disabled={isXMLLoading}
+							// icon={<FileUploaderIcon style={{maxWidth: '1.2rem', transform: 'rotate(180deg)'}}/>}
+							onClick={() => {
+								setIsXMLLoading(true)
+								interceptor.get(`customers/export`, {
+									responseType: 'blob'
+								}).then(res => {
+									const blob = new Blob([res.data])
+									const link = document.createElement('a')
+									link.href = window.URL.createObjectURL(blob)
+									link.download = `${t(`${t('Customers')}`)}.xlsx`
+									link.click()
+								}).finally(() => {
+									setIsXMLLoading(false)
+								})
+							}}
+							mini={true}
+						>
+							Export
+						</Button>
+						<FileUploader
+							content={
+								<Button
+									style={{marginTop: 'auto'}}
+									// icon={<FileUploaderIcon style={{maxWidth: '1.2rem'}}/>}
+									disabled={exelLoader}
+									mini={true}
+								>
+									Import
+								</Button>
+							}
+							type="exel"
+							handleChange={(files) => {
+								const item = files[0]
+								setIsLoading(true)
+								const formData = new FormData()
+								formData.append('xlsx-file', item)
+								formData.append('name', item.name)
+								interceptor
+									.post(`customers/import/new`, formData, {
+										headers: {
+											'Content-Type': 'multipart/form-data'
+										}
+									})
+									.then(async (res) => {
+										showMessage(`${res.data.name} ${t('File successfully accepted')}`, 'success')
+										await refetch()
+									})
+									.catch(() => {
+										showMessage(`${item.name} ${t('File not accepted')}`, 'error')
+									})
+									.finally(() => {
+										setIsLoading(false)
+									})
+							}}
+							value={undefined}
+							id="series"
+						/>
+						<FileUploader
+							content={
+								<Button
+									style={{marginTop: 'auto'}}
+									// icon={<FileUploaderIcon style={{maxWidth: '1.2rem'}}/>}
+									disabled={exelLoader}
+									mini={true}
+								>
+									Edit
+								</Button>
+							}
+							type="exel"
+							handleChange={(files) => {
+								const item = files[0]
+								setIsLoading(true)
+								const formData = new FormData()
+								formData.append('xlsx-file', item)
+								formData.append('name', item.name)
+								interceptor
+									.post(`customers/import`, formData, {
+										headers: {
+											'Content-Type': 'multipart/form-data'
+										}
+									})
+									.then(async (res) => {
+										showMessage(`${res.data.name} ${t('File successfully accepted')}`, 'success')
+										await refetch()
+									})
+									.catch(() => {
+										showMessage(`${item.name} ${t('File not accepted')}`, 'error')
+									})
+									.finally(() => {
+										setIsLoading(false)
+									})
+							}}
+							value={undefined}
+							id="series"
+						/>
+					</div>
 				</div>
 				<ReactTable columns={columns} data={data} isLoading={isLoading}/>
 				<HR/>

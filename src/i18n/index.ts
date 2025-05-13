@@ -12,7 +12,7 @@ i18n.use(HttpBackend)
 	.init({
 		resources,
 		supportedLngs: ['uz', 'uzb'],
-		lng: localStorage.getItem('i18nextLng') || 'uz',
+		lng: localStorage.getItem('i18nextLng') || 'uzb',
 		detection: {
 			order: ['localStorage'],
 			caches: ['localStorage']

@@ -1,8 +1,12 @@
 import {Box, Cart, Plus} from 'assets/icons'
-import {Button, PageTitle} from 'components'
+import {Button, FileUploader, PageTitle} from 'components'
 import {useSearchParams} from 'hooks'
 import {ISelectOption} from 'interfaces/form.interface'
 import ProductWarehouse from 'modules/products/components/Products'
+import {interceptor} from 'libraries/index'
+import {showMessage} from 'utilities/alert'
+import {useState} from 'react'
+import {useTranslation} from 'react-i18next'
 
 
 const tabOptions: ISelectOption[] = [
@@ -20,6 +24,9 @@ const tabOptions: ISelectOption[] = [
 
 const Index = () => {
 	const {paramsObject: {tab = tabOptions[0]?.value}, addParams} = useSearchParams()
+	const {t} = useTranslation()
+	const [isXMLLoading, setIsXMLLoading] = useState<boolean>(false)
+	const [exelLoader, setIsLoading] = useState<boolean>(false)
 
 	return (
 		<>
@@ -31,6 +38,126 @@ const Index = () => {
 					>
 						Add a new product
 					</Button>
+					<Button
+						style={{marginTop: 'auto'}}
+						disabled={isXMLLoading}
+						// icon={<FileUploaderIcon style={{maxWidth: '1.2rem', transform: 'rotate(180deg)'}}/>}
+						onClick={() => {
+							setIsXMLLoading(true)
+							interceptor.get(`products/download/template`, {
+								responseType: 'blob'
+							}).then(res => {
+								const blob = new Blob([res.data])
+								const link = document.createElement('a')
+								link.href = window.URL.createObjectURL(blob)
+								link.download = `${t(`${t('Products')}`)}.xlsx`
+								link.click()
+							}).finally(() => {
+								setIsXMLLoading(false)
+							})
+						}}
+						mini={true}
+					>
+						Template
+					</Button>
+					<Button
+						style={{marginTop: 'auto'}}
+						disabled={isXMLLoading}
+						// icon={<FileUploaderIcon style={{maxWidth: '1.2rem', transform: 'rotate(180deg)'}}/>}
+						onClick={() => {
+							setIsXMLLoading(true)
+							interceptor.get(`products/export`, {
+								responseType: 'blob'
+							}).then(res => {
+								const blob = new Blob([res.data])
+								const link = document.createElement('a')
+								link.href = window.URL.createObjectURL(blob)
+								link.download = `${t(`${t('Products')}`)}.xlsx`
+								link.click()
+							}).finally(() => {
+								setIsXMLLoading(false)
+							})
+						}}
+						mini={true}
+					>
+						Export
+					</Button>
+					<FileUploader
+						content={
+							<Button
+								style={{marginTop: 'auto'}}
+								// icon={<FileUploaderIcon style={{maxWidth: '1.2rem'}}/>}
+								disabled={exelLoader}
+								mini={true}
+							>
+								Import
+							</Button>
+						}
+						type="exel"
+						handleChange={(files) => {
+							const item = files[0]
+							setIsLoading(true)
+							const formData = new FormData()
+							formData.append('xlsx-file', item)
+							formData.append('name', item.name)
+							interceptor
+								.post(`products/import/new`, formData, {
+									headers: {
+										'Content-Type': 'multipart/form-data'
+									}
+								})
+								.then(async (res) => {
+									showMessage(`${res.data.name} ${t('File successfully accepted')}`, 'success')
+									// await refetch()
+								})
+								.catch(() => {
+									showMessage(`${item.name} ${t('File not accepted')}`, 'error')
+								})
+								.finally(() => {
+									setIsLoading(false)
+								})
+						}}
+						value={undefined}
+						id="series"
+					/>
+					<FileUploader
+						content={
+							<Button
+								style={{marginTop: 'auto'}}
+								// icon={<FileUploaderIcon style={{maxWidth: '1.2rem'}}/>}
+								disabled={exelLoader}
+								mini={true}
+							>
+								Edit
+							</Button>
+						}
+						type="exel"
+						handleChange={(files) => {
+							const item = files[0]
+							setIsLoading(true)
+							const formData = new FormData()
+							formData.append('xlsx-file', item)
+							formData.append('name', item.name)
+							interceptor
+								.post(`products/import`, formData, {
+									headers: {
+										'Content-Type': 'multipart/form-data'
+									}
+								})
+								.then(async (res) => {
+									showMessage(`${res.data.name} ${t('File successfully accepted')}`, 'success')
+									// await refetch()
+								})
+								.catch(() => {
+									showMessage(`${item.name} ${t('File not accepted')}`, 'error')
+								})
+								.finally(() => {
+									setIsLoading(false)
+								})
+						}}
+						value={undefined}
+						id="series"
+					/>
 				</div>
 			</PageTitle>
 			{/*<HorizontalTab*/}

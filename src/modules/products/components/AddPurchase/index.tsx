@@ -16,7 +16,7 @@ import HR from 'components/HR'
 // import {BUTTON_THEME, FIELD} from 'constants/fields'
 import {
 	useAdd,
-	useData,
+	useData, useDelete,
 	useDetail,
 	useSearchParams,
 	useUpdate
@@ -65,6 +65,7 @@ const Index: FC<IProperties> = ({
 
 	const {data: products = []} = useData<ISelectOption[]>('products/select')
 
+	const {mutateAsync: del, isPending: isDelete} = useDelete('temporary/delete/')
 
 	const columns: Column<ITemporaryListItem>[] = useMemo(
 		() => [
@@ -97,14 +98,13 @@ const Index: FC<IProperties> = ({
 				accessor: row => (
 					<div className="flex items-start gap-lg">
 						<EditButton id={row.id}/>
-						<DeleteButton id={row.id}/>
+						<DeleteButton onDelete={() => !isDelete && del(row?.id).then(() => refetchTemporaryList?.())}/>
 					</div>
 				)
 			}
 		],
-		[]
+		[isDelete]
 	)
-
 
 	const {
 		handleSubmit,
@@ -126,7 +126,6 @@ const Index: FC<IProperties> = ({
 		},
 		resolver: yupResolver(temporaryItemSchema)
 	})
-
 
 	const {mutateAsync} = useAdd('temporary/create')
 	const {mutateAsync: update} = useUpdate('temporary/update/', updateId)

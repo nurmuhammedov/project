@@ -13,6 +13,7 @@ import {Delete, Download, FileUploader} from 'assets/icons'
 interface FileUploaderProps {
 	onChange?: (file: IFile | IFile[] | undefined) => void
 	handleOnChange?: (arr: string[] | undefined) => void
+	handleChange?: (acceptedFiles: FileWithPath[]) => void
 	onBlur?: () => void
 	value: IFile | IFile[] | undefined | null
 	multi?: boolean
@@ -20,13 +21,14 @@ interface FileUploaderProps {
 	label?: string
 	content?: ReactNode
 	error?: string
-	type?: 'pdf' | 'image' | 'txt'
+	type?: 'pdf' | 'image' | 'txt' | 'exel'
 }
 
 const Index = forwardRef<HTMLInputElement, FileUploaderProps>(({
 	                                                               onBlur,
 	                                                               onChange,
 	                                                               handleOnChange,
+	                                                               handleChange,
 	                                                               value,
 	                                                               content,
 	                                                               label,
@@ -42,7 +44,9 @@ const Index = forwardRef<HTMLInputElement, FileUploaderProps>(({
 
 		const onDrop = useCallback(
 			(acceptedFiles: FileWithPath[]) => {
-				if (handleOnChange && acceptedFiles?.length) {
+				if (handleChange && acceptedFiles?.length) {
+					handleChange(acceptedFiles)
+				} else if (handleOnChange && acceptedFiles?.length) {
 					const file = acceptedFiles?.[0]
 					if (!file) return
 					const reader = new FileReader()
@@ -102,7 +106,10 @@ const Index = forwardRef<HTMLInputElement, FileUploaderProps>(({
 		} = useDropzone({
 			onDrop,
 			accept: type === 'pdf' ? {'application/pdf': ['.pdf']}
-				: type === 'txt' ? {'text/plain': ['.txt']} : {
+				: type === 'txt' ? {'text/plain': ['.txt']} : type === 'exel' ? {
+					'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'],
+					'application/vnd.ms-excel': ['.xls']
+				} : {
 					'image/jpeg': ['.jpg', '.jpeg'], 'image/png': ['.png']
 				},
 			maxFiles: 1,
@@ -171,7 +178,7 @@ const Index = forwardRef<HTMLInputElement, FileUploaderProps>(({
 				<div
 					className={
 						classNames(styles.root, {
-							[styles.isLoading]: isLoading || (!onChange && !handleOnChange),
+							[styles.isLoading]: isLoading || (!onChange && !handleOnChange && !handleChange),
 							[styles.error]: !!error
 						})
 					}

@@ -17,6 +17,11 @@ export const currencyOptions: ISelectOption[] = [
 	// {value: 'RUB', label: 'Ruble', code: 'ruble'}
 ]
 
+export const languageOptions: ISelectOption[] = [
+	{value: 'uzb', label: 'uzb'},
+	{value: 'uz', label: 'uz'}
+]
+
 export const regionsOptions: ISelectOption[] = [
 	{
 		label: 'Fergana region',

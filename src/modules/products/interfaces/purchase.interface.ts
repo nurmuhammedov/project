@@ -11,6 +11,7 @@ export interface ITemporaryListItem {
 	package_quantity?: number;
 	unit_quantity?: string;
 	serial_numbers?: string[];
+	temp_quantities?: { quantity: string, purchase_item: number }[];
 	store: IIDName;
 	expiry_date?: string | null;
 	supplier: IIDName;
@@ -52,4 +53,12 @@ export interface IPurchaseItem {
 	created_at: string;
 	items: ITemporaryListItem[];
 	items_count: number;
+}
+
+
+export interface IPurchasesItem {
+	id: number
+	quantity: string
+	purchase_date: string
+	supplier_name: string
 }

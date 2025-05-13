@@ -10,9 +10,9 @@ const useDelete = (
 	successMessage: string = 'Deleted successfully'
 ) => {
 	return useMutation({
-		mutationFn: () => {
-			if (id) {
-				return CommonService.deleteData(endpoint, id?.toString())
+		mutationFn: (ID?: number) => {
+			if (id || ID) {
+				return CommonService.deleteData(endpoint, id?.toString() || ID?.toString() || '')
 			} else {
 				showMessage('ID is required to perform delete operation', 'error')
 				return noopAsync()

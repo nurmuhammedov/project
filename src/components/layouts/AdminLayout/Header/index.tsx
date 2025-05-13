@@ -11,12 +11,14 @@ import NavItem from './NavItem'
 import classNames from 'classnames'
 import {useState} from 'react'
 import Status from 'assets/icons/Status'
+import {languageOptions} from 'constants/options'
 
 
 const Index = () => {
 	const {t} = useTranslation()
 	const sideMenu = useSideMenu()
 	const [accountIsOpen, setAccountIsOpen] = useState(false)
+	const {i18n} = useTranslation()
 	const {user} = useAppContext()
 	const {handleLogout, isPending} = useLogout()
 	const {store, stores} = useTypedSelector(state => state.stores)
@@ -54,6 +56,15 @@ const Index = () => {
 			</div>
 
 			<div className={styles['profile-container']}>
+				<Select
+					id="language"
+					options={languageOptions}
+					isSearchable={false}
+					placeholder="Select language"
+					value={getSelectValue(languageOptions, i18n.language ?? 'uzb')}
+					defaultValue={getSelectValue(languageOptions, i18n.language ?? 'uzb')}
+					handleOnChange={(e) => i18n.changeLanguage((e ?? 'uzb') as string)}
+				/>
 				<div
 					onClick={() => setAccountIsOpen(p => !p)}
 					className={classNames(styles.profile)}

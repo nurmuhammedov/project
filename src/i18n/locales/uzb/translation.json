@@ -1,7 +1,7 @@
 {
   "Internal server error": "Серверда номаълум хатолик юз берди. Хатолик ҳақида бизга хабар беринг, биз уни бартараф этамиз",
   "uzb": "Ўзбекча",
-  "uz": "Ўзбекча",
+  "uz": "O‘zbekcha",
   "User": "Фойдаланувчи",
   "Admin": "Админ",
   "Login": "Логин",
@@ -213,5 +213,7 @@
   "Only .jpg, .png, .jpeg files are accepted": "Фақат .jpg, .png, .jpeg кенгайтмали файллар қабул қилинади",
   "Only .txt files are accepted": "Фақат .txt кенгайтмали файллар қабул қилинади",
   "File successfully accepted": "файли муваффақиятли юкланди",
-  "Loading...": "юкланмоқда"
+  "Loading...": "юкланмоқда",
+  "Serial number already exist": "{{number}} серия рақами мавжуд",
+  "Parties": "Партия"
 }

@@ -20,6 +20,7 @@
   align-items: center;
   position: relative;
   user-select: none;
+  gap: 1rem;
 }
 .root .profile-container .profile {
   display: flex;

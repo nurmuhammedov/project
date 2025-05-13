@@ -377,6 +377,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 								handleSubmit((data) => {
 									mutateAsync({
 										...data,
+										store: store?.value ? Number(store?.value) : null,
 										temporary_items: temporaryList?.map(i => i?.id)
 									}).then(async () => {
 										removeParams('updateId', 'type')
