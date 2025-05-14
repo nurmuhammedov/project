@@ -1,38 +1,39 @@
-import SalesHistory from 'modules/stores/components/SalesHistory'
-import Employees from 'modules/stores/components/Employees'
-import {Loader, PageInfo, HorizontalTab} from 'components'
-import Warehouse from 'modules/stores/components/Warehouse'
-import {storeTypes} from 'modules/stores/helpers/options'
-import {ISelectOption} from 'interfaces/form.interface'
+import Balance from 'modules/stores/components/Balance'
+import {storeDetailTabs, storeTypes} from 'modules/stores/helpers/options'
+import ExchangesHistory from 'modules/stores/components/ExchangesHistory'
+import BalanceChange from 'modules/stores/components/BalanceChange'
+import ProductIncome from 'modules/stores/components/ProductIncome'
+import ProductLoss from 'modules/stores/components/ProductLoss'
+import {Loader, PageInfo, VerticalTab} from 'components'
 import {IStoreDetail} from 'modules/stores/interfaces'
 import {useDetail, useSearchParams} from 'hooks'
 import {useTranslation} from 'react-i18next'
 import {useParams} from 'react-router-dom'
-import {Status, Store} from 'assets/icons'
+import {Store} from 'assets/icons'
 
 
-const tabOptions: ISelectOption[] = [
-	// {
-	// 	label: 'Sales history',
-	// 	value: 'salesHistory',
-	// 	icon: <Cart/>
-	// },
-	// {
-	// 	label: 'Products',
-	// 	value: 'warehouse',
-	// 	icon: <Box/>
-	// },
-	{
-		label: 'Employees',
-		value: 'employees',
-		icon: <Status/>
-	}
-]
+// const tabOptions: ISelectOption[] = [
+// 	{
+// 		label: 'Sales history',
+// 		value: 'salesHistory',
+// 		icon: <Cart/>
+// 	},
+// 	{
+// 		label: 'Products',
+// 		value: 'warehouse',
+// 		icon: <Box/>
+// 	},
+// 	{
+// 		label: 'Employees',
+// 		value: 'employees',
+// 		icon: <Status/>
+// 	}
+// ]
 
 const Index = () => {
 	const {id = undefined} = useParams()
 	const {t} = useTranslation()
-	const {paramsObject: {tab = tabOptions[0]?.value}} = useSearchParams()
+	const {paramsObject: {tab = storeDetailTabs[0]?.value}} = useSearchParams()
 	const {data: detail, isPending: isDetailLoading} = useDetail<IStoreDetail>('stores/', id)
 
 
@@ -50,18 +51,20 @@ const Index = () => {
 				/>
 			</div>
 
-			<HorizontalTab
-				tabs={tabOptions}
-				fallbackValue={tabOptions[0]?.value}
-				style={{marginTop: '2.25rem', marginBottom: '0.75rem'}}
-			/>
-			{
-				tab === 'salesHistory' ? <SalesHistory/> :
-					tab === 'warehouse' ? <Warehouse/> :
-						tab === 'employees' ? <Employees/> :
-							null
+			<div className="grid gap-md flex-1" style={{marginTop: '1rem'}}>
+				<div className="span-3">
+					<VerticalTab fallbackValue={storeDetailTabs[0]?.value} tabs={storeDetailTabs}/>
+				</div>
+				{
+					tab === 'balance' ? <Balance/> :
+						tab === 'currencies' ? <ExchangesHistory/> :
+							tab === 'balanceChange' ? <BalanceChange/> :
+								tab === 'income' ? <ProductIncome/> :
+									tab === 'loss' ? <ProductLoss/> :
+										null
 
-			}
+				}
+			</div>
 		</>
 	)
 }

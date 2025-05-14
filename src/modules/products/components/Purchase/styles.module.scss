@@ -7,7 +7,7 @@
     font-style: normal;
     font-weight: 400;
     line-height: 160%; /* 1.2rem */
-    margin-bottom: .75rem;
+    margin-bottom: .3rem;
   }
 
   .not-found {
@@ -23,7 +23,7 @@
 
   .footer {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 2fr;
     gap: 1rem;
     margin-top: auto;
 

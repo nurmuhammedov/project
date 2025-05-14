@@ -1,6 +1,6 @@
 import {BUTTON_THEME} from 'constants/fields'
 import {exchangeOptions} from 'modules/dashboard/helpers/options'
-import {Button, HorizontalTab, PageTitle} from 'components'
+import {Button, Card, CardTab, PageTitle} from 'components'
 import {useSearchParams} from 'hooks'
 import ProductIncome from 'modules/dashboard/screens/ProductIncome'
 import ProductLoss from 'modules/dashboard/screens/ProductLoss'
@@ -25,18 +25,19 @@ const Index = () => {
 					</Button>
 				</div>
 			</PageTitle>
-			<HorizontalTab
-				style={{marginBottom: '1rem'}}
-				fallbackValue={exchangeOptions[0]?.value}
-				tabs={exchangeOptions}
-			/>
-			<div className="grid gap-md flex-1">
+
+			<Card screen={true} style={{paddingTop: '0'}} className="span-12 gap-md flex-1">
+				<CardTab
+					// style={{marginBottom: '1rem'}}
+					fallbackValue={exchangeOptions[0]?.value}
+					tabs={exchangeOptions}
+				/>
 				{
 					tab == '1' ? <ProductIncome/> :
 						tab == '2' ? <ProductLoss/> :
 							null
 				}
-			</div>
+			</Card>
 		</>
 	)
 }

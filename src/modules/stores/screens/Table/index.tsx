@@ -24,7 +24,8 @@ import {
 	EditButton,
 	// DetailButton,
 	Select,
-	PageTitle
+	PageTitle,
+    DetailButton
 } from 'components'
 import {InferType} from 'yup'
 
@@ -146,7 +147,7 @@ const Stores = () => {
 				accessor: row => (
 					<div className="flex items-start gap-lg">
 						<EditButton id={row.id}/>
-						{/*<DetailButton id={row.id}/>*/}
+						<DetailButton id={row.id}/>
 					</div>
 				)
 			}

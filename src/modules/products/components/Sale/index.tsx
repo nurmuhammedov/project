@@ -36,14 +36,14 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 	const {t} = useTranslation()
 	const {removeParams} = useSearchParams()
 	const {productId = undefined} = useParams()
-	const {mutateAsync, isPending: isAdding} = useAdd('sale/create')
+	const {mutateAsync, isPending: isAdding} = useAdd('sales')
 	const {store} = useTypedSelector(state => state.stores)
 	const {data: clients = []} = useData<ISelectOption[]>('customers/select', !!store?.value, {store: store?.value})
 
 	const {
 		data: saleDetail,
 		isPending: isSaleDetailLoading
-	} = useDetail<IPurchaseItem>('sale/detail/', productId, !!(productId && retrieve))
+	} = useDetail<IPurchaseItem>('sales/', productId, !!(productId && retrieve))
 
 
 	const {
@@ -73,7 +73,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 		data: temporaryList = [],
 		isFetching: isTemporaryListFetching,
 		refetch: refetchTemporaryList
-	} = useData<ITemporaryListItem[]>('sale-temporary/list', !!watch('customer') && !retrieve, {supplier: watch('customer')})
+	} = useData<ITemporaryListItem[]>('sale-temporaries', !!watch('customer') && !retrieve, {supplier: watch('customer')})
 
 	const {
 		data: customerDetail,
@@ -246,7 +246,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 
 				</div>
 
-				<div className={styles.footer}>
+				<div className={styles.footer} style={{direction: 'rtl'}}>
 
 					{
 						!retrieve &&
@@ -278,7 +278,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 						</Button>
 					}
 
-					<div className={styles['price-wrapper']}>
+					<div className={styles['price-wrapper']} style={{direction: 'ltr'}}>
 						<div className={styles.price}>
 							<p>{`${t('Total')} ${t('Count')?.toLowerCase()}`}:</p>
 							{
@@ -302,7 +302,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 			{
 				!retrieve && temporaryList?.length > 0 &&
 				<DeleteModal
-					endpoint="sale-temporary/delete/"
+					endpoint="sale-temporaries/"
 					onDelete={() => refetchTemporaryList()}
 					removedParams={['updateId', 'type']}
 				/>

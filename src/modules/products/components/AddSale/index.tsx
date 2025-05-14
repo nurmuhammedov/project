@@ -61,7 +61,7 @@ const Index: FC<IProperties> = ({
 		removeParams,
 		paramsObject: {updateId = undefined}
 	} = useSearchParams()
-	const {mutateAsync: del, isPending: isDelete} = useDelete('sale-temporary/delete/')
+	const {mutateAsync: del, isPending: isDelete} = useDelete('sale-temporaries/')
 
 	const {data: products = []} = useData<ISelectOption[]>('products/select')
 
@@ -77,7 +77,7 @@ const Index: FC<IProperties> = ({
 			},
 			{
 				Header: t('Name'),
-				accessor: row => `${row?.product?.name}${row?.product?.brand?.name ? ` (${row?.product?.brand?.name || ''})` : ''}`
+				accessor: row => `${row?.product?.name}`
 			},
 			{
 				Header: t('Price'),
@@ -200,13 +200,13 @@ const Index: FC<IProperties> = ({
 	)
 
 
-	const {mutateAsync} = useAdd('sale-temporary/create')
-	const {mutateAsync: update} = useUpdate('sale-temporary/update/', updateId)
+	const {mutateAsync} = useAdd('sale-temporaries')
+	const {mutateAsync: update} = useUpdate('sale-temporaries/', updateId)
 
 	const {
 		data: detail,
 		isPending: isDetailLoading
-	} = useDetail<ITemporaryListItem>('sale-temporary/detail/', updateId)
+	} = useDetail<ITemporaryListItem>('sale-temporaries/', updateId)
 
 	const {
 		data: purchases = [],
@@ -269,6 +269,15 @@ const Index: FC<IProperties> = ({
 			}, 0)
 		}
 	}, [clientId])
+
+
+	useEffect(() => {
+		if (!isValidationDataFetching) {
+			setTimeout(() => {
+				setFormFocus('unit_quantity')
+			}, 0)
+		}
+	}, [isValidationDataFetching])
 
 	const onSubmit = () => {
 		handleSubmit((data) => {
@@ -438,7 +447,7 @@ const Index: FC<IProperties> = ({
 
 					<div className="span-12">
 						<div className={styles.title}>{t('Products')}</div>
-						<HR style={{marginBottom: '1rem'}}/>
+						{/*<HR style={{marginBottom: '1rem'}}/>*/}
 						<ReactTable columns={columns} data={temporaryList} isLoading={isTemporaryListFetching}/>
 						<HR style={{marginBottom: '1rem'}}/>
 					</div>
@@ -451,14 +460,14 @@ const Index: FC<IProperties> = ({
 				<div className="grid gap-lg">
 					<div className="span-12" style={{maxHeight: '25rem', overflowY: 'auto'}}>
 						<div className={styles.title}>{t('Parties')}</div>
-						<HR style={{marginBottom: '1rem'}}/>
+						{/*<HR style={{marginBottom: '1rem'}}/>*/}
 						<ReactTable
 							columns={purchaseColumns}
 							// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 							// @ts-expect-error
 							data={purchases as unknown as IPurchasesItem}
 						/>
-						<HR style={{marginBottom: '1rem'}}/>
+						{/*<HR style={{marginBottom: '1rem'}}/>*/}
 					</div>
 
 					{
@@ -512,7 +521,7 @@ const Index: FC<IProperties> = ({
 
 							<div className="span-12" style={{maxHeight: '25rem', overflowY: 'auto'}}>
 								<div className={styles.title}>{t('Series')}</div>
-								<HR style={{marginBottom: '1rem'}}/>
+								{/*<HR style={{marginBottom: '1rem'}}/>*/}
 								<ReactTable
 									columns={seriesColumns}
 									data={

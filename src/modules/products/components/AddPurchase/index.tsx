@@ -65,7 +65,7 @@ const Index: FC<IProperties> = ({
 
 	const {data: products = []} = useData<ISelectOption[]>('products/select')
 
-	const {mutateAsync: del, isPending: isDelete} = useDelete('temporary/delete/')
+	const {mutateAsync: del, isPending: isDelete} = useDelete('temporaries/')
 
 	const columns: Column<ITemporaryListItem>[] = useMemo(
 		() => [
@@ -79,7 +79,7 @@ const Index: FC<IProperties> = ({
 			},
 			{
 				Header: t('Name'),
-				accessor: row => `${row?.product?.name}${row?.product?.brand?.name ? ` (${row?.product?.brand?.name || ''})` : ''}`
+				accessor: row => `${row?.product?.name}`
 			},
 			{
 				Header: t('Price'),
@@ -127,13 +127,13 @@ const Index: FC<IProperties> = ({
 		resolver: yupResolver(temporaryItemSchema)
 	})
 
-	const {mutateAsync} = useAdd('temporary/create')
-	const {mutateAsync: update} = useUpdate('temporary/update/', updateId)
+	const {mutateAsync} = useAdd('temporaries')
+	const {mutateAsync: update} = useUpdate('temporaries/', updateId)
 
 	const {
 		data: detail,
 		isPending: isDetailLoading
-	} = useDetail<ITemporaryListItem>('temporary/detail/', updateId)
+	} = useDetail<ITemporaryListItem>('temporaries/', updateId)
 
 	const {
 		data: validationData,
@@ -222,6 +222,14 @@ const Index: FC<IProperties> = ({
 			}, 0)
 		}
 	}, [clientId])
+
+	useEffect(() => {
+		if (!isValidationDataFetching) {
+			setTimeout(() => {
+				setFocus('unit_quantity')
+			}, 0)
+		}
+	}, [isValidationDataFetching])
 
 	const onSubmit = () => {
 		handleSubmit((data) => {
@@ -447,7 +455,7 @@ const Index: FC<IProperties> = ({
 
 						<div className="span-12">
 							<div className={styles.title}>{t('Products')}</div>
-							<HR style={{marginBottom: '1rem'}}/>
+							{/*<HR style={{marginBottom: '1rem'}}/>*/}
 							<ReactTable columns={columns} data={temporaryList} isLoading={isTemporaryListFetching}/>
 							<HR style={{marginBottom: '1rem'}}/>
 						</div>
@@ -504,7 +512,7 @@ const Index: FC<IProperties> = ({
 							<div className="span-12"
 							     style={{paddingBottom: '.5rem', maxHeight: '25rem', overflowY: 'auto'}}>
 								<div className={styles.title}>{t('Series')}</div>
-								<HR style={{marginBottom: '1rem'}}/>
+								{/*<HR style={{marginBottom: '1rem'}}/>*/}
 								<ReactTable
 									columns={seriesColumns}
 									data={

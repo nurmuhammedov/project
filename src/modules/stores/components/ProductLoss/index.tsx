@@ -1,29 +1,30 @@
 import {Search} from 'assets/icons'
 import {
 	HR,
+	Card,
 	Input,
 	ReactTable,
 	Pagination
-} from 'components'
+} from 'components/index'
 import {currencyOptions} from 'constants/options'
 import {ITemporaryListItem} from 'modules/products/interfaces/purchase.interface'
 import {useMemo} from 'react'
+import {useParams} from 'react-router-dom'
 import {Column} from 'react-table'
-import {usePaginatedData, usePagination} from 'hooks'
+import {usePaginatedData, usePagination} from 'hooks/index'
 import {decimalToPrice, findName} from 'utilities/common'
 import {getDate} from 'utilities/date'
 import {useTranslation} from 'react-i18next'
-import useTypedSelector from 'hooks/useTypedSelector'
 
 
 const Index = () => {
 	const {t} = useTranslation()
 	const {page, pageSize} = usePagination()
-	const {store} = useTypedSelector(state => state.stores)
-	const {data, isPending: isLoading, totalPages} = usePaginatedData<ITemporaryListItem[]>(
-		`stores/${store?.value}/purchases`,
+	const {id = undefined} = useParams()
+	const {data, totalPages, isPending: isLoading} = usePaginatedData<ITemporaryListItem[]>(
+		`stores/${id}/sales`,
 		{page: page, page_size: pageSize},
-		!!store?.value
+		!!id
 	)
 
 	const columns: Column<ITemporaryListItem>[] = useMemo(() =>
@@ -38,32 +39,23 @@ const Index = () => {
 				},
 				{
 					Header: t('Full name'),
-					accessor: row => row?.supplier?.name || ''
+					accessor: row => row?.customer?.name || ''
 				},
-				// {
-				// 	Header: t('Store'),
-				// 	accessor: row => row?.store?.name || ''
-				// },
-				// {
-				// 	Header: t('Price type'),
-				// 	accessor: row => row?.price_type?.name || ''
-				// },
 				{
 					Header: `${t('Total')} ${t('Price')?.toLowerCase()}`,
 					accessor: row => ` ${decimalToPrice(row?.total_price || 0)} ${t(findName(currencyOptions, row?.currency, 'code')).toLowerCase()}`
 				},
 				{
-					Header: `${t('Expense')}`,
-					accessor: row => ` ${decimalToPrice(row?.cost_amount || 0)} ${t(findName(currencyOptions, row?.currency, 'code')).toLowerCase()}`
+					Header: t('Price type'),
+					accessor: row => row?.price_type?.name || ''
 				},
-
 				{
 					Header: t('Product types'),
 					accessor: row => row?.items_count || '0'
 				},
 				{
 					Header: t('Date'),
-					accessor: row => getDate(row.purchase_date ?? '')
+					accessor: row => getDate(row.sale_date ?? '')
 				}
 			],
 		[]
@@ -71,20 +63,22 @@ const Index = () => {
 
 	return (
 		<>
-			<div className="flex justify-between align-center">
-				<Input
-					id="search"
-					icon={<Search/>}
-					placeholder="Search"
-					radius={true}
-					style={{width: 400}}
-				/>
-			</div>
-			<div className="flex flex-col gap-md flex-1">
-				<ReactTable columns={columns} data={data} isLoading={isLoading}/>
-				<HR/>
-				<Pagination totalPages={totalPages}/>
-			</div>
+			<Card screen={true} className="span-9 gap-2xl flex-1">
+				<div className="flex justify-between align-center">
+					<Input
+						id="search"
+						icon={<Search/>}
+						placeholder="Search"
+						radius={true}
+						style={{width: 400}}
+					/>
+				</div>
+				<div className="flex flex-col gap-md flex-1">
+					<ReactTable columns={columns} data={data} isLoading={isLoading}/>
+					<HR/>
+					<Pagination totalPages={totalPages}/>
+				</div>
+			</Card>
 		</>
 	)
 }

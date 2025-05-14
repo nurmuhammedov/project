@@ -215,5 +215,8 @@
   "File successfully accepted": "файли муваффақиятли юкланди",
   "Loading...": "юкланмоқда",
   "Serial number already exist": "{{number}} серия рақами мавжуд",
-  "Parties": "Партия"
+  "Parties": "Партия",
+  "Template": "Шаблон",
+  "Export": "Экспорт",
+  "Import": "Импорт"
 }

@@ -1,29 +1,30 @@
 import {Search} from 'assets/icons'
 import {
 	HR,
+	Card,
 	Input,
 	ReactTable,
 	Pagination
-} from 'components'
+} from 'components/index'
 import {currencyOptions} from 'constants/options'
 import {ITemporaryListItem} from 'modules/products/interfaces/purchase.interface'
 import {useMemo} from 'react'
+import {useParams} from 'react-router-dom'
 import {Column} from 'react-table'
-import {usePaginatedData, usePagination} from 'hooks'
+import {usePaginatedData, usePagination} from 'hooks/index'
 import {decimalToPrice, findName} from 'utilities/common'
 import {getDate} from 'utilities/date'
 import {useTranslation} from 'react-i18next'
-import useTypedSelector from 'hooks/useTypedSelector'
 
 
 const Index = () => {
 	const {t} = useTranslation()
 	const {page, pageSize} = usePagination()
-	const {store} = useTypedSelector(state => state.stores)
-	const {data, isPending: isLoading, totalPages} = usePaginatedData<ITemporaryListItem[]>(
-		`stores/${store?.value}/purchases`,
+	const {customerId = undefined} = useParams()
+	const {data, totalPages, isPending: isLoading} = usePaginatedData<ITemporaryListItem[]>(
+		`customers/${customerId}/purchases`,
 		{page: page, page_size: pageSize},
-		!!store?.value
+		!!customerId
 	)
 
 	const columns: Column<ITemporaryListItem>[] = useMemo(() =>
@@ -36,17 +37,9 @@ const Index = () => {
 						textAlign: 'center'
 					}
 				},
-				{
-					Header: t('Full name'),
-					accessor: row => row?.supplier?.name || ''
-				},
 				// {
-				// 	Header: t('Store'),
-				// 	accessor: row => row?.store?.name || ''
-				// },
-				// {
-				// 	Header: t('Price type'),
-				// 	accessor: row => row?.price_type?.name || ''
+				// 	Header: t('Full name'),
+				// 	accessor: row => row?.supplier?.name || ''
 				// },
 				{
 					Header: `${t('Total')} ${t('Price')?.toLowerCase()}`,
@@ -71,20 +64,22 @@ const Index = () => {
 
 	return (
 		<>
-			<div className="flex justify-between align-center">
-				<Input
-					id="search"
-					icon={<Search/>}
-					placeholder="Search"
-					radius={true}
-					style={{width: 400}}
-				/>
-			</div>
-			<div className="flex flex-col gap-md flex-1">
-				<ReactTable columns={columns} data={data} isLoading={isLoading}/>
-				<HR/>
-				<Pagination totalPages={totalPages}/>
-			</div>
+			<Card screen={true} className="span-9 gap-2xl flex-1">
+				<div className="flex justify-between align-center">
+					<Input
+						id="search"
+						icon={<Search/>}
+						placeholder="Search"
+						radius={true}
+						style={{width: 400}}
+					/>
+				</div>
+				<div className="flex flex-col gap-md flex-1">
+					<ReactTable columns={columns} data={data} isLoading={isLoading}/>
+					<HR/>
+					<Pagination totalPages={totalPages}/>
+				</div>
+			</Card>
 		</>
 	)
 }

@@ -24,8 +24,8 @@ const Index = () => {
 	const {page, pageSize} = usePagination()
 	const {customerId = undefined} = useParams()
 	const {data, totalPages, isPending: isLoading} = usePaginatedData<IExchange[]>(
-		`transactions/by-customer`,
-		{page: page, page_size: pageSize, customer: customerId},
+		`customers/${customerId}/transactions`,
+		{page: page, page_size: pageSize},
 		!!customerId
 	)
 
@@ -39,10 +39,10 @@ const Index = () => {
 						textAlign: 'center'
 					}
 				},
-				{
-					Header: t('Store'),
-					accessor: row => row?.store?.name
-				},
+				// {
+				// 	Header: t('Store'),
+				// 	accessor: row => row?.store?.name
+				// },
 				{
 					Header: t('Amount'),
 					accessor: row => `${decimalToPrice(row?.amount || 0)} ${t(findName(currencyOptions, row?.currency)).toLowerCase()}`

@@ -5,7 +5,7 @@
   font-style: normal;
   font-weight: 400;
   line-height: 160%; /* 1.2rem */
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.3rem;
 }
 .root .not-found {
   color: var(--dark-slate);
@@ -19,7 +19,7 @@
 }
 .root .footer {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 2fr;
   gap: 1rem;
   margin-top: auto;
 }

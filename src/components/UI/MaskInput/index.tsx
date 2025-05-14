@@ -10,7 +10,7 @@ interface IProperties {
 	label?: string
 	error?: string
 	placeholder?: string
-	value?: string | number
+	value?: string | number | null
 	mask?: string
 	disabled?: boolean
 	onChange: (value: ChangeEvent<HTMLInputElement>) => void
@@ -46,7 +46,7 @@ const Index = forwardRef<HTMLInputElement, IProperties>(({
 				disabled={disabled}
 				data-title="input"
 				maskChar=""
-				value={value}
+				value={value as unknown as string}
 				onChange={onChange}
 				onBlur={onBlur}
 				onKeyDown={onKeyDown}

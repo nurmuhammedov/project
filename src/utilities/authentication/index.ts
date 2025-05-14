@@ -5,7 +5,7 @@ import {ROLE_LIST} from 'constants/roles'
 function buildUser(userData: ILogin | undefined): IUser | null {
 	if (!userData) return null
 	return {
-		fullName: `${userData?.first_name || 'Admin'} ${userData?.last_name}`,
+		fullName: `${userData?.first_name || 'Admin'}`,
 		role: userData?.role ?? ROLE_LIST.ADMIN
 	}
 }

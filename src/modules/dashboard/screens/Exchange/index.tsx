@@ -73,7 +73,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 	const {
 		data: storeBalance = [],
 		refetch: storeBalanceRefetch
-	} = useData<IBalance[]>(`stores/${watch('store')}/balance`, !!watch('store') && !retrieve, {}, [watch('store')])
+	} = useData<IBalance[]>(`stores/${watch('store')}/balance`, !!watch('store') && !retrieve)
 
 	const {
 		data: customerBalance = [],

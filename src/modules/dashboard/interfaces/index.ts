@@ -53,6 +53,7 @@ export interface ITransactionDetail {
 	description: string | null;
 	records: IRecord[];
 	created_at: string;
+	date: string;
 }
 
 
@@ -65,5 +66,6 @@ export interface IBalanceChange {
 	store_currency: string;
 	customer_currency: string;
 	change: string;
+	date: string;
 }
 

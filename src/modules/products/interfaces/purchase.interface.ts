@@ -15,9 +15,12 @@ export interface ITemporaryListItem {
 	store: IIDName;
 	expiry_date?: string | null;
 	supplier: IIDName;
+	customer: IIDName;
 	price_type: IIDName;
 	currency: string;
 	purchase_date: string;
+	items_count: string | number;
+	date: string;
 	cost_currency: string;
 	cost_amount: string;
 	created_at: string;

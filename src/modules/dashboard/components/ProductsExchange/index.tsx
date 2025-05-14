@@ -1,11 +1,13 @@
+import {currencyOptions} from 'constants/options'
 import {usePaginatedData} from 'hooks/index'
+import useTypedSelector from 'hooks/useTypedSelector'
 import {ITemporaryListItem} from 'modules/products/interfaces/purchase.interface'
 import {Card, CardTitle, ReactTable} from 'components'
 import {CSSProperties, FC, useMemo} from 'react'
 import {useNavigate} from 'react-router-dom'
-import {decimalToPrice} from 'utilities/common'
+import {decimalToPrice, findName} from 'utilities/common'
 import {useTranslation} from 'react-i18next'
-import {formatDate} from 'utilities/date'
+import {getDate} from 'utilities/date'
 import {Column} from 'react-table'
 
 
@@ -17,9 +19,11 @@ interface IProperties {
 const Index: FC<IProperties> = ({style, className}) => {
 	const {t} = useTranslation()
 	const navigate = useNavigate()
+	const {store} = useTypedSelector(state => state.stores)
 	const {data, isPending: isLoading} = usePaginatedData<ITemporaryListItem[]>(
-		`purchase/list`,
-		{page: 1, page_size: 7}
+		`stores/${store?.value}/purchases`,
+		{page: 1, page_size: 7},
+		!!store?.value
 	)
 
 	const columns: Column<ITemporaryListItem>[] = useMemo(() =>
@@ -34,23 +38,23 @@ const Index: FC<IProperties> = ({style, className}) => {
 				},
 				{
 					Header: t('Full name'),
-					accessor: row => row?.store?.name || ''
+					accessor: row => row?.supplier?.name || ''
 				},
-				{
-					Header: t('Store'),
-					accessor: row => row?.store?.name || ''
-				},
+				// {
+				// 	Header: t('Store'),
+				// 	accessor: row => row?.store?.name || ''
+				// },
 				// {
 				// 	Header: t('Price type'),
 				// 	accessor: row => row?.price_type?.name || ''
 				// },
 				{
 					Header: `${t('Total')} ${t('Price')?.toLowerCase()}`,
-					accessor: row => ` ${decimalToPrice(row?.total_price || 0)} ${row?.currency?.toLowerCase()}`
+					accessor: row => ` ${decimalToPrice(row?.total_price || 0)} ${t(findName(currencyOptions, row?.currency, 'code')).toLowerCase()}`
 				},
 				{
 					Header: t('Date'),
-					accessor: row => formatDate(row.purchase_date ?? '')
+					accessor: row => getDate(row.purchase_date ?? '')
 				}
 				// {
 				// 	Header: t('Actions'),

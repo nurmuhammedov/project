@@ -22,4 +22,5 @@ export interface IExchange {
 	type: number;
 	amount: string;
 	created_at: string;
+	date: string;
 }

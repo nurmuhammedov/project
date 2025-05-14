@@ -6,13 +6,13 @@ import {
 	ReactTable,
 	Pagination,
 	Badge
-} from 'components'
+} from 'components/index'
 import {currencyOptions} from 'constants/options'
-import useTypedSelector from 'hooks/useTypedSelector'
 import {IBalanceChange} from 'modules/dashboard/interfaces'
 import {useMemo} from 'react'
+import {useParams} from 'react-router-dom'
 import {Column} from 'react-table'
-import {usePaginatedData, usePagination} from 'hooks'
+import {usePaginatedData, usePagination} from 'hooks/index'
 import {decimalToPrice, findName} from 'utilities/common'
 import {getDate} from 'utilities/date'
 import {useTranslation} from 'react-i18next'
@@ -21,11 +21,11 @@ import {useTranslation} from 'react-i18next'
 const Index = () => {
 	const {t} = useTranslation()
 	const {page, pageSize} = usePagination()
-	const {store} = useTypedSelector(state => state.stores)
+	const {id = undefined} = useParams()
 	const {data, totalPages, isPending: isLoading} = usePaginatedData<IBalanceChange[]>(
-		`stores/${store?.value}/transactions/changes`,
-		{page: 1, page_size: 7},
-		!!store?.value
+		`stores/${id}/changes`,
+		{page: page, page_size: pageSize},
+		!!id
 	)
 
 	const columns: Column<IBalanceChange>[] = useMemo(() =>
@@ -38,10 +38,6 @@ const Index = () => {
 						textAlign: 'center'
 					}
 				},
-				// {
-				// 	Header: t('Store'),
-				// 	accessor: row => row?.store?.name
-				// },
 				{
 					Header: t('Customer'),
 					accessor: row => row?.customer?.name

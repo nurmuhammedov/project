@@ -36,7 +36,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 	const {t} = useTranslation()
 	const {removeParams} = useSearchParams()
 	const {productId = undefined} = useParams()
-	const {mutateAsync, isPending: isAdding} = useAdd('purchase/create')
+	const {mutateAsync, isPending: isAdding} = useAdd('purchases')
 	const {store} = useTypedSelector(state => state.stores)
 	// const {data: stores = []} = useData<ISelectOption[]>('stores/select')
 	// const navigate = useNavigate()
@@ -44,7 +44,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 	const {
 		data: purchase,
 		isPending: isPurchaseLoading
-	} = useDetail<IPurchaseItem>('purchase/detail/', productId, !!(productId && retrieve))
+	} = useDetail<IPurchaseItem>('purchases/', productId, !!(productId && retrieve))
 
 	const {
 		watch,
@@ -78,7 +78,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 		data: temporaryList = [],
 		isFetching: isTemporaryListFetching,
 		refetch: refetchTemporaryList
-	} = useData<ITemporaryListItem[]>('temporary/list', !!watch('supplier') && !retrieve, {supplier: watch('supplier')})
+	} = useData<ITemporaryListItem[]>('temporaries', !!watch('supplier') && !retrieve, {supplier: watch('supplier')})
 
 	const {
 		data: detail,
@@ -440,7 +440,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 			{
 				!retrieve &&
 				<DeleteModal
-					endpoint="temporary/delete/"
+					endpoint="temporaries/"
 					onDelete={() => refetchTemporaryList()}
 					removedParams={['updateId', 'type']}
 				/>

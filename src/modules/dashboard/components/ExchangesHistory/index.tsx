@@ -1,11 +1,12 @@
 import {currencyOptions} from 'constants/options'
+import useTypedSelector from 'hooks/useTypedSelector'
 import {IExchange} from 'modules/clients/interfaces'
 import {exchangeOptions} from 'modules/dashboard/helpers/options'
 import {useTranslation} from 'react-i18next'
 import {useNavigate} from 'react-router-dom'
 import {Column} from 'react-table'
 import {decimalToPrice, findName} from 'utilities/common'
-import {formatDate} from 'utilities/date'
+import {getDate} from 'utilities/date'
 import {Badge, Card, CardTitle, DetailButton, ReactTable} from 'components'
 import {CSSProperties, FC, useMemo} from 'react'
 import {usePaginatedData} from 'hooks'
@@ -19,9 +20,11 @@ interface IProperties {
 const Index: FC<IProperties> = ({style, className}) => {
 	const navigate = useNavigate()
 	const {t} = useTranslation()
+	const {store} = useTypedSelector(state => state.stores)
 	const {data, isPending: isLoading} = usePaginatedData<IExchange[]>(
-		`transactions`,
-		{page: 1, page_size: 7}
+		`stores/${store?.value}/transactions`,
+		{page: 1, page_size: 7},
+		!!store?.value
 	)
 
 	const columns: Column<IExchange>[] = useMemo(() =>
@@ -34,13 +37,13 @@ const Index: FC<IProperties> = ({style, className}) => {
 						textAlign: 'center'
 					}
 				},
-				{
-					Header: t('Store'),
-					accessor: row => row?.store?.name
-				},
+				// {
+				// 	Header: t('Store'),
+				// 	accessor: row => row?.store?.name
+				// },
 				{
 					Header: t('Amount'),
-					accessor: row => `${decimalToPrice(row?.amount || 0)} ${t(findName(currencyOptions, row?.currency)).toLowerCase()}`
+					accessor: row => `${decimalToPrice(row?.amount || 0)} ${t(findName(currencyOptions, row?.currency, 'code')).toLowerCase()}`
 				},
 				{
 					Header: t('Type'),
@@ -51,7 +54,7 @@ const Index: FC<IProperties> = ({style, className}) => {
 				},
 				{
 					Header: t('Date'),
-					accessor: row => formatDate(row.created_at ?? '')
+					accessor: row => getDate(row.date ?? '')
 				},
 				{
 					Header: t('Actions'),
