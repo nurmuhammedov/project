@@ -15,7 +15,7 @@ interface IProperties {
 	disabled?: boolean
 	onChange: (value: ChangeEvent<HTMLInputElement>) => void
 	onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
-	onBlur: (event: FocusEvent<HTMLInputElement>) => void;
+	onBlur?: (event: FocusEvent<HTMLInputElement>) => void;
 }
 
 const Index = forwardRef<HTMLInputElement, IProperties>(({

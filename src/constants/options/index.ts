@@ -18,9 +18,14 @@ export const currencyOptions: ISelectOption[] = [
 	// {value: 'RUB', label: 'Ruble', code: 'ruble'}
 ]
 
-export const languageOptions: ISelectOption[] = [
-	{value: 'uzb', label: 'uzb'},
-	// {value: 'uz', label: 'uz'}
+export const isSerialOptions: ISelectOption[] = [
+	{label: 'With a series', value: true},
+	{label: 'Without a series', value: false}
+]
+
+export const expiryOptions: ISelectOption[] = [
+	{label: 'Yes', value: true},
+	{label: 'No', value: false}
 ]
 
 export const regionsOptions: ISelectOption[] = [

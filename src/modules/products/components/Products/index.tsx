@@ -1,3 +1,4 @@
+import Filter from 'components/Filter'
 import {ISearchParams} from 'interfaces/params.interface'
 import {measurementUnits} from 'modules/database/helpers/options'
 import {IProductDetail} from 'modules/products/interfaces'
@@ -7,7 +8,7 @@ import {BUTTON_THEME, FIELD} from 'constants/fields'
 import {yupResolver} from '@hookform/resolvers/yup'
 import {getSelectValue} from 'utilities/common'
 import {useTranslation} from 'react-i18next'
-import {Plus, Search} from 'assets/icons'
+import {Plus} from 'assets/icons'
 import {productSchema} from 'helpers/yup'
 import {useEffect, useMemo} from 'react'
 import {Column} from 'react-table'
@@ -45,7 +46,7 @@ const Products = () => {
 	const {page, pageSize} = usePagination()
 	const {
 		removeParams,
-		paramsObject: {updateId = undefined, modal = undefined}
+		paramsObject: {updateId = undefined, modal = undefined, product_type = undefined, ...params}
 	} = useSearchParams()
 	const {data: types = []} = useData<ISelectOption[]>('product-types/select', modal === 'product' || modal === 'edit')
 	const {data: countries = []} = useData<ISelectOption[]>('countries/select', modal === 'product' || modal === 'edit')
@@ -53,7 +54,7 @@ const Products = () => {
 
 	const {data, totalPages, isPending: isLoading, refetch} = usePaginatedData<IProductDetail[]>(
 		`products`,
-		{page: page, page_size: pageSize}
+		{...params, page: page, page_size: pageSize, type: product_type}
 	)
 
 	const {
@@ -199,13 +200,7 @@ const Products = () => {
 		<>
 			<Card screen={true} className="span-9 gap-2xl">
 				<div className="flex justify-between align-center">
-					<Input
-						id="search"
-						radius={true}
-						icon={<Search/>}
-						placeholder="Search"
-						style={{width: 400}}
-					/>
+					<Filter fieldsToShow={['search', 'product_type', 'brand', 'country', 'is_serial', 'expiry']}/>
 				</div>
 				<ReactTable columns={columns} data={data} isLoading={isLoading}/>
 				<HR/>

@@ -1,8 +1,9 @@
+import Filter from 'components/Filter'
 import {Column} from 'react-table'
 import {FIELD} from 'constants/fields'
 import {useEffect, useMemo} from 'react'
 import {formatDate} from 'utilities/date'
-import {Plus, Search} from 'assets/icons'
+import {Plus} from 'assets/icons'
 import {useTranslation} from 'react-i18next'
 import {getSelectValue} from 'utilities/common'
 import {yupResolver} from '@hookform/resolvers/yup'
@@ -25,7 +26,7 @@ import {
 	// DetailButton,
 	Select,
 	PageTitle,
-    DetailButton
+	DetailButton
 } from 'components'
 import {InferType} from 'yup'
 
@@ -40,7 +41,7 @@ const Stores = () => {
 	const {t} = useTranslation()
 	// const {setStore} = useActions()
 	const {
-		paramsObject: {updateId = undefined, modal = undefined},
+		paramsObject: {updateId = undefined, modal = undefined, ...params},
 		addParams,
 		removeParams
 	} = useSearchParams()
@@ -51,6 +52,7 @@ const Stores = () => {
 		isPending: isLoading,
 		refetch
 	} = usePaginatedData<IStoreDetail[]>('stores', {
+		...params,
 		page,
 		page_size: pageSize
 	})
@@ -178,7 +180,7 @@ const Stores = () => {
 			</PageTitle>
 			<Card screen={true} className="span-9 gap-2xl">
 				<div className="flex justify-between align-center">
-					<Input id="search" icon={<Search/>} placeholder="Search" radius style={{width: 400}}/>
+					<Filter fieldsToShow={['search']}/>
 				</div>
 
 				<div className="flex flex-col gap-md flex-1">

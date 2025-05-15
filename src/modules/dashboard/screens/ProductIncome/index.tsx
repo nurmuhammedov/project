@@ -1,15 +1,14 @@
-import {Search} from 'assets/icons'
 import {
 	HR,
-	Input,
 	ReactTable,
 	Pagination
 } from 'components'
+import Filter from 'components/Filter'
 import {currencyOptions} from 'constants/options'
 import {ITemporaryListItem} from 'modules/products/interfaces/purchase.interface'
 import {useMemo} from 'react'
 import {Column} from 'react-table'
-import {usePaginatedData, usePagination} from 'hooks'
+import {usePaginatedData, usePagination, useSearchParams} from 'hooks'
 import {decimalToPrice, findName} from 'utilities/common'
 import {getDate} from 'utilities/date'
 import {useTranslation} from 'react-i18next'
@@ -19,10 +18,12 @@ import useTypedSelector from 'hooks/useTypedSelector'
 const Index = () => {
 	const {t} = useTranslation()
 	const {page, pageSize} = usePagination()
+	const {paramsObject: {customer = undefined, ...params}} = useSearchParams()
+
 	const {store} = useTypedSelector(state => state.stores)
 	const {data, isPending: isLoading, totalPages} = usePaginatedData<ITemporaryListItem[]>(
 		`stores/${store?.value}/purchases`,
-		{page: page, page_size: pageSize},
+		{...params, supplier: customer, page: page, page_size: pageSize},
 		!!store?.value
 	)
 
@@ -72,13 +73,7 @@ const Index = () => {
 	return (
 		<>
 			<div className="flex justify-between align-center">
-				<Input
-					id="search"
-					icon={<Search/>}
-					placeholder="Search"
-					radius={true}
-					style={{width: 400}}
-				/>
+				<Filter fieldsToShow={['search', 'store', 'customer', 'currency', 'from_date', 'to_date']}/>
 			</div>
 			<div className="flex flex-col gap-md flex-1">
 				<ReactTable columns={columns} data={data} isLoading={isLoading}/>
