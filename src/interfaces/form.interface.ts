@@ -11,6 +11,7 @@ export interface IFieldProperties {
 	textarea?: boolean;
 	autocomplete?: boolean;
 	required?: boolean;
+	redLabel?: boolean;
 	radius?: boolean,
 	icon?: React.ReactNode;
 	iconPosition?: 'right' | 'left';
@@ -51,6 +52,7 @@ export interface ISelect extends SelectProps<ISelectOption> {
 	handleOnChange?: (e: string | number | boolean | string[] | number[] | boolean[] | null) => void;
 	disabled?: boolean;
 	label?: string;
+	redLabel?: boolean;
 	error?: string;
 	top?: boolean;
 }

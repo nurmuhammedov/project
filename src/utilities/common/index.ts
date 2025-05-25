@@ -94,5 +94,5 @@ export function convertCurrency(amount: number, direction: 'toStore' | 'fromStor
 export function findName(arr: ISelectOption[], id: number | string | null | undefined, label: string = 'label'): string {
 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 	// @ts-expect-error
-	return arr.find(item => item?.value == id)?.[label]?.toString() || ''
+	return arr?.find(item => item?.value == id)?.[label]?.toString() || ''
 }

@@ -1,4 +1,5 @@
 import Balance from 'modules/stores/components/Balance'
+import ProductWarehouse from 'modules/stores/components/ProductWarehouse'
 import {storeDetailTabs, storeTypes} from 'modules/stores/helpers/options'
 import ExchangesHistory from 'modules/stores/components/ExchangesHistory'
 import BalanceChange from 'modules/stores/components/BalanceChange'
@@ -61,6 +62,7 @@ const Index = () => {
 							tab === 'balanceChange' ? <BalanceChange/> :
 								tab === 'income' ? <ProductIncome/> :
 									tab === 'loss' ? <ProductLoss/> :
+									tab === 'warehouse' ? <ProductWarehouse/> :
 										null
 
 				}

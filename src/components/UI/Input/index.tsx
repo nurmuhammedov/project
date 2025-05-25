@@ -15,6 +15,7 @@ const Index = forwardRef<HTMLInputElement | HTMLTextAreaElement, IField>(
 			type = FIELD.TEXT,
 			textarea = false,
 			radius = false,
+			redLabel = false,
 			handleDelete,
 			handleIcon,
 			disabled = false,
@@ -35,6 +36,7 @@ const Index = forwardRef<HTMLInputElement | HTMLTextAreaElement, IField>(
 				[styles.error]: error,
 				[styles.icon]: icon,
 				[styles.delete]: handleDelete,
+				[styles.redLabel]: redLabel,
 				[styles.disabled]: disabled,
 				[styles['delete-children']]: !!children && handleDelete,
 				[styles.radius]: radius

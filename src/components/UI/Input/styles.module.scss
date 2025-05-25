@@ -25,13 +25,20 @@
   margin-bottom: .3rem;
 
   label {
-    color: var(--light-gray-2);
+    //color: var(--light-gray-2);
+    color: var(--dark-slate);
     font-family: Golos, Arial, Helvetica, sans-serif;
     font-size: 1rem;
     line-height: 1.2rem;
     font-style: normal;
     font-weight: 400;
     white-space: nowrap;
+  }
+}
+
+.redLabel {
+  label {
+    color: var(--red-alert);
   }
 }
 

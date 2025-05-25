@@ -181,7 +181,8 @@ const PriceTypes = () => {
 			<Modal title="Add new" id="price-types" style={{height: '25rem'}}>
 				<Form
 					onSubmit={handleAddSubmit((formData: InferType<typeof priceTypeSchema>) =>
-						addPriceType(formData).then(async () => {
+						addPriceType(formData)
+							.then(async () => {
 							removeParams('modal')
 							resetAdd(DEFAULT_FORM_VALUES)
 							await refetch()

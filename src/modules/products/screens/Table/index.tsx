@@ -1,24 +1,26 @@
 import {Box, Cart, Plus} from 'assets/icons'
-import {Button, FileUploader, PageTitle} from 'components'
+import {Button, FileUploader, HorizontalTab, PageTitle} from 'components'
 import {useSearchParams} from 'hooks'
 import {ISelectOption} from 'interfaces/form.interface'
-import ProductWarehouse from 'modules/products/components/Products'
+import Products from 'modules/products/components/Products'
 import {interceptor} from 'libraries/index'
+import ProductWarehouse from 'modules/products/components/ProductWarehouse'
 import {showMessage} from 'utilities/alert'
 import {useState} from 'react'
 import {useTranslation} from 'react-i18next'
+import {findName} from 'utilities/common'
 
 
 const tabOptions: ISelectOption[] = [
 	{
-		label: 'Products',
-		value: 'products',
-		icon: <Cart/>
-	},
-	{
-		label: 'Products',
+		label: 'Products warehouse',
 		value: 'warehouse',
 		icon: <Box/>
+	},
+	{
+		label: 'Products list',
+		value: 'products',
+		icon: <Cart/>
 	}
 ]
 
@@ -30,144 +32,148 @@ const Index = () => {
 
 	return (
 		<>
-			<PageTitle title="Products">
-				<div className="flex align-center gap-lg">
-					<Button
-						icon={<Plus/>}
-						onClick={() => addParams({modal: 'product'})}
-					>
-						Add a new product
-					</Button>
-					<Button
-						style={{marginTop: 'auto'}}
-						disabled={isXMLLoading}
-						// icon={<FileUploaderIcon style={{maxWidth: '1.2rem', transform: 'rotate(180deg)'}}/>}
-						onClick={() => {
-							setIsXMLLoading(true)
-							interceptor.get(`products/download/template`, {
-								responseType: 'blob'
-							}).then(res => {
-								const blob = new Blob([res.data])
-								const link = document.createElement('a')
-								link.href = window.URL.createObjectURL(blob)
-								link.download = `${t(`${t('Products')}`)}.xlsx`
-								link.click()
-							}).finally(() => {
-								setIsXMLLoading(false)
-							})
-						}}
-						mini={true}
-					>
-						Template
-					</Button>
-					<Button
-						style={{marginTop: 'auto'}}
-						disabled={isXMLLoading}
-						// icon={<FileUploaderIcon style={{maxWidth: '1.2rem', transform: 'rotate(180deg)'}}/>}
-						onClick={() => {
-							setIsXMLLoading(true)
-							interceptor.get(`products/export`, {
-								responseType: 'blob'
-							}).then(res => {
-								const blob = new Blob([res.data])
-								const link = document.createElement('a')
-								link.href = window.URL.createObjectURL(blob)
-								link.download = `${t(`${t('Products')}`)}.xlsx`
-								link.click()
-							}).finally(() => {
-								setIsXMLLoading(false)
-							})
-						}}
-						mini={true}
-					>
-						Export
-					</Button>
-					<FileUploader
-						content={
-							<Button
-								style={{marginTop: 'auto'}}
-								// icon={<FileUploaderIcon style={{maxWidth: '1.2rem'}}/>}
-								disabled={exelLoader}
-								mini={true}
-							>
-								Import
-							</Button>
-						}
-						type="exel"
-						handleChange={(files) => {
-							const item = files[0]
-							setIsLoading(true)
-							const formData = new FormData()
-							formData.append('xlsx-file', item)
-							formData.append('name', item.name)
-							interceptor
-								.post(`products/import/new`, formData, {
-									headers: {
-										'Content-Type': 'multipart/form-data'
-									}
+			<PageTitle title={findName(tabOptions, tab?.toString(), 'label') || ''}>
+				{
+					tab == tabOptions[1]?.value &&
+					<div className="flex align-center gap-lg">
+						<Button
+							icon={<Plus/>}
+							onClick={() => addParams({modal: 'product'})}
+						>
+							Add a new product
+						</Button>
+						<Button
+							style={{marginTop: 'auto'}}
+							disabled={isXMLLoading}
+							// icon={<FileUploaderIcon style={{maxWidth: '1.2rem', transform: 'rotate(180deg)'}}/>}
+							onClick={() => {
+								setIsXMLLoading(true)
+								interceptor.get(`products/download/template`, {
+									responseType: 'blob'
+								}).then(res => {
+									const blob = new Blob([res.data])
+									const link = document.createElement('a')
+									link.href = window.URL.createObjectURL(blob)
+									link.download = `${t(`${t('Products')}`)}.xlsx`
+									link.click()
+								}).finally(() => {
+									setIsXMLLoading(false)
 								})
-								.then(async (res) => {
-									showMessage(`${res.data.name} ${t('File successfully accepted')}`, 'success')
-									// await refetch()
+							}}
+							mini={true}
+						>
+							Template
+						</Button>
+						<Button
+							style={{marginTop: 'auto'}}
+							disabled={isXMLLoading}
+							// icon={<FileUploaderIcon style={{maxWidth: '1.2rem', transform: 'rotate(180deg)'}}/>}
+							onClick={() => {
+								setIsXMLLoading(true)
+								interceptor.get(`products/export`, {
+									responseType: 'blob'
+								}).then(res => {
+									const blob = new Blob([res.data])
+									const link = document.createElement('a')
+									link.href = window.URL.createObjectURL(blob)
+									link.download = `${t(`${t('Products')}`)}.xlsx`
+									link.click()
+								}).finally(() => {
+									setIsXMLLoading(false)
 								})
-								.catch(() => {
-									showMessage(`${item.name} ${t('File not accepted')}`, 'error')
-								})
-								.finally(() => {
-									setIsLoading(false)
-								})
-						}}
-						value={undefined}
-						id="series"
-					/>
-					<FileUploader
-						content={
-							<Button
-								style={{marginTop: 'auto'}}
-								// icon={<FileUploaderIcon style={{maxWidth: '1.2rem'}}/>}
-								disabled={exelLoader}
-								mini={true}
-							>
-								Edit
-							</Button>
-						}
-						type="exel"
-						handleChange={(files) => {
-							const item = files[0]
-							setIsLoading(true)
-							const formData = new FormData()
-							formData.append('xlsx-file', item)
-							formData.append('name', item.name)
-							interceptor
-								.post(`products/import`, formData, {
-									headers: {
-										'Content-Type': 'multipart/form-data'
-									}
-								})
-								.then(async (res) => {
-									showMessage(`${res.data.name} ${t('File successfully accepted')}`, 'success')
-									// await refetch()
-								})
-								.catch(() => {
-									showMessage(`${item.name} ${t('File not accepted')}`, 'error')
-								})
-								.finally(() => {
-									setIsLoading(false)
-								})
-						}}
-						value={undefined}
-						id="series"
-					/>
-				</div>
+							}}
+							mini={true}
+						>
+							Export
+						</Button>
+						<FileUploader
+							content={
+								<Button
+									style={{marginTop: 'auto'}}
+									// icon={<FileUploaderIcon style={{maxWidth: '1.2rem'}}/>}
+									disabled={exelLoader}
+									mini={true}
+								>
+									Import
+								</Button>
+							}
+							type="exel"
+							handleChange={(files) => {
+								const item = files[0]
+								setIsLoading(true)
+								const formData = new FormData()
+								formData.append('xlsx-file', item)
+								formData.append('name', item.name)
+								interceptor
+									.post(`products/import/new`, formData, {
+										headers: {
+											'Content-Type': 'multipart/form-data'
+										}
+									})
+									.then(async (res) => {
+										showMessage(`${res.data.name} ${t('File successfully accepted')}`, 'success')
+										// await refetch()
+									})
+									.catch(() => {
+										showMessage(`${item.name} ${t('File not accepted')}`, 'error')
+									})
+									.finally(() => {
+										setIsLoading(false)
+									})
+							}}
+							value={undefined}
+							id="series"
+						/>
+						<FileUploader
+							content={
+								<Button
+									style={{marginTop: 'auto'}}
+									// icon={<FileUploaderIcon style={{maxWidth: '1.2rem'}}/>}
+									disabled={exelLoader}
+									mini={true}
+								>
+									Edit
+								</Button>
+							}
+							type="exel"
+							handleChange={(files) => {
+								const item = files[0]
+								setIsLoading(true)
+								const formData = new FormData()
+								formData.append('xlsx-file', item)
+								formData.append('name', item.name)
+								interceptor
+									.post(`products/import`, formData, {
+										headers: {
+											'Content-Type': 'multipart/form-data'
+										}
+									})
+									.then(async (res) => {
+										showMessage(`${res.data.name} ${t('File successfully accepted')}`, 'success')
+										// await refetch()
+									})
+									.catch(() => {
+										showMessage(`${item.name} ${t('File not accepted')}`, 'error')
+									})
+									.finally(() => {
+										setIsLoading(false)
+									})
+							}}
+							value={undefined}
+							id="series"
+						/>
+					</div>
+				}
 			</PageTitle>
-			{/*<HorizontalTab*/}
-			{/*	tabs={tabOptions}*/}
-			{/*	fallbackValue={tabOptions[0]?.value}*/}
-			{/*	style={{marginTop: '1rem', marginBottom: '1rem'}}*/}
-			{/*/>*/}
+			<HorizontalTab
+				tabs={tabOptions}
+				fallbackValue={tabOptions[0]?.value}
+				style={{marginTop: '1rem', marginBottom: '1rem'}}
+			/>
 			{
-				tab === 'products' ? <ProductWarehouse/> :
-					null
+				tab === 'products' ? <Products/> :
+					tab === 'warehouse' ? <ProductWarehouse/> :
+						null
 			}
 		</>
 	)

@@ -1,5 +1,5 @@
 import {yupResolver} from '@hookform/resolvers/yup'
-import {FileUploader as FileUploaderIcon, Plus} from 'assets/icons'
+import {Delete, Edit, FileUploader as FileUploaderIcon, Plus} from 'assets/icons'
 import {
 	Button,
 	Select,
@@ -11,6 +11,7 @@ import {
 	DeleteButton, Input
 } from 'components'
 import HR from 'components/HR'
+import {BUTTON_THEME} from 'constants/fields'
 import {
 	useAdd,
 	useData, useDelete,
@@ -371,6 +372,7 @@ const Index: FC<IProperties> = ({
 										ref={ref}
 										id="product"
 										label={`${t('Product')}${productCount?.quantity ? ` (${t('Total')?.toLowerCase()} - ${productCount?.quantity})` : ''}`}
+										redLabel={true}
 										onBlur={onBlur}
 										options={products}
 										isDisabled={!!updateId}
@@ -398,6 +400,7 @@ const Index: FC<IProperties> = ({
 											<NumberFormattedInput
 												id="unit_quantity"
 												disableGroupSeparators={false}
+												redLabel={true}
 												allowDecimals={measurementUnits?.find(i => i.id == validationData?.measure)?.type == 'float'}
 												maxLength={measurementUnits?.find(i => i.id == validationData?.measure)?.type == 'int' ? 6 : 9}
 												onKeyDown={handleKeyDown}
@@ -409,25 +412,53 @@ const Index: FC<IProperties> = ({
 									/>
 								</div>
 
-								<div className="flex-4">
-									<Controller
-										control={control}
-										name="price"
-										render={({field}) => (
-											<NumberFormattedInput
-												id="price"
-												maxLength={12}
-												disableGroupSeparators={false}
-												allowDecimals={true}
-												label={t('Price')}
-												onKeyDown={handleKeyDown}
-												error={errors?.price?.message}
-												{...field}
-											/>
-										)}
-									/>
-								</div>
+								<div className="flex-4 flex gap-lg">
+									<div className="flex-1">
+										<Controller
+											control={control}
+											name="price"
+											render={({field}) => (
+												<NumberFormattedInput
+													id="price"
+													maxLength={12}
+													redLabel={true}
+													disableGroupSeparators={false}
+													allowDecimals={true}
+													label="Price"
+													onKeyDown={handleKeyDown}
+													error={errors?.price?.message}
+													{...field}
+												/>
+											)}
+										/>
+									</div>
+									<div className="gap-md flex align-start" style={{paddingTop: '1.5rem'}}>
+										<Button
+											icon={updateId ? <Edit/> : <Plus/>}
+											mini={true}
+											onClick={() => onSubmit()}
+										/>
+										<Button
+											theme={BUTTON_THEME.DANGER_OUTLINE}
+											icon={<Delete/>}
+											mini={true}
+											onClick={() => {
+												if (updateId) {
+													removeParams('updateId', 'modal')
+												} else {
+													reset({
+															price: '',
+															unit_quantity: '',
+															serial_numbers: [],
+															product: undefined
+														}
+													)
+												}
+											}}
+										/>
 
+									</div>
+								</div>
 								{/*<div className="flex-1 flex items-end">*/}
 								{/*	<Button*/}
 								{/*		icon={<Plus/>}*/}
@@ -479,6 +510,7 @@ const Index: FC<IProperties> = ({
 									id="serial_numbers"
 									label="Series"
 									disabled={!validationData?.is_serial}
+									redLabel={true}
 									value={series}
 									onChange={(e) => {
 										setSeries(e.target.value)
@@ -486,9 +518,8 @@ const Index: FC<IProperties> = ({
 									onKeyDown={handleSeriesKeyDown}
 								/>
 
-								<div className="gap-md flex align-end">
+								<div className="gap-md flex align-start" style={{paddingTop: '1.5rem'}}>
 									<Button
-										style={{marginTop: 'auto'}}
 										disabled={!series?.trim()}
 										icon={<Plus/>}
 										mini={true}
@@ -506,7 +537,6 @@ const Index: FC<IProperties> = ({
 									<FileUploader
 										content={
 											<Button
-												style={{marginTop: 'auto'}}
 												icon={<FileUploaderIcon style={{maxWidth: '1.2rem'}}/>}
 												mini={true}
 											/>

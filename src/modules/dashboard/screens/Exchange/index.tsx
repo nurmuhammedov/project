@@ -323,6 +323,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 											ref={ref}
 											id="customer"
 											label="Customer"
+											redLabel={exchangeOptions[1].value == tab}
 											onBlur={onBlur}
 											options={customers}
 											isDisabled={retrieve}
@@ -344,6 +345,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 											id="currency"
 											label="Currency"
 											onBlur={onBlur}
+											redLabel={exchangeOptions[1].value == tab}
 											placeholder=" "
 											isDisabled={true}
 											options={currencyOptions}
@@ -361,6 +363,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 								<Input
 									id="total"
 									label={`Total`}
+									redLabel={exchangeOptions[1].value == tab}
 									disabled={true}
 									value={`${decimalToPrice(calculateTotalByRecords(watch('first_amount'), watch('records') as unknown as IRecord[]))} ${t(findName(currencyOptions, watch('currency'), 'code'))}`}
 								/>
@@ -369,6 +372,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 							<div style={{flex: '2'}}>
 								<Input
 									id="comment"
+									redLabel={exchangeOptions[1].value == tab}
 									label={`Comment`}
 									disabled={retrieve}
 									error={errors?.description?.message}
@@ -428,6 +432,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 													// 	field.onChange(e)
 													// }}
 													id="first_amount"
+													redLabel={exchangeOptions[1].value == tab}
 													maxLength={15}
 													disableGroupSeparators={false}
 													allowDecimals={true}
@@ -474,6 +479,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 															id={`records.${index}.store_amount`}
 															maxLength={15}
 															disableGroupSeparators={false}
+															redLabel={exchangeOptions[1].value == tab}
 															allowDecimals={true}
 															disabled={retrieve}
 															label={`${t(findName(currencyOptions, watch(`records.${index}.store_currency`)))} (${t('Checkout')?.toLowerCase()})`}
@@ -534,6 +540,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 															id={`records.${index}.customer_amount`}
 															maxLength={15}
 															disableGroupSeparators={false}
+															redLabel={exchangeOptions[1].value == tab}
 															allowDecimals={true}
 															disabled={retrieve}
 															label={`${t(findName(currencyOptions, watch(`currency`)))} (${t('Customer')?.toLowerCase()})`}

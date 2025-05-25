@@ -6,6 +6,7 @@ import {Button, Loader, PageInfo, VerticalTab} from 'components'
 import {useDetail, useSearchParams} from 'hooks'
 import ProductIncome from 'modules/clients/components/ProductIncome'
 import ProductLoss from 'modules/clients/components/ProductLoss'
+import ProductWarehouse from 'modules/clients/components/ProductWarehouse'
 import {clientDetailTabs} from 'modules/clients/helpers/options'
 import {ICustomerDetail} from 'modules/clients/interfaces'
 import {useNavigate, useParams} from 'react-router-dom'
@@ -50,6 +51,7 @@ const Index = () => {
 							tab === 'balanceChange' ? <BalanceChange/> :
 								tab === 'income' ? <ProductIncome/> :
 									tab === 'loss' ? <ProductLoss/> :
+									tab === 'warehouse' ? <ProductWarehouse/> :
 										null
 
 				}

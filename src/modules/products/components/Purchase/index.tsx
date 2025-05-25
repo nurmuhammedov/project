@@ -35,7 +35,7 @@ interface IProperties {
 const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 	const {t} = useTranslation()
 	const {removeParams} = useSearchParams()
-	const {productId = undefined} = useParams()
+	const {id = undefined} = useParams()
 	const {mutateAsync, isPending: isAdding} = useAdd('purchases')
 	const {store} = useTypedSelector(state => state.stores)
 	// const {data: stores = []} = useData<ISelectOption[]>('stores/select')
@@ -44,7 +44,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 	const {
 		data: purchase,
 		isPending: isPurchaseLoading
-	} = useDetail<IPurchaseItem>('purchases/', productId, !!(productId && retrieve))
+	} = useDetail<IPurchaseItem>('purchases/', id, !!(id && retrieve))
 
 	const {
 		watch,
@@ -169,7 +169,6 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 				className={classNames(styles.root)}
 			>
 				<div className={classNames('grid gap-lg')}>
-
 					<div className="span-12">
 						<CardTab
 							disabled={retrieve}
@@ -209,11 +208,11 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 								render={({field: {value, ref, onChange, onBlur}}) => (
 									<Select
 										ref={ref}
-										isDisabled={retrieve}
 										id="supplier"
 										label="Customer"
 										onBlur={onBlur}
 										options={clients}
+										isDisabled={retrieve}
 										error={errors.supplier?.message}
 										value={getSelectValue(clients, value)}
 										defaultValue={getSelectValue(clients, value)}
@@ -233,9 +232,9 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 										ref={ref}
 										id="currency"
 										label="Currency"
-										options={currencyOptions}
 										onBlur={onBlur}
 										isDisabled={retrieve}
+										options={currencyOptions}
 										error={errors.currency?.message}
 										value={getSelectValue(currencyOptions, value)}
 										defaultValue={getSelectValue(currencyOptions, value)}
@@ -279,9 +278,9 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 												ref={ref}
 												id="cost_currency"
 												label="Expense currency"
-												options={currencyOptions}
 												onBlur={onBlur}
 												isDisabled={retrieve}
+												options={currencyOptions}
 												error={errors.cost_currency?.message}
 												value={getSelectValue(currencyOptions, value)}
 												defaultValue={getSelectValue(currencyOptions, value)}
@@ -343,6 +342,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 							<Checkbox
 								id="isExpanseExist"
 								title="Expense"
+								disabled={retrieve}
 								{...register('isExpanseExist')}
 							/>
 						</div>
@@ -352,6 +352,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 						<AddPurchase
 							clientId={watch('supplier')}
 							trigger={trigger}
+							detail={retrieve}
 							focus={setFocus}
 							temporaryList={temporaryList}
 							isTemporaryListFetching={isTemporaryListFetching}

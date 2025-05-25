@@ -147,6 +147,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 									<Select
 										ref={ref}
 										isDisabled={retrieve}
+										redLabel={true}
 										id="customer"
 										label="Customer"
 										onBlur={onBlur}
@@ -169,6 +170,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 										ref={ref}
 										id="currency"
 										label="Currency"
+										redLabel={true}
 										options={currencyOptions}
 										onBlur={onBlur}
 										isDisabled={retrieve}
@@ -191,6 +193,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 										id="price_type"
 										label="Price type"
 										options={priceTypes}
+										redLabel={true}
 										onBlur={onBlur}
 										isDisabled={retrieve}
 										error={errors.price_type?.message}
@@ -211,6 +214,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 										id="sale_date"
 										disabled={retrieve}
 										label="Date"
+										redLabel={true}
 										placeholder={getDate()}
 										mask="99.99.9999"
 										error={errors?.sale_date?.message}
@@ -224,6 +228,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 							<Input
 								id="comment"
 								label={`Comment`}
+								redLabel={true}
 								disabled={retrieve}
 								error={errors?.comment?.message}
 								{...register(`comment`)}

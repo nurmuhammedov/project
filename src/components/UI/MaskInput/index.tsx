@@ -13,6 +13,7 @@ interface IProperties {
 	value?: string | number | null
 	mask?: string
 	disabled?: boolean
+	redLabel?: boolean
 	onChange: (value: ChangeEvent<HTMLInputElement>) => void
 	onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
 	onBlur?: (event: FocusEvent<HTMLInputElement>) => void;
@@ -25,6 +26,7 @@ const Index = forwardRef<HTMLInputElement, IProperties>(({
 	                                                         mask = '+\\9\\98 99 999 99 99',
 	                                                         error,
 	                                                         disabled,
+	                                                         redLabel,
 	                                                         value,
 	                                                         onChange,
 	                                                         onKeyDown,
@@ -38,6 +40,7 @@ const Index = forwardRef<HTMLInputElement, IProperties>(({
 			id={id}
 			type="text"
 			label={label}
+			redLabel={redLabel}
 			error={error}
 			// ref={inputRef}
 			disabled={disabled}

@@ -19,20 +19,20 @@
   justify-content: flex-end;
   align-items: center;
   gap: 0.3rem;
-  color: var(--light-gray-2);
+  color: var(--dark-slate);
   font-family: Golos, Arial, Helvetica, sans-serif;
-  font-size: 0.875rem;
+  font-size: 1rem;
   font-style: normal;
   font-weight: 400;
   line-height: 150%;
 }
 .root .sub-title svg {
-  max-width: 0.875rem !important;
-  min-width: 0.875rem !important;
+  max-width: 1rem !important;
+  min-width: 1rem !important;
   transform: rotate(-90deg) !important;
 }
 .root .sub-title svg path {
-  stroke: var(--light-gray-2) !important;
+  stroke: var(--dark-slate) !important;
 }
 
 /*# sourceMappingURL=styles.module.css.map */

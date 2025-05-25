@@ -15,3 +15,16 @@ export interface IProductDetail {
 	expiry: boolean;
 	barcodes: string[];
 }
+
+export interface IStock {
+	product_id: number;
+	product_name: string;
+	store_id: number;
+	store_name: string;
+	brand_name: string;
+	type_name: string;
+	code: string;
+	total_quantity: string;
+	customer_count: number;
+	store_count: number;
+}

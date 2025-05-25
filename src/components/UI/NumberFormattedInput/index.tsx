@@ -14,6 +14,7 @@ interface IProps {
 	maxLength?: number
 	disableGroupSeparators?: boolean
 	allowDecimals?: boolean
+	redLabel?: boolean
 	groupSeparator?: string
 	value?: string | number | null | undefined
 	disabled?: boolean
@@ -27,6 +28,7 @@ interface IProps {
 const Index = forwardRef<HTMLInputElement, IProps>(({
 	                                                    disableGroupSeparators = false,
 	                                                    allowDecimals = true,
+	                                                    redLabel = false,
 	                                                    onBlur,
 	                                                    id,
 	                                                    label,
@@ -44,6 +46,7 @@ const Index = forwardRef<HTMLInputElement, IProps>(({
 	const {t} = useTranslation()
 	return (
 		<Input
+			redLabel={redLabel}
 			id={id}
 			type={FIELD.TEXT}
 			label={label}

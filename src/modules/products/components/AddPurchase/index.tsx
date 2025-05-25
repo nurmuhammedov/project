@@ -1,5 +1,5 @@
 import {yupResolver} from '@hookform/resolvers/yup'
-import {FileUploader as FileUploaderIcon, Plus} from 'assets/icons'
+import {Delete, Edit, FileUploader as FileUploaderIcon, Plus} from 'assets/icons'
 import {
 	// Button,
 	// Input,
@@ -12,6 +12,7 @@ import {
 	Button
 } from 'components'
 import HR from 'components/HR'
+import {BUTTON_THEME} from 'constants/fields'
 // import FileUpLoader from 'components/UI/FileUpLoader'
 // import {BUTTON_THEME, FIELD} from 'constants/fields'
 import {
@@ -24,7 +25,7 @@ import {
 import {measurementUnits} from 'modules/database/helpers/options'
 import styles from 'modules/products/components/Purchase/styles.module.scss'
 import {purchaseItemSchema, temporaryItemSchema} from 'modules/products/helpers/yup'
-import {ITemporaryListItem, IValidationData} from 'modules/products/interfaces/purchase.interface'
+import {IPurchaseItem, ITemporaryListItem, IValidationData} from 'modules/products/interfaces/purchase.interface'
 import React, {FC, useEffect, useMemo, useState} from 'react'
 import {Controller, useFieldArray, useForm, UseFormSetFocus, UseFormTrigger} from 'react-hook-form'
 import {Column} from 'react-table'
@@ -44,6 +45,8 @@ interface IProperties {
 	refetchTemporaryList?: () => void,
 	focus?: UseFormSetFocus<InferType<typeof purchaseItemSchema>>,
 	isTemporaryListFetching: boolean,
+	detail?: boolean,
+	detailData?: IPurchaseItem,
 	temporaryList: ITemporaryListItem[],
 	trigger?: UseFormTrigger<InferType<typeof purchaseItemSchema>>,
 }
@@ -53,6 +56,8 @@ const Index: FC<IProperties> = ({
 	                                refetchTemporaryList,
 	                                trigger,
 	                                focus,
+	                                detail: retrieve = false,
+	                                detailData,
 	                                temporaryList,
 	                                isTemporaryListFetching
                                 }) => {
@@ -62,6 +67,9 @@ const Index: FC<IProperties> = ({
 		removeParams,
 		paramsObject: {updateId = undefined}
 	} = useSearchParams()
+
+	console.log(retrieve)
+	console.log(detailData)
 
 	const {data: products = []} = useData<ISelectOption[]>('products/select')
 
@@ -364,24 +372,6 @@ const Index: FC<IProperties> = ({
 												/>
 											</div>
 
-											<div className="flex-3">
-												<Controller
-													control={control}
-													name="price"
-													render={({field}) => (
-														<NumberFormattedInput
-															id="price"
-															maxLength={12}
-															disableGroupSeparators={false}
-															allowDecimals={true}
-															label="Price"
-															onKeyDown={handleKeyDown}
-															error={errors?.price?.message}
-															{...field}
-														/>
-													)}
-												/>
-											</div>
 
 											{
 												validationData.expiry &&
@@ -403,6 +393,54 @@ const Index: FC<IProperties> = ({
 													/>
 												</div>
 											}
+
+											<div className="flex-3 flex gap-lg">
+												<div className="flex-1">
+													<Controller
+														control={control}
+														name="price"
+														render={({field}) => (
+															<NumberFormattedInput
+																id="price"
+																maxLength={12}
+																disableGroupSeparators={false}
+																allowDecimals={true}
+																label="Price"
+																onKeyDown={handleKeyDown}
+																error={errors?.price?.message}
+																{...field}
+															/>
+														)}
+													/>
+												</div>
+												<div className="gap-md flex align-start" style={{paddingTop: '1.5rem'}}>
+													<Button
+														icon={updateId ? <Edit/> : <Plus/>}
+														mini={true}
+														onClick={() => onSubmit()}
+													/>
+													<Button
+														theme={BUTTON_THEME.DANGER_OUTLINE}
+														icon={<Delete/>}
+														mini={true}
+														onClick={() => {
+															if (updateId) {
+																removeParams('updateId', 'modal')
+															} else {
+																reset({
+																		price: '',
+																		unit_quantity: '',
+																		serial_numbers: [],
+																		product: undefined,
+																		expiry_date: ''
+																	}
+																)
+															}
+														}}
+													/>
+
+												</div>
+											</div>
 
 
 											{/*{*/}
@@ -477,9 +515,8 @@ const Index: FC<IProperties> = ({
 									}}
 									onKeyDown={handleSeriesKeyDown}
 								/>
-								<div className="gap-md flex align-end">
+								<div className="gap-md flex align-start" style={{paddingTop: '1.5rem'}}>
 									<Button
-										style={{marginTop: 'auto'}}
 										disabled={!series?.trim()}
 										icon={<Plus/>}
 										mini={true}
@@ -497,7 +534,6 @@ const Index: FC<IProperties> = ({
 									<FileUploader
 										content={
 											<Button
-												style={{marginTop: 'auto'}}
 												icon={<FileUploaderIcon style={{maxWidth: '1.2rem'}}/>}
 												mini={true}
 											/>

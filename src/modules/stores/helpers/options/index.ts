@@ -17,5 +17,6 @@ export const storeDetailTabs: ISelectOption[] = [
 	{label: 'Currency exchange history', value: 'currencies'},
 	{label: 'Balance change', value: 'balanceChange'},
 	{label: 'Income', value: 'income'},
-	{label: 'Loss', value: 'loss'}
+	{label: 'Loss', value: 'loss'},
+	{label: 'Products warehouse', value: 'warehouse'}
 ]

@@ -167,6 +167,15 @@ const DynamicFilter: FC<DynamicFilterProps> = ({fieldsToShow, width = true}) => 
 		addParams({[paramKey]: formattedForURL}, 'page')
 	}
 
+	const parseMultiValue = (paramValue: string | number | boolean| null | undefined) => {
+		return paramValue?.toString()?.split(',')?.map((i: string) => isNaN(Number(i)) ? i : Number(i))
+	}
+
+	const handleMultiChange = (paramKey: FilterFieldType) => (selectedValue: string | number | boolean | string[] | number[] | boolean[] | null) => {
+		addParams({ [paramKey]: selectedValue?.toString() ?? undefined }, 'page');
+	};
+
+
 	const renderField = (field: FilterFieldType) => {
 		const placeholderText = t(fieldLabels[field])
 		const commonSelectProps = {
@@ -175,7 +184,6 @@ const DynamicFilter: FC<DynamicFilterProps> = ({fieldsToShow, width = true}) => 
 		}
 		const selectId = `${field}_filter_select`
 		const inputId = `${field}_filter_input`
-
 
 		switch (field) {
 			case 'search':
@@ -197,9 +205,10 @@ const DynamicFilter: FC<DynamicFilterProps> = ({fieldsToShow, width = true}) => 
 				return (
 					<Select
 						id={selectId}
+						isMulti={true}
 						options={storesOptions}
-						value={getSelectValue(storesOptions, paramsObject.store)}
-						handleOnChange={(selectedValue) => addParams({store: selectedValue as unknown as string ?? undefined}, 'page')}
+						value={getSelectValue(storesOptions, parseMultiValue(paramsObject.store))}
+						handleOnChange={handleMultiChange('store')}
 						isLoading={storesLoading}
 						{...commonSelectProps}
 					/>
@@ -208,9 +217,10 @@ const DynamicFilter: FC<DynamicFilterProps> = ({fieldsToShow, width = true}) => 
 				return (
 					<Select
 						id={selectId}
+						isMulti={true}
 						options={customersOptions}
-						value={getSelectValue(customersOptions, paramsObject.customer)}
-						handleOnChange={(selectedValue) => addParams({customer: selectedValue as unknown as string ?? undefined}, 'page')}
+						value={getSelectValue(customersOptions, parseMultiValue(paramsObject.customer))}
+						handleOnChange={handleMultiChange('customer')}
 						isLoading={customersLoading}
 						{...commonSelectProps}
 					/>
@@ -219,9 +229,10 @@ const DynamicFilter: FC<DynamicFilterProps> = ({fieldsToShow, width = true}) => 
 				return (
 					<Select
 						id={selectId}
+						isMulti={true}
 						options={priceTypesOptions}
-						value={getSelectValue(priceTypesOptions, paramsObject.price_type)}
-						handleOnChange={(selectedValue) => addParams({price_type: selectedValue as unknown as string ?? undefined}, 'page')}
+						value={getSelectValue(priceTypesOptions, parseMultiValue(paramsObject.price_type))}
+						handleOnChange={handleMultiChange('price_type')}
 						isLoading={priceTypesLoading}
 						{...commonSelectProps}
 					/>
@@ -230,9 +241,10 @@ const DynamicFilter: FC<DynamicFilterProps> = ({fieldsToShow, width = true}) => 
 				return (
 					<Select
 						id={selectId}
+						isMulti={true}
 						options={serviceTypesOptions}
-						value={getSelectValue(serviceTypesOptions, paramsObject.service_type)}
-						handleOnChange={(selectedValue) => addParams({service_type: selectedValue as unknown as string ?? undefined}, 'page')}
+						value={getSelectValue(serviceTypesOptions, parseMultiValue(paramsObject.service_type))}
+						handleOnChange={handleMultiChange('service_type')}
 						isLoading={serviceTypesLoading}
 						{...commonSelectProps}
 					/>
@@ -241,9 +253,10 @@ const DynamicFilter: FC<DynamicFilterProps> = ({fieldsToShow, width = true}) => 
 				return (
 					<Select
 						id={selectId}
+						isMulti={true}
 						options={currencyOptions}
-						value={getSelectValue(currencyOptions, paramsObject.currency)}
-						handleOnChange={(selectedValue) => addParams({currency: selectedValue as unknown as string ?? undefined}, 'page')}
+						value={getSelectValue(currencyOptions, parseMultiValue(paramsObject.currency))}
+						handleOnChange={handleMultiChange('currency')}
 						{...commonSelectProps}
 					/>
 				)
@@ -251,9 +264,10 @@ const DynamicFilter: FC<DynamicFilterProps> = ({fieldsToShow, width = true}) => 
 				return (
 					<Select
 						id={selectId}
+						isMulti={true}
 						options={productTypesOptions}
-						value={getSelectValue(productTypesOptions, paramsObject.product_type)}
-						handleOnChange={(selectedValue) => addParams({product_type: selectedValue as unknown as string ?? undefined}, 'page')}
+						value={getSelectValue(productTypesOptions, parseMultiValue(paramsObject.product_type))}
+						handleOnChange={handleMultiChange('product_type')}
 						isLoading={productTypesLoading}
 						{...commonSelectProps}
 					/>
@@ -262,9 +276,10 @@ const DynamicFilter: FC<DynamicFilterProps> = ({fieldsToShow, width = true}) => 
 				return (
 					<Select
 						id={selectId}
+						isMulti={true}
 						options={brandOptions}
-						value={getSelectValue(brandOptions, paramsObject.brand)}
-						handleOnChange={(selectedValue) => addParams({brand: selectedValue as unknown as string ?? undefined}, 'page')}
+						value={getSelectValue(brandOptions, parseMultiValue(paramsObject.brand))}
+						handleOnChange={handleMultiChange('brand')}
 						isLoading={brandLoading}
 						{...commonSelectProps}
 					/>
@@ -273,9 +288,10 @@ const DynamicFilter: FC<DynamicFilterProps> = ({fieldsToShow, width = true}) => 
 				return (
 					<Select
 						id={selectId}
+						isMulti={true}
 						options={countryOptions}
-						value={getSelectValue(countryOptions, paramsObject.country)}
-						handleOnChange={(selectedValue) => addParams({country: selectedValue as unknown as string ?? undefined}, 'page')}
+						value={getSelectValue(countryOptions, parseMultiValue(paramsObject.country))}
+						handleOnChange={handleMultiChange('country')}
 						isLoading={countryLoading}
 						{...commonSelectProps}
 					/>
@@ -294,7 +310,7 @@ const DynamicFilter: FC<DynamicFilterProps> = ({fieldsToShow, width = true}) => 
 				return (
 					<Select
 						id={selectId}
-						options={expiryOptions} // Reusing expiryOptions as per previous instruction
+						options={expiryOptions}
 						value={getSelectValue(expiryOptions, paramsObject.expiry)}
 						handleOnChange={(selectedValue) => addParams({expiry: selectedValue as unknown as string ?? undefined}, 'page')}
 						{...commonSelectProps}
@@ -304,7 +320,7 @@ const DynamicFilter: FC<DynamicFilterProps> = ({fieldsToShow, width = true}) => 
 				return (
 					<Select
 						id={selectId}
-						options={expiryOptions} // Using expiryOptions as requested
+						options={expiryOptions}
 						value={getSelectValue(expiryOptions, paramsObject.is_user)}
 						handleOnChange={(selectedValue) => addParams({is_user: selectedValue as unknown as string ?? undefined}, 'page')}
 						{...commonSelectProps}
@@ -314,9 +330,10 @@ const DynamicFilter: FC<DynamicFilterProps> = ({fieldsToShow, width = true}) => 
 				return (
 					<Select
 						id={selectId}
+						isMulti={true}
 						options={regionsOptions}
-						value={getSelectValue(regionsOptions, paramsObject.region)}
-						handleOnChange={(selectedValue) => addParams({region: selectedValue as unknown as string ?? undefined}, 'page')}
+						value={getSelectValue(regionsOptions, parseMultiValue(paramsObject.region))}
+						handleOnChange={handleMultiChange('region')}
 						{...commonSelectProps}
 					/>
 				)
