@@ -38,11 +38,13 @@
       .price, .total-price {
         display: flex;
         gap: .5rem;
+        white-space: nowrap;
 
         p, span {
           color: var(--light-gray-2);
           font-family: Golos, Arial, Helvetica, sans-serif;
           font-size: 1.125rem;
+          white-space: nowrap;
           font-style: normal;
           font-weight: 400;
           line-height: 150%; /* 1.6875rem */

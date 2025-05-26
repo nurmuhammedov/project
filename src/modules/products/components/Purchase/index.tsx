@@ -2,7 +2,7 @@ import {
 	Button,
 	Card,
 	CardTab, Checkbox, DeleteModal,
-	Input,
+	Input, Loader,
 	MaskInput,
 	NumberFormattedInput,
 	Select
@@ -125,6 +125,10 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 			}))
 		}
 	}, [purchase, isPurchaseLoading, retrieve])
+
+	if (isPurchaseLoading && retrieve) {
+		return <Loader/>
+	}
 
 	return (
 		<>
@@ -316,7 +320,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 
 					<div className={styles['price-wrapper']}>
 						<div className={styles.price}>
-							<p>{`${t('Total')} ${t('Count')?.toLowerCase()}`}:</p>
+							<p>{`${t('Total')}`}:</p>
 							<span>{decimalToInteger(sumDecimals((retrieve ? purchase?.items : temporaryList)?.map(i => i?.unit_quantity ?? '0.00') ?? []))}</span>
 						</div>
 						<div className={styles.price}>

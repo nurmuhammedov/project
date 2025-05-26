@@ -4,7 +4,7 @@ import styles from '../DeleteButton/styles.module.scss'
 
 
 interface IProperties {
-	id: string | number,
+	id?: string | number,
 	url?: string
 }
 

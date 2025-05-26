@@ -1,7 +1,7 @@
 import {
 	HR,
 	ReactTable,
-	Pagination
+	Pagination, DetailButton
 } from 'components'
 import Filter from 'components/Filter'
 import {currencyOptions} from 'constants/options'
@@ -55,6 +55,17 @@ const Index = () => {
 				{
 					Header: t('Date'),
 					accessor: row => getDate(row.sale_date ?? '')
+				},
+				{
+					Header: t('Actions'),
+					accessor: row => (
+						<div className="flex items-start gap-lg">
+							<DetailButton id={row.id} url={`${row.id}?tab=sale`}/>
+						</div>
+					),
+					style: {
+						width: '5rem'
+					}
 				}
 			],
 		[]

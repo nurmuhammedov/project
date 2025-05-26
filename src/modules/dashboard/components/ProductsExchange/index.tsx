@@ -2,7 +2,7 @@ import {currencyOptions} from 'constants/options'
 import {usePaginatedData} from 'hooks/index'
 import useTypedSelector from 'hooks/useTypedSelector'
 import {ITemporaryListItem} from 'modules/products/interfaces/purchase.interface'
-import {Card, CardTitle, ReactTable} from 'components'
+import {Card, CardTitle, DetailButton, ReactTable} from 'components'
 import {CSSProperties, FC, useMemo} from 'react'
 import {useNavigate} from 'react-router-dom'
 import {decimalToPrice, findName} from 'utilities/common'
@@ -55,7 +55,7 @@ const Index: FC<IProperties> = ({style, className}) => {
 				{
 					Header: t('Date'),
 					accessor: row => getDate(row.purchase_date ?? '')
-				}
+				},
 				// {
 				// 	Header: t('Actions'),
 				// 	accessor: row => (
@@ -66,7 +66,21 @@ const Index: FC<IProperties> = ({style, className}) => {
 				// 			/>
 				// 		</div>
 				// 	)
-				// }
+				// },
+				{
+					Header: t('Actions'),
+					accessor: row => (
+						<div className="flex items-start gap-lg">
+							<DetailButton
+								id={row.id}
+								url={`product-exchange/history/${row.id}?tab=purchase`}
+							/>
+						</div>
+					),
+					style: {
+						width: '5rem'
+					}
+				}
 			],
 		[]
 	)

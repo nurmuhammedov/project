@@ -22,7 +22,7 @@ import {
 import {measurementUnits} from 'modules/database/helpers/options'
 import styles from 'modules/products/components/Purchase/styles.module.scss'
 import {purchaseItemSchema, temporaryItemSchema} from 'modules/products/helpers/yup'
-import {IPurchaseItem, ITemporaryListItem, IValidationData} from 'modules/products/interfaces/purchase.interface'
+import {ITemporaryListItem, IValidationData} from 'modules/products/interfaces/purchase.interface'
 import React, {FC, useEffect, useMemo, useState} from 'react'
 import {Controller, useFieldArray, useForm, UseFormSetFocus, UseFormTrigger} from 'react-hook-form'
 import {Column} from 'react-table'
@@ -98,7 +98,8 @@ const Index: FC<IProperties> = ({
 				accessor: (row: ITemporaryListItem) => (
 					<div className="flex items-start gap-lg">
 						<EditButton id={row.id}/>
-						<DeleteButton onDelete={() => !isDeleteLoading && del(row?.id).then(() => refetchTemporaryList?.())}/>
+						<DeleteButton
+							onDelete={() => !isDeleteLoading && del(row?.id).then(() => refetchTemporaryList?.())}/>
 					</div>
 				),
 				style: {
@@ -160,7 +161,7 @@ const Index: FC<IProperties> = ({
 			reset((prevValues) => ({
 				...prevValues,
 				price: '',
-				unit_quantity: validationData?.is_serial ? String(watch('serial_numbers')?.length || 1) : '1',
+				unit_quantity: '1',
 				expiry_date: getDate()
 			}))
 		}
@@ -180,16 +181,11 @@ const Index: FC<IProperties> = ({
 	}, [updateId, retrieve])
 
 
-	const {fields: serialFields, append, remove} = useFieldArray({
+	const {append, remove} = useFieldArray({
 		control,
 		name: 'serial_numbers' as never
 	})
 
-	useEffect(() => {
-		if (validationData?.is_serial && !retrieve) {
-			setValue('unit_quantity', String(serialFields?.length || 0))
-		}
-	}, [serialFields, validationData?.is_serial, setValue, retrieve])
 
 	const seriesColumns: Column<{ name: string, id: number | string }>[] = useMemo(
 		() => [
@@ -217,7 +213,7 @@ const Index: FC<IProperties> = ({
 				}
 			}
 		],
-		[remove, t]
+		[]
 	)
 
 	useEffect(() => {
@@ -300,9 +296,10 @@ const Index: FC<IProperties> = ({
 		}
 	}
 
-	const handleSeriesKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+	const handleSeriesKeyDown = (e: unknown) => {
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-expect-error
 		if (e.key === 'Enter') {
-			e.preventDefault()
 			if (series.trim()?.toString() == '') return
 			const serialNumbers = watch('serial_numbers') || []
 			if (!serialNumbers?.includes(series?.trim()?.toString())) {
@@ -315,10 +312,7 @@ const Index: FC<IProperties> = ({
 	}
 
 	return (
-		<Form onSubmit={(e) => {
-			e.preventDefault()
-			if(!retrieve) onSubmit()
-		}}>
+		<Form onSubmit={(e) => e.preventDefault()}>
 			<div className="grid gap-lg">
 				<div className={validationData?.is_serial && !retrieve ? 'span-9' : 'span-12'}>
 					<div className="grid gap-lg">
@@ -361,7 +355,7 @@ const Index: FC<IProperties> = ({
 															<NumberFormattedInput
 																id="unit_quantity"
 																disableGroupSeparators={false}
-																disabled={validationData?.is_serial || retrieve}
+																disabled={retrieve}
 																allowDecimals={measurementUnits?.find(i => i.id == validationData?.measure)?.type == 'float'}
 																maxLength={measurementUnits?.find(i => i.id == validationData?.measure)?.type == 'int' ? 6 : 9}
 																onKeyDown={handleKeyDown}
@@ -418,7 +412,8 @@ const Index: FC<IProperties> = ({
 													</div>
 													{
 														!retrieve &&
-														<div className="gap-md flex align-start" style={{paddingTop: '1.5rem'}}>
+														<div className="gap-md flex align-start"
+														     style={{paddingTop: '1.5rem'}}>
 															<Button
 																icon={updateId ? <Edit/> : <Plus/>}
 																mini={true}
@@ -456,7 +451,10 @@ const Index: FC<IProperties> = ({
 
 						<div className="span-12">
 							<div className={styles.title}>{t('Products')}</div>
-							<ReactTable columns={columns} data={retrieve ? detailItems ?? [] : temporaryList} isLoading={isTemporaryListFetching}/>
+							<ReactTable
+								columns={columns} data={retrieve ? detailItems ?? [] : temporaryList ?? []}
+								isLoading={isTemporaryListFetching}
+							/>
 							<HR style={{marginBottom: '1rem'}}/>
 						</div>
 					</div>

@@ -34,11 +34,13 @@
 .root .footer .price-wrapper .price, .root .footer .price-wrapper .total-price {
   display: flex;
   gap: 0.5rem;
+  white-space: nowrap;
 }
 .root .footer .price-wrapper .price p, .root .footer .price-wrapper .price span, .root .footer .price-wrapper .total-price p, .root .footer .price-wrapper .total-price span {
   color: var(--light-gray-2);
   font-family: Golos, Arial, Helvetica, sans-serif;
   font-size: 1.125rem;
+  white-space: nowrap;
   font-style: normal;
   font-weight: 400;
   line-height: 150%; /* 1.6875rem */

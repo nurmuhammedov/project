@@ -18,7 +18,7 @@ import {
 	Login,
 	Home,
 	CurrencyExchangeHistory,
-	ProductExchangeHistory
+	ProductExchangeHistory, StoreWarehouseDetail, ClientWarehouseDetail
 } from 'modules'
 
 
@@ -63,7 +63,16 @@ function useAppRoutes() {
 											},
 											{
 												path: 'history',
-												element: <ProductExchangeHistory/>
+												children: [
+													{
+														index: true,
+														element: <ProductExchangeHistory/>
+													},
+													{
+														path: ':id',
+														element: <ProductExchange detail={true}/>
+													}
+												]
 											}
 										]
 									},
@@ -104,7 +113,16 @@ function useAppRoutes() {
 									},
 									{
 										path: 'exchange',
-										element: <ProductExchange/>
+										children: [
+											{
+												index: true,
+												element: <ProductExchange/>
+											},
+											{
+												path: ':id',
+												element: <ProductExchange detail={true}/>
+											}
+										]
 									}
 								]
 							},
@@ -121,8 +139,18 @@ function useAppRoutes() {
 									},
 									{
 										path: 'detail/:id',
-										element: <StoreDetail/>
+										children: [
+											{
+												index: true,
+												element: <StoreDetail/>
+											},
+											{
+												path: ':productId',
+												element: <StoreWarehouseDetail/>
+											}
+										]
 									}
+
 								]
 							},
 							{
@@ -151,6 +179,10 @@ function useAppRoutes() {
 														element: <CurrencyExchange detail={true}/>
 													}
 												]
+											},
+											{
+												path: 'warehouse/:productId',
+												element: <ClientWarehouseDetail/>
 											}
 										]
 									}

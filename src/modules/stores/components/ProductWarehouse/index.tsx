@@ -9,9 +9,8 @@ import {
 	HR,
 	Card,
 	ReactTable,
-	// EditButton,
-	Pagination
-	// DeleteButton
+	Pagination,
+	DetailButton
 } from 'components'
 
 import {
@@ -69,15 +68,14 @@ const ProductWarehouse = () => {
 				Header: t('Code'),
 				accessor: (row) => row.code
 			},
-			// {
-			// 	Header: t('Actions'),
-			// 	accessor: (row) => (
-			// 		<div className="flex items-start gap-lg">
-			// 			<EditButton id={row.id}/>
-			// 			<DeleteButton id={row.id}/>
-			// 		</div>
-			// 	)
-			// }
+			{
+				Header: t('Actions'),
+				accessor: (row) => (
+					<div className="flex items-start gap-lg">
+						<DetailButton url={`${row.product_id}`}/>
+					</div>
+				)
+			}
 		],
 		[page, pageSize]
 	)

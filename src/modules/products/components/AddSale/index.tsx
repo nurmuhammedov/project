@@ -8,7 +8,7 @@ import {
 	FileUploader,
 	ReactTable,
 	EditButton,
-	DeleteButton, Input
+	DeleteButton, Input, Form
 } from 'components'
 import HR from 'components/HR'
 import {BUTTON_THEME} from 'constants/fields'
@@ -41,19 +41,22 @@ interface IProperties {
 	refetchTemporaryList?: () => void;
 	focus?: UseFormSetFocus<InferType<typeof saleItemSchema>>;
 	isTemporaryListFetching: boolean;
-	temporaryList: ITemporaryListItem[];
+	detailItems?: ITemporaryListItem[];
+	temporaryList?: ITemporaryListItem[];
 	trigger?: UseFormTrigger<InferType<typeof saleItemSchema>>;
 	currency?: string | number;
-	// priceType?: string | number;
+	detail?: boolean;
 }
 
 const Index: FC<IProperties> = ({
 	                                clientId,
 	                                refetchTemporaryList,
 	                                trigger,
-	                                focus,
+	                                focus: parentFocus,
+	                                detailItems,
 	                                temporaryList,
-	                                isTemporaryListFetching
+	                                isTemporaryListFetching,
+	                                detail: retrieve = false
                                 }) => {
 	const {t} = useTranslation()
 	const [series, setSeries] = useState('')
@@ -62,9 +65,9 @@ const Index: FC<IProperties> = ({
 		removeParams,
 		paramsObject: {updateId = undefined}
 	} = useSearchParams()
-	const {mutateAsync: del, isPending: isDelete} = useDelete('sale-temporaries/')
+	const {mutateAsync: del, isPending: isDeleteLoading} = useDelete('sale-temporaries/')
 
-	const {data: products = []} = useData<ISelectOption[]>('products/select')
+	const {data: products = []} = useData<ISelectOption[]>('products/select', !retrieve)
 
 	const columns: Column<ITemporaryListItem>[] = useMemo(
 		() => [
@@ -92,17 +95,21 @@ const Index: FC<IProperties> = ({
 				Header: `${t('Total')} ${t('Price')?.toLowerCase()}`,
 				accessor: row => decimalToPrice(row.total_price)
 			},
-			{
+			...(!retrieve ? [{
 				Header: t('Actions'),
-				accessor: row => (
+				accessor: (row: ITemporaryListItem) => (
 					<div className="flex items-start gap-lg">
 						<EditButton id={row.id}/>
-						<DeleteButton onDelete={() => !isDelete && del(row?.id).then(() => refetchTemporaryList?.())}/>
+						<DeleteButton
+							onDelete={() => !isDeleteLoading && del(row?.id).then(() => refetchTemporaryList?.())}/>
 					</div>
-				)
-			}
+				),
+				style: {
+					width: '5rem'
+				}
+			}] : [])
 		],
-		[isDelete]
+		[isDeleteLoading, retrieve, t, refetchTemporaryList, del]
 	)
 
 	const {
@@ -111,19 +118,19 @@ const Index: FC<IProperties> = ({
 		reset,
 		control,
 		setValue,
-		setFocus: setFormFocus,
+		setFocus,
 		formState: {errors}
 	} = useForm({
 		mode: 'onSubmit',
 		defaultValues: {
 			price: '',
 			unit_quantity: '1',
-			serial_numbers: [],
-			product: undefined
+			serial_numbers: [] as string[],
+			product: undefined,
+			temp_quantities: [] as { purchase_item: number, quantity: string }[]
 		},
 		resolver: yupResolver(temporarySaleItemSchema)
 	})
-
 
 	const {append, remove} = useFieldArray({
 		control,
@@ -159,7 +166,6 @@ const Index: FC<IProperties> = ({
 		[]
 	)
 
-
 	const purchaseColumns: Column<IPurchasesItem>[] = useMemo(
 		() => [
 			{
@@ -171,11 +177,11 @@ const Index: FC<IProperties> = ({
 							name={`temp_quantities.${index}.quantity`}
 							render={({field, fieldState: {error}}) => (
 								<NumberFormattedInput
-									disabled={!!updateId}
+									disabled={!!updateId || retrieve}
 									{...field}
 									id={`temp_quantity_input_${row.id}`}
 									placeholder={t('Quantity')}
-									allowDecimals={measurementUnits?.find(i => i.id == validationData?.measure)?.type == 'float'} // Adjust as needed
+									allowDecimals={measurementUnits?.find(i => i.id == validationData?.measure)?.type == 'float'}
 									disableGroupSeparators={false}
 									error={error?.message}
 								/>
@@ -197,7 +203,7 @@ const Index: FC<IProperties> = ({
 				accessor: row => getDate(row?.purchase_date)
 			}
 		],
-		[control, updateId]
+		[control, updateId, retrieve]
 	)
 
 
@@ -207,25 +213,28 @@ const Index: FC<IProperties> = ({
 	const {
 		data: detail,
 		isPending: isDetailLoading
-	} = useDetail<ITemporaryListItem>('sale-temporaries/', updateId)
+	} = useDetail<ITemporaryListItem>('sale-temporaries/', updateId, !retrieve)
 
 	const {
 		data: purchases = [],
 		isFetching
-	} = useDetail<IPurchasesItem>(`residues/${watch('product')}/`, 'purchase-items', !!watch('product'), {store: store?.value})
+	} = useDetail<IPurchasesItem[]>(`residues/${watch('product')}/`, 'purchase-items', !!watch('product') && !retrieve, {store: store?.value})
+
 
 	const {
 		data: productCount
-	} = useDetail<{ quantity: number }>(`residues/`, `${watch('product')}`, !!watch('product'), {store: store?.value})
+	} = useDetail<{
+		quantity: number
+	}>(`residues/`, `${watch('product')}`, !!watch('product') && !retrieve, {store: store?.value})
 
 	const {
 		data: validationData,
 		isPending: isValidationDataLoading,
 		isFetching: isValidationDataFetching
-	} = useDetail<IValidationData>('products/val-data/', watch('product'))
+	} = useDetail<IValidationData>('products/val-data/', watch('product'), !retrieve)
 
 	useEffect(() => {
-		if (detail && !isDetailLoading) {
+		if (detail && !isDetailLoading && !retrieve) {
 			reset({
 				product: detail.product.id,
 				price: detail.price,
@@ -239,10 +248,10 @@ const Index: FC<IProperties> = ({
 					: detail.total_quantity
 			})
 		}
-	}, [detail, isDetailLoading])
+	}, [detail, isDetailLoading, retrieve])
 
 	useEffect(() => {
-		if (validationData && !isValidationDataLoading && !updateId) {
+		if (validationData && !isValidationDataLoading && !updateId && !retrieve) {
 			reset((prevValues) => ({
 				...prevValues,
 				price: '',
@@ -250,41 +259,42 @@ const Index: FC<IProperties> = ({
 				serial_numbers: []
 			}))
 		}
-	}, [validationData, isValidationDataLoading])
+	}, [validationData, isValidationDataLoading, updateId, retrieve])
 
 	useEffect(() => {
-		if (!updateId) {
+		if (!updateId && !retrieve) {
 			reset({
 				price: '',
 				unit_quantity: '1',
 				serial_numbers: [],
-				product: undefined
+				product: undefined,
+				temp_quantities: []
 			})
 		}
-	}, [updateId])
+	}, [updateId, retrieve])
 
 	useEffect(() => {
-		if (clientId) {
+		if (clientId && !retrieve) {
 			setTimeout(() => {
-				setFormFocus('product')
+				setFocus('product')
 			}, 0)
 		}
-	}, [clientId])
+	}, [clientId, retrieve, setFocus])
 
 
 	useEffect(() => {
-		if (!isValidationDataFetching) {
+		if (!isValidationDataFetching && !retrieve) {
 			setTimeout(() => {
-				setFormFocus('unit_quantity')
+				setFocus('unit_quantity')
 			}, 0)
 		}
-	}, [isValidationDataFetching])
+	}, [isValidationDataFetching, retrieve, setFocus])
 
 	const onSubmit = () => {
 		handleSubmit((data) => {
 				if (!clientId) {
 					trigger?.(['customer'])
-					focus?.('customer')
+					parentFocus?.('customer')
 				} else if (updateId) {
 					const newData = {
 						product: data?.product,
@@ -297,8 +307,11 @@ const Index: FC<IProperties> = ({
 					}
 					update(cleanParams(newData as unknown as ISearchParams)).then(async () => {
 						removeParams('updateId')
-						reset({price: '', unit_quantity: '', serial_numbers: [], product: undefined, temp_quantities: []})
-						setTimeout(() => { setFormFocus('product') }, 0)
+						setSeries('')
+						reset({price: '', unit_quantity: '1', serial_numbers: [], product: undefined, temp_quantities: []})
+						setTimeout(() => {
+							setFocus('product')
+						}, 0)
 						refetchTemporaryList?.()
 					})
 				} else {
@@ -312,8 +325,11 @@ const Index: FC<IProperties> = ({
 						customer: clientId
 					}
 					mutateAsync(cleanParams(newData as unknown as ISearchParams)).then(async () => {
-						reset({price: '', unit_quantity: '', serial_numbers: [], product: undefined, temp_quantities: []})
-						setTimeout(() => { setFormFocus('product') }, 0)
+						setSeries('')
+						reset({price: '', unit_quantity: '1', serial_numbers: [], product: undefined, temp_quantities: []})
+						setTimeout(() => {
+							setFocus('product')
+						}, 0)
 						refetchTemporaryList?.()
 					})
 				}
@@ -331,11 +347,14 @@ const Index: FC<IProperties> = ({
 	const handleSeriesKeyDown = (e: unknown) => {
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-expect-error
+		e?.preventDefault()
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-expect-error
 		if (e?.key === 'Enter') {
 			if (series.trim()?.toString() == '') return
-			const serialNumbers = watch('serial_numbers')
+			const serialNumbers = watch('serial_numbers') || []
 			if (!serialNumbers?.includes(series?.trim()?.toString())) {
-				append(series)
+				append(series.trim())
 				setSeries('')
 			} else {
 				showMessage(t('Serial number already exist', {number: series?.trim()?.toString()}))
@@ -344,7 +363,7 @@ const Index: FC<IProperties> = ({
 	}
 
 	useEffect(() => {
-		if (purchases && Array.isArray(purchases) && !isFetching && watch('product') && !updateId) {
+		if (purchases && Array.isArray(purchases) && !isFetching && watch('product') && !updateId && !retrieve) {
 			const newTempQuantities = purchases?.map((purchase: IPurchasesItem) => {
 				return {
 					purchase_item: purchase.id,
@@ -352,224 +371,232 @@ const Index: FC<IProperties> = ({
 				}
 			})
 			setValue('temp_quantities', newTempQuantities)
-		} else if (!watch('product') && !updateId) {
+		} else if (!watch('product') && !updateId && !retrieve) {
 			setValue('temp_quantities', [])
 		}
-	}, [isFetching, watch('product')])
+	}, [isFetching, watch('product'), retrieve])
 
 	return (
-		<div className="grid gap-lg">
-			<div className={validationData?.is_serial ? 'span-8' : 'span-8'}>
-				<div className="grid gap-lg">
-
-					<div className="flex gap-lg span-12">
-						<div className="flex-5">
-							<Controller
-								name="product"
-								control={control}
-								render={({field: {value, ref, onChange, onBlur}}) => (
-									<Select
-										ref={ref}
-										id="product"
-										label={`${t('Product')}${productCount?.quantity ? ` (${t('Total')?.toLowerCase()} - ${productCount?.quantity})` : ''}`}
-										redLabel={true}
-										onBlur={onBlur}
-										options={products}
-										isDisabled={!!updateId}
-										error={errors.product?.message}
-										value={getSelectValue(products, value)}
-										defaultValue={getSelectValue(products, value)}
-										handleOnChange={(e) => onChange(e as string)}
-									/>
-								)
-								}
-							/>
-						</div>
-
-						{isValidationDataFetching ? (
-							<div style={{flex: '7'}}>
-								<Loader/>
-							</div>
-						) : validationData ? (
-							<>
-								<div className="flex-4">
+		<Form onSubmit={(e) => e.preventDefault()}>
+			<div className="grid gap-lg">
+				<div className={validationData?.is_serial && !retrieve ? 'span-8' : 'span-8'}>
+					<div className="grid gap-lg">
+						{
+							!retrieve &&
+							<div className="flex gap-lg span-12">
+								<div className="flex-5">
 									<Controller
+										name="product"
 										control={control}
-										name="unit_quantity"
-										render={({field}) => (
-											<NumberFormattedInput
-												id="unit_quantity"
-												disableGroupSeparators={false}
+										render={({field: {value, ref, onChange, onBlur}}) => (
+											<Select
+												ref={ref}
+												id="product"
+												label={`${t('Product')}${productCount?.quantity ? ` (${t('Total')?.toLowerCase()} - ${productCount?.quantity})` : ''}`}
 												redLabel={true}
-												allowDecimals={measurementUnits?.find(i => i.id == validationData?.measure)?.type == 'float'}
-												maxLength={measurementUnits?.find(i => i.id == validationData?.measure)?.type == 'int' ? 6 : 9}
-												onKeyDown={handleKeyDown}
-												error={errors?.unit_quantity?.message}
-												label={measurementUnits?.find(i => i.id == validationData?.measure)?.type == 'int' ? t('Count') + ` (${t(measurementUnits?.find(i => i.id == validationData?.measure)?.label?.toString() || '')})` : t('Quantity') + ` (${t(measurementUnits?.find(i => i.id == validationData?.measure)?.label?.toString() || '')})`}
-												{...field}
+												onBlur={onBlur}
+												options={products}
+												isDisabled={!!updateId || retrieve}
+												error={errors.product?.message}
+												value={getSelectValue(products, value)}
+												defaultValue={getSelectValue(products, value)}
+												handleOnChange={(e) => onChange(e as string)}
 											/>
-										)}
+										)
+										}
 									/>
 								</div>
 
-								<div className="flex-4 flex gap-lg">
-									<div className="flex-1">
-										<Controller
-											control={control}
-											name="price"
-											render={({field}) => (
-												<NumberFormattedInput
-													id="price"
-													maxLength={12}
-													redLabel={true}
-													disableGroupSeparators={false}
-													allowDecimals={true}
-													label="Price"
-													onKeyDown={handleKeyDown}
-													error={errors?.price?.message}
-													{...field}
+								{isValidationDataFetching ? (
+									<div style={{flex: '7'}}>
+										<Loader/>
+									</div>
+								) : validationData ? (
+									<>
+										<div className="flex-4">
+											<Controller
+												control={control}
+												name="unit_quantity"
+												render={({field}) => (
+													<NumberFormattedInput
+														id="unit_quantity"
+														disableGroupSeparators={false}
+														redLabel={true}
+														disabled={retrieve}
+														allowDecimals={measurementUnits?.find(i => i.id == validationData?.measure)?.type == 'float'}
+														maxLength={measurementUnits?.find(i => i.id == validationData?.measure)?.type == 'int' ? 6 : 9}
+														onKeyDown={handleKeyDown}
+														error={errors?.unit_quantity?.message}
+														label={measurementUnits?.find(i => i.id == validationData?.measure)?.type == 'int' ? t('Count') + ` (${t(measurementUnits?.find(i => i.id == validationData?.measure)?.label?.toString() || '')})` : t('Quantity') + ` (${t(measurementUnits?.find(i => i.id == validationData?.measure)?.label?.toString() || '')})`}
+														{...field}
+													/>
+												)}
+											/>
+										</div>
+
+										<div className="flex-4 flex gap-lg">
+											<div className="flex-1">
+												<Controller
+													control={control}
+													name="price"
+													render={({field}) => (
+														<NumberFormattedInput
+															id="price"
+															maxLength={12}
+															redLabel={true}
+															disableGroupSeparators={false}
+															allowDecimals={true}
+															disabled={retrieve}
+															label="Price"
+															onKeyDown={handleKeyDown}
+															error={errors?.price?.message}
+															{...field}
+														/>
+													)}
 												/>
-											)}
-										/>
-									</div>
-									<div className="gap-md flex align-start" style={{paddingTop: '1.5rem'}}>
-										<Button
-											icon={updateId ? <Edit/> : <Plus/>}
-											mini={true}
-											onClick={() => onSubmit()}
-										/>
-										<Button
-											theme={BUTTON_THEME.DANGER_OUTLINE}
-											icon={<Delete/>}
-											mini={true}
-											onClick={() => {
-												if (updateId) {
-													removeParams('updateId', 'modal')
-												} else {
-													reset({
-															price: '',
-															unit_quantity: '',
-															serial_numbers: [],
-															product: undefined
-														}
-													)
-												}
-											}}
-										/>
-
-									</div>
-								</div>
-								{/*<div className="flex-1 flex items-end">*/}
-								{/*	<Button*/}
-								{/*		icon={<Plus/>}*/}
-								{/*		type="button"*/}
-								{/*		onClick={onSubmit}*/}
-								{/*		disabled={!watch('product') || (validationData?.is_serial && !watch('serial_numbers')?.length)}*/}
-								{/*	>*/}
-								{/*		{updateId ? t('Edit') : t('Add')}*/}
-								{/*	</Button>*/}
-								{/*</div>*/}
-							</>
-						) : (
-							<div style={{flex: '7'}}></div>
-						)}
-					</div>
+											</div>
+											{
+												!retrieve &&
+												<div className="gap-md flex align-start" style={{paddingTop: '1.5rem'}}>
+													<Button
+														icon={updateId ? <Edit/> : <Plus/>}
+														mini={true}
+														type="submit"
+													/>
+													<Button
+														theme={BUTTON_THEME.DANGER_OUTLINE}
+														icon={<Delete/>}
+														type="button"
+														mini={true}
+														onClick={() => {
+															if (updateId) {
+																removeParams('updateId')
+															}
+															reset({
+																	price: '',
+																	unit_quantity: '1',
+																	serial_numbers: [],
+																	product: undefined,
+																	temp_quantities: []
+																}
+															)
+														}}
+													/>
+												</div>
+											}
+										</div>
+									</>
+								) : (
+									<div style={{flex: '7'}}></div>
+								)}
+							</div>
+						}
 
 
-					<div className="span-12">
-						<div className={styles.title}>{t('Products')}</div>
-						{/*<HR style={{marginBottom: '1rem'}}/>*/}
-						<ReactTable columns={columns} data={temporaryList} isLoading={isTemporaryListFetching}/>
-						<HR style={{marginBottom: '1rem'}}/>
+						<div className="span-12">
+							<div className={styles.title}>{t('Products')}</div>
+							<ReactTable
+								columns={columns}
+								data={retrieve ? detailItems ?? [] : temporaryList ?? []}
+								isLoading={isTemporaryListFetching}
+
+							/>
+							<HR style={{marginBottom: '1rem'}}/>
+						</div>
 					</div>
 				</div>
-			</div>
 
-			<div className="span-4">
-
-
-				<div className="grid gap-lg">
-					<div className="span-12" style={{maxHeight: '25rem', overflowY: 'auto'}}>
-						<div className={styles.title}>{t('Parties')}</div>
-						{/*<HR style={{marginBottom: '1rem'}}/>*/}
-						<ReactTable
-							columns={purchaseColumns}
-							// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-							// @ts-expect-error
-							data={purchases as unknown as IPurchasesItem}
-						/>
-						{/*<HR style={{marginBottom: '1rem'}}/>*/}
-					</div>
-
-					{
-						validationData?.is_serial &&
-						<>
-							<div className="flex gap-lg span-12">
-								<Input
-									className="flex-1"
-									id="serial_numbers"
-									label="Series"
-									disabled={!validationData?.is_serial}
-									redLabel={true}
-									value={series}
-									onChange={(e) => {
-										setSeries(e.target.value)
-									}}
-									onKeyDown={handleSeriesKeyDown}
-								/>
-
-								<div className="gap-md flex align-start" style={{paddingTop: '1.5rem'}}>
-									<Button
-										disabled={!series?.trim()}
-										icon={<Plus/>}
-										mini={true}
-										onClick={() => {
-											if (series.trim() == '') return
-											const serialNumbers = watch('serial_numbers')
-											if (!serialNumbers?.includes(series?.trim()?.toString())) {
-												append(series)
-												setSeries('')
-											} else {
-												showMessage(t('Serial number already exist', {number: series?.trim()?.toString()}))
-											}
-										}}
-									/>
-									<FileUploader
-										content={
-											<Button
-												icon={<FileUploaderIcon style={{maxWidth: '1.2rem'}}/>}
-												mini={true}
-											/>
-										}
-										type="txt"
-										handleOnChange={(arr) => setValue('serial_numbers', Array.isArray(arr) ? Array.from(new Set(arr)) : [])}
-										value={undefined}
-										id="series"
-									/>
-								</div>
-							</div>
-
+				<div className="span-4">
+					<div className="grid gap-lg">
+						{
+							!retrieve && !validationData?.is_serial &&
 							<div className="span-12" style={{maxHeight: '25rem', overflowY: 'auto'}}>
-								<div className={styles.title}>{t('Series')}</div>
-								{/*<HR style={{marginBottom: '1rem'}}/>*/}
+								<div className={styles.title}>{t('Parties')}</div>
 								<ReactTable
-									columns={seriesColumns}
-									data={
-										watch('serial_numbers')?.filter(i => !!i)?.map((i, index) => ({
-											name: String(i),
-											id: index
-										})) || []
-									}
+									columns={purchaseColumns}
+									data={purchases as unknown as IPurchasesItem[]}
+									isLoading={isFetching}
 								/>
 								<HR style={{marginBottom: '1rem'}}/>
 							</div>
+						}
 
-						</>
-					}
+						{
+							validationData?.is_serial && !retrieve &&
+							<>
+								<div className="flex gap-lg span-12">
+									<Input
+										className="flex-1"
+										id="serial_numbers_input"
+										label="Series"
+										disabled={!validationData?.is_serial || retrieve}
+										redLabel={true}
+										value={series}
+										onChange={(e) => {
+											setSeries(e.target.value)
+										}}
+										onKeyDown={handleSeriesKeyDown}
+									/>
 
+									<div className="gap-md flex align-start" style={{paddingTop: '1.5rem'}}>
+										<Button
+											disabled={!series?.trim() || retrieve}
+											icon={<Plus/>}
+											type="button"
+											mini={true}
+											onClick={() => {
+												if (series.trim() == '') return
+												const serialNumbers = watch('serial_numbers') || []
+												if (!serialNumbers?.includes(series?.trim()?.toString())) {
+													append(series.trim())
+													setSeries('')
+												} else {
+													showMessage(t('Serial number already exist', {number: series?.trim()?.toString()}))
+												}
+											}}
+										/>
+										<FileUploader
+											content={
+												<Button
+													icon={<FileUploaderIcon style={{maxWidth: '1.2rem'}}/>}
+													mini={true}
+													type="button"
+													disabled={retrieve}
+												/>
+											}
+											type="txt"
+											handleOnChange={(arr) => {
+												const currentSerials = watch('serial_numbers') || []
+												const newSerials = Array.isArray(arr) ? Array.from(new Set([...currentSerials, ...arr.map(s => s.trim()).filter(Boolean)])) : currentSerials
+												setValue('serial_numbers', newSerials as never[])
+											}}
+											value={undefined}
+											id="series_file_uploader"
+										/>
+									</div>
+								</div>
+
+								<div className="span-12" style={{maxHeight: '25rem', overflowY: 'auto'}}>
+									<div className={styles.title}>{t('Series')}</div>
+									<ReactTable
+										columns={seriesColumns}
+										data={
+											watch('serial_numbers')?.filter(i => !!i)?.map((i, index) => ({
+												name: String(i),
+												id: index
+											})) || []
+										}
+									/>
+									<HR style={{marginBottom: '1rem'}}/>
+								</div>
+
+							</>
+						}
+
+					</div>
 				</div>
 			</div>
-		</div>
+		</Form>
 	)
 }
 

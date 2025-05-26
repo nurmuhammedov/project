@@ -3,7 +3,7 @@ import {
 	Card,
 	CardTab,
 	DeleteModal,
-	Input,
+	Input, Loader,
 	MaskInput,
 	Select
 } from 'components'
@@ -35,7 +35,7 @@ interface IProperties {
 const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 	const {t} = useTranslation()
 	const {removeParams} = useSearchParams()
-	const {productId = undefined} = useParams()
+	const {id: productId = undefined} = useParams()
 	const {mutateAsync, isPending: isAdding} = useAdd('sales')
 	const {store} = useTypedSelector(state => state.stores)
 	const {data: clients = []} = useData<ISelectOption[]>('customers/select', !!store?.value, {store: store?.value})
@@ -73,7 +73,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 		data: temporaryList = [],
 		isFetching: isTemporaryListFetching,
 		refetch: refetchTemporaryList
-	} = useData<ITemporaryListItem[]>('sale-temporaries', !!watch('customer') && !retrieve, {supplier: watch('customer')})
+	} = useData<ITemporaryListItem[]>('sale-temporaries', !!watch('customer') && !retrieve, {customer: watch('customer')})
 
 	const {
 		data: customerDetail,
@@ -81,30 +81,31 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 	} = useData<ICustomerShortData>(`customers/${watch('customer')}/short-data`, !!watch('customer') && !retrieve)
 
 	useEffect(() => {
-		if (customerDetail && !isCustomerDetailLoading) {
+		if (customerDetail && !isCustomerDetailLoading && !retrieve) {
 			reset((prevValues) => ({
 				...prevValues,
 				price_type: customerDetail?.price_type?.id ?? prevValues.price_type,
-				currency: customerDetail?.currency ?? prevValues.currency
+				currency: customerDetail?.currency ?? prevValues.currency,
+				sale_date: getDate()
 			}))
 		}
-	}, [customerDetail, isCustomerDetailLoading])
+	}, [customerDetail, isCustomerDetailLoading, retrieve])
 
 	useEffect(() => {
-		if (saleDetail && !isSaleDetailLoading) {
+		if (saleDetail && !isSaleDetailLoading && retrieve) {
 			reset((prevValues) => ({
 				...prevValues,
-				customer: saleDetail?.supplier?.id ?? undefined,
+				customer: saleDetail?.customer?.id ?? undefined,
 				price_type: saleDetail?.price_type?.id ?? undefined,
 				currency: saleDetail?.currency ?? undefined,
 				sale_date: saleDetail?.sale_date ? getDate(saleDetail.sale_date) : getDate(),
 				comment: saleDetail?.comment ?? undefined
 			}))
 		}
-	}, [saleDetail, isSaleDetailLoading])
+	}, [saleDetail, isSaleDetailLoading, retrieve])
 
 	useEffect(() => {
-		if (store?.value) {
+		if (store?.value && !retrieve) {
 			setTimeout(() => {
 				setFocus('customer')
 			}, 0)
@@ -116,8 +117,11 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 				sale_date: getDate()
 			})
 		}
-	}, [store?.value])
+	}, [store?.value, retrieve])
 
+	if (isSaleDetailLoading && retrieve) {
+		return <Loader/>
+	}
 
 	return (
 		<>
@@ -242,8 +246,10 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 							clientId={watch('customer')}
 							trigger={trigger}
 							focus={setFocus}
+							detail={retrieve}
+							detailItems={saleDetail?.items}
 							temporaryList={temporaryList}
-							isTemporaryListFetching={isTemporaryListFetching}
+							isTemporaryListFetching={retrieve ? isSaleDetailLoading : isTemporaryListFetching}
 							refetchTemporaryList={refetchTemporaryList}
 							currency={watch('currency')}
 						/>
@@ -277,7 +283,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 										await refetchTemporaryList()
 									})
 								})}
-							disabled={isAdding || temporaryList?.length < 1}
+							disabled={isAdding || retrieve || temporaryList?.length < 1}
 						>
 							{t(productExchangeTabOptions[1]?.label)}
 						</Button>
@@ -286,19 +292,11 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 					<div className={styles['price-wrapper']} style={{direction: 'ltr'}}>
 						<div className={styles.price}>
 							<p>{`${t('Total')} ${t('Count')?.toLowerCase()}`}:</p>
-							{
-								retrieve ?
-									<span>{decimalToInteger(sumDecimals(saleDetail?.items?.map(i => i?.unit_quantity ?? '0.00') ?? []))}</span> :
-									<span>{decimalToInteger((sumDecimals(temporaryList?.map(i => i?.unit_quantity ?? '0.00') ?? [])))}</span>
-							}
+							<span>{decimalToInteger(sumDecimals((retrieve ? saleDetail?.items : temporaryList)?.map(i => i?.total_quantity ?? '0.00') ?? []))}</span>
 						</div>
 						<div className={styles.price}>
 							<p>{t('Products')}:</p>
-							{
-								retrieve ?
-									<span>{decimalToPrice(sumDecimals(saleDetail?.items?.map(i => i?.total_price ?? '0.00') ?? []))} {t(currencyOptions?.find(i => i?.value == saleDetail?.currency)?.label?.toString() || '')?.toLowerCase() ?? ''}</span> :
-									<span>{decimalToPrice(sumDecimals(temporaryList?.map(i => i?.total_price ?? '0.00') ?? []))} {t(currencyOptions?.find(i => i?.value == watch('currency'))?.label?.toString() || '')?.toLowerCase() ?? ''}</span>
-							}
+							<span>{decimalToPrice(sumDecimals((retrieve ? saleDetail?.items : temporaryList)?.map(i => i?.total_price ?? '0.00') ?? []))} {t(currencyOptions?.find(i => i?.value == (retrieve ? saleDetail?.currency : watch('currency')))?.label?.toString() || '')?.toLowerCase() ?? ''}</span>
 						</div>
 					</div>
 				</div>

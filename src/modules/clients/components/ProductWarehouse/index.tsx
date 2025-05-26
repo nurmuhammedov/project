@@ -10,7 +10,7 @@ import {
 	Card,
 	ReactTable,
 	// EditButton,
-	Pagination
+	Pagination, DetailButton
 	// DeleteButton
 } from 'components'
 
@@ -69,15 +69,14 @@ const ProductWarehouse = () => {
 				Header: t('Code'),
 				accessor: (row) => row.code
 			},
-			// {
-			// 	Header: t('Actions'),
-			// 	accessor: (row) => (
-			// 		<div className="flex items-start gap-lg">
-			// 			<EditButton id={row.id}/>
-			// 			<DeleteButton id={row.id}/>
-			// 		</div>
-			// 	)
-			// }
+			{
+				Header: t('Actions'),
+				accessor: (row) => (
+					<div className="flex items-start gap-lg">
+						<DetailButton url={`warehouse/${row.product_id}`}/>
+					</div>
+				)
+			}
 		],
 		[page, pageSize]
 	)
