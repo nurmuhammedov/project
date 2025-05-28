@@ -223,5 +223,10 @@
   "To": "Gacha",
   "Products warehouse": "Mahsulotlar qoldig‘i",
   "Products list": "Mahsulotlar ro‘yxati",
-  "Code": "Kodi"
+  "Code": "Kodi",
+  "Remaining stock (by price)": "Mahsulotlar qoldig‘i (narx bo‘yicha)",
+  "Product balance (by purchase)": "Mahsulotlar qoldig‘i (kirim bo‘yicha)",
+  "Sales (by customer)": "Sotilganlar (mijozlar bo‘yicha)",
+  "Sales (total)": "Sotilganlar (umumiy)",
+  "Reports": "Hisobotlar"
 }

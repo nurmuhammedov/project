@@ -130,8 +130,8 @@ const Index: FC<IProperties> = ({
 		resolver: yupResolver(temporaryItemSchema)
 	})
 
-	const {mutateAsync} = useAdd('temporaries')
-	const {mutateAsync: update} = useUpdate('temporaries/', updateId)
+	const {mutateAsync, isPending: isAdding} = useAdd('temporaries')
+	const {mutateAsync: update, isPending: isUpdating} = useUpdate('temporaries/', updateId)
 
 	const {
 		data: detail,
@@ -418,6 +418,8 @@ const Index: FC<IProperties> = ({
 																icon={updateId ? <Edit/> : <Plus/>}
 																mini={true}
 																type="submit"
+																disabled={isAdding || isUpdating || retrieve}
+																onClick={()=> onSubmit()}
 															/>
 															<Button
 																theme={BUTTON_THEME.DANGER_OUTLINE}

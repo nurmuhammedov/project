@@ -57,5 +57,53 @@ export const menu: IMenuItem[] = [
 		order: {
 			[ROLE_LIST.ADMIN]: 1
 		}
+	},
+	{
+		id: '/admin/reports',
+		label: 'Reports',
+		href: '/admin/reports',
+		allowedRoles: [
+			ROLE_LIST.ADMIN
+		],
+		order: {
+			[ROLE_LIST.ADMIN]: 1
+		},
+		children: [
+			{
+				id: '/admin/reports/by-warehouse',
+				label: 'Products warehouse',
+				href: '/admin/reports/by-warehouse',
+				allowedRoles: [ROLE_LIST.ADMIN],
+				order: {[ROLE_LIST.ADMIN]: 1}
+			},
+			{
+				id: '/admin/reports/by-price',
+				label: 'Remaining stock (by price)',
+				href: '/admin/reports/by-price',
+				allowedRoles: [ROLE_LIST.ADMIN],
+				order: {[ROLE_LIST.ADMIN]: 2}
+			},
+			{
+				id: '/admin/reports/by-purchase',
+				label: 'Product balance (by purchase)',
+				href: '/admin/reports/by-purchase',
+				allowedRoles: [ROLE_LIST.ADMIN],
+				order: {[ROLE_LIST.ADMIN]: 2}
+			},
+			{
+				id: '/admin/reports/by-customer',
+				label: 'Sales (by customer)',
+				href: '/admin/reports/by-customer',
+				allowedRoles: [ROLE_LIST.ADMIN],
+				order: {[ROLE_LIST.ADMIN]: 2}
+			},
+			{
+				id: '/admin/reports/by-total',
+				label: 'Sales (total)',
+				href: '/admin/reports/by-total',
+				allowedRoles: [ROLE_LIST.ADMIN],
+				order: {[ROLE_LIST.ADMIN]: 2}
+			}
+		]
 	}
 ]

@@ -18,7 +18,12 @@ import {
 	Login,
 	Home,
 	CurrencyExchangeHistory,
-	ProductExchangeHistory, StoreWarehouseDetail, ClientWarehouseDetail
+	ProductExchangeHistory,
+	StoreWarehouseDetail,
+	ClientWarehouseDetail,
+	ProductsWarehouseReport,
+	StocksByPriceReport,
+	StockByPurchaseReport, SaleByCustomerReport, SalesTotalReport
 } from 'modules'
 
 
@@ -123,6 +128,35 @@ function useAppRoutes() {
 												element: <ProductExchange detail={true}/>
 											}
 										]
+									}
+								]
+							},
+							{
+								path: 'reports',
+								children: [
+									{
+										index: true,
+										element: <ProductsWarehouseReport/>
+									},
+									{
+										path: 'by-warehouse',
+										element: <ProductsWarehouseReport/>
+									},
+									{
+										path: 'by-price',
+										element: <StocksByPriceReport/>
+									},
+									{
+										path: 'by-purchase',
+										element: <StockByPurchaseReport/>
+									},
+									{
+										path: 'by-customer',
+										element: <SaleByCustomerReport/>
+									},
+									{
+										path: 'by-total',
+										element: <SalesTotalReport/>
 									}
 								]
 							},

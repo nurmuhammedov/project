@@ -5,12 +5,9 @@ import {useMemo} from 'react'
 import {Column} from 'react-table'
 
 import {
-	HR,
 	Card,
 	ReactTable,
-	// EditButton,
 	Pagination
-	// DeleteButton
 } from 'components'
 
 import {
@@ -29,7 +26,7 @@ const ProductWarehouse = () => {
 	} = useSearchParams()
 
 	const {data, totalPages, isPending: isLoading} = usePaginatedData<IStock[]>(
-		`stock`,
+		`stocks`,
 		{...params, page: page, page_size: pageSize, type: product_type, tab: undefined}
 	)
 
@@ -48,7 +45,7 @@ const ProductWarehouse = () => {
 				accessor: (row) => row.product_name
 			},
 			{
-				Header: t('Count'),
+				Header: `${t('Total')} ${t('Count')?.toLowerCase()}`,
 				accessor: (row) => decimalToInteger(row.total_quantity)
 			},
 			// {
@@ -69,7 +66,7 @@ const ProductWarehouse = () => {
 			},
 			{
 				Header: t('Code'),
-					accessor: (row) => row.code
+				accessor: (row) => row.code
 			}
 			// {
 			// 	Header: t('Actions'),
@@ -86,12 +83,11 @@ const ProductWarehouse = () => {
 
 	return (
 		<>
-			<Card screen={true} className="span-9 gap-2xl">
+			<Card screen={true} className="span-9 gap-xl">
 				<div className="flex justify-between align-center">
-					<Filter fieldsToShow={['search', 'customer', 'product_type', 'store']}/>
+					<Filter fieldsToShow={['search', 'customer', 'product_type', 'store', 'product']}/>
 				</div>
 				<ReactTable columns={columns} data={data} isLoading={isLoading}/>
-				<HR/>
 				<Pagination totalPages={totalPages}/>
 			</Card>
 		</>

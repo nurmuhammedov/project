@@ -223,5 +223,10 @@
   "To": "гача",
   "Products warehouse": "Маҳсулотлар қолдиғи",
   "Products list": "Маҳсулотлар рўйхати",
-  "Code": "Коди"
+  "Code": "Коди",
+  "Remaining stock (by price)": "Маҳсулотлар қолдиғи (нарх бўйича)",
+  "Product balance (by purchase)": "Маҳсулотлар қолдиғи (кирим бўйича)",
+  "Sales (by customer)": "Сотилганлар (мижозлар бўйича)",
+  "Sales (total)": "Сотилганлар (умумий)",
+  "Reports": "Ҳисоботлар"
 }

@@ -207,8 +207,8 @@ const Index: FC<IProperties> = ({
 	)
 
 
-	const {mutateAsync} = useAdd('sale-temporaries')
-	const {mutateAsync: update} = useUpdate('sale-temporaries/', updateId)
+	const {mutateAsync, isPending: isAdding} = useAdd('sale-temporaries')
+	const {mutateAsync: update, isPending: isUpdating} = useUpdate('sale-temporaries/', updateId)
 
 	const {
 		data: detail,
@@ -462,6 +462,8 @@ const Index: FC<IProperties> = ({
 														icon={updateId ? <Edit/> : <Plus/>}
 														mini={true}
 														type="submit"
+														disabled={isAdding || isUpdating || retrieve}
+														onClick={()=> onSubmit()}
 													/>
 													<Button
 														theme={BUTTON_THEME.DANGER_OUTLINE}
@@ -509,7 +511,7 @@ const Index: FC<IProperties> = ({
 				<div className="span-4">
 					<div className="grid gap-lg">
 						{
-							!retrieve && !validationData?.is_serial &&
+							!retrieve &&
 							<div className="span-12" style={{maxHeight: '25rem', overflowY: 'auto'}}>
 								<div className={styles.title}>{t('Parties')}</div>
 								<ReactTable

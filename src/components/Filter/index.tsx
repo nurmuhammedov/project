@@ -1,4 +1,3 @@
-// components/DynamicFilter/DynamicFilter.tsx
 import useData from 'hooks/useData'
 import useSearchParams from 'hooks/useSearchParams'
 import React, {useState, useEffect, FC} from 'react'
@@ -27,7 +26,8 @@ export type FilterFieldType =
 	| 'expiry'
 	| 'is_user'
 	| 'region'
-	| 'purchase_date';
+	| 'purchase_date'
+	| 'product';
 
 interface DynamicFilterProps {
 	fieldsToShow: FilterFieldType[];
@@ -50,7 +50,8 @@ const fieldLabels: Record<FilterFieldType, string> = {
 	expiry: 'Expiry deadline',
 	is_user: 'Employee',
 	region: 'Region',
-	purchase_date: 'Date'
+	purchase_date: 'Date',
+	product: 'Product',
 }
 
 function useDebouncedValue<T>(value: T, delay: number): T {
@@ -129,6 +130,10 @@ const DynamicFilter: FC<DynamicFilterProps> = ({fieldsToShow, width = true}) => 
 	const {data: storesOptions = [], isPending: storesLoading} = useData<ISelectOption[]>(
 		'stores/select',
 		fieldsToShow.includes('store')
+	)
+	const {data: productsOptions = [], isPending: productsLoading} = useData<ISelectOption[]>(
+		'products/select',
+		fieldsToShow.includes('product')
 	)
 	const {data: customersOptions = [], isPending: customersLoading} = useData<ISelectOption[]>(
 		'customers/select',
@@ -210,6 +215,18 @@ const DynamicFilter: FC<DynamicFilterProps> = ({fieldsToShow, width = true}) => 
 						value={getSelectValue(storesOptions, parseMultiValue(paramsObject.store))}
 						handleOnChange={handleMultiChange('store')}
 						isLoading={storesLoading}
+						{...commonSelectProps}
+					/>
+				)
+			case 'product':
+				return (
+					<Select
+						id={selectId}
+						isMulti={true}
+						options={productsOptions}
+						value={getSelectValue(productsOptions, parseMultiValue(paramsObject.product))}
+						handleOnChange={handleMultiChange('product')}
+						isLoading={productsLoading}
 						{...commonSelectProps}
 					/>
 				)

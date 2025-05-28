@@ -12,6 +12,7 @@ interface IMenuItem {
 	href: string;
 	allowedRoles: string[];
 	order: RoleOrder;
+	children?: IMenuItem[];
 }
 
 interface IListResponse<T> {

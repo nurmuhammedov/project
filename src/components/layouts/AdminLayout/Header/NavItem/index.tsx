@@ -1,4 +1,4 @@
-import {FC} from 'react'
+import {FC, useState, useRef, useEffect} from 'react'
 import {useTranslation} from 'react-i18next'
 import {NavLink, NavLinkRenderProps, useLocation} from 'react-router-dom'
 import classNames from 'classnames'
@@ -6,20 +6,68 @@ import styles from './styles.module.scss'
 import {IMenuItem} from 'interfaces/configuration.interface'
 
 
-const Index: FC<IMenuItem> = ({href, label, icon}) => {
+const NavItem: FC<IMenuItem> = ({href, label, icon, children}) => {
 	const {t} = useTranslation()
 	const location = useLocation()
+	const [isSubMenuOpen, setIsSubMenuOpen] = useState(false)
+	const navItemRef = useRef<HTMLDivElement>(null)
+
 	const isRootActive = href === '/' && location.pathname === '/'
+	const hasChildren = children && children.length > 0
+
+	const handleMouseEnter = () => {
+		if (hasChildren) {
+			setIsSubMenuOpen(true)
+		}
+	}
+
+	const handleMouseLeave = () => {
+		if (hasChildren) {
+			setIsSubMenuOpen(false)
+		}
+	}
+
+	useEffect(() => {
+		const isActiveParent = hasChildren && children.some(child => location.pathname.startsWith(child.href.split('?')[0]))
+		if (isActiveParent) {
+			setIsSubMenuOpen(true)
+		}
+	}, [location.pathname, hasChildren, children])
+
+
+	const renderNavItem = (item: IMenuItem, isSubItem: boolean = false) => {
+		const itemIsActive = location.pathname === item.href.split('?')[0] || (item.href === '/' && location.pathname === '/')  || (hasChildren && !isSubItem && children.some(child => location.pathname.startsWith(child.href.split('?')[0])));
+
+		return (
+			<NavLink
+				to={item.href}
+				className={({isActive}: NavLinkRenderProps) => classNames(styles.navItem, {[styles.active]: (isSubItem ? isActive : itemIsActive) || (isRootActive && !isSubItem)})}
+			>
+				{!!item.icon && <span className={classNames(styles.icon)}>{item.icon()}</span>}
+				<span className={styles.title}>{t(item.label)}</span>
+			</NavLink>
+		)
+	}
 
 	return (
-		<NavLink
-			to={href}
-			className={({isActive}: NavLinkRenderProps) => classNames(styles.navItem, {[styles.active]: isActive || isRootActive})}
+		<div
+			ref={navItemRef}
+			className={classNames(styles.navItemContainer, {[styles.navItemContainerOpen]: isSubMenuOpen && hasChildren})}
+			onMouseEnter={handleMouseEnter}
+			onMouseLeave={handleMouseLeave}
 		>
-			{!!icon && <span className={classNames(styles.icon)}>{icon()}</span>}
-			<span className={styles.title}>{t(label)}</span>
-		</NavLink>
+			{renderNavItem({href, label, icon, children} as IMenuItem)}
+			{hasChildren && isSubMenuOpen && (
+				<div className={styles.subMenu}>
+					{children.map((subItem) => (
+						<div key={subItem.id} className={styles.subMenuItem}>
+							{renderNavItem(subItem, true)}
+						</div>
+					))}
+				</div>
+			)}
+		</div>
 	)
 }
 
-export default Index
+export default NavItem
