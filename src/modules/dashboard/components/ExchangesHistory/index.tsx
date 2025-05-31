@@ -48,8 +48,8 @@ const Index: FC<IProperties> = ({style, className}) => {
 				{
 					Header: t('Type'),
 					accessor: row => <Badge
-						title={findName(exchangeOptions, row.type)}
-						type={row.type == 2 ? 'loss' : row?.type == 3 ? 'expense' : undefined}
+						title={row.type == 3 ? 'Expense' : findName(exchangeOptions, row.type)}
+						type={row.type == 3 ? 'expense' : row.type == 2 ? 'loss' : row?.type == 3 ? 'expense' : undefined}
 					/>
 				},
 				{
@@ -62,7 +62,7 @@ const Index: FC<IProperties> = ({style, className}) => {
 						<div className="flex items-start gap-lg">
 							<DetailButton
 								id={row.id}
-								url={`currency-exchange/${row.id}/?tab=${row.type == 2 ? '2' : row.type == 3 ? '3' : '1'}`}
+								url={row?.type == 3 ? `currency-exchange/expense/${row.id}` : `currency-exchange/${row.id}?tab=${row.type == 2 ? '2' : row.type == 3 ? '3' : '1'}`}
 							/>
 						</div>
 					)

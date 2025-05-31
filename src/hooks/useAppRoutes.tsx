@@ -23,7 +23,7 @@ import {
 	ClientWarehouseDetail,
 	ProductsWarehouseReport,
 	StocksByPriceReport,
-	StockByPurchaseReport, SaleByCustomerReport, SalesTotalReport
+	StockByPurchaseReport, SaleByCustomerReport, SalesTotalReport, Service
 } from 'modules'
 
 
@@ -58,6 +58,10 @@ function useAppRoutes() {
 									{
 										index: true,
 										element: <Home/>
+									},
+									{
+										path: 'service',
+										element: <Service/>
 									},
 									{
 										path: 'product-exchange',
@@ -102,6 +106,15 @@ function useAppRoutes() {
 													{
 														index: true,
 														element: <CurrencyExchange detail={true}/>
+													}
+												]
+											},
+											{
+												path: 'expense/:exchangeId',
+												children: [
+													{
+														index: true,
+														element: <Service detail={true}/>
 													}
 												]
 											}

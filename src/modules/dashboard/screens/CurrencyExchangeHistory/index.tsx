@@ -51,8 +51,8 @@ const Index = () => {
 				{
 					Header: t('Type'),
 					accessor: row => <Badge
-						title={findName(exchangeOptions, row.type)}
-						type={row.type == 2 ? 'loss' : row?.type == 3 ? 'expense' : undefined}
+						title={row.type == 3 ? 'Expense' : findName(exchangeOptions, row.type)}
+						type={row.type == 3 ? 'expense' : row.type == 2 ? 'loss' : row?.type == 3 ? 'expense' : undefined}
 					/>
 				},
 				{
@@ -65,7 +65,7 @@ const Index = () => {
 						<div className="flex items-start gap-lg">
 							<DetailButton
 								id={row.id}
-								url={`/admin/home/currency-exchange/${row.id}?tab=${row.type == 2 ? '2' : row.type == 3 ? '3' : '1'}`}
+								url={row?.type == 3 ? `/admin/home/currency-exchange/expense/${row.id}` : `/admin/home/currency-exchange/${row.id}?tab=${row.type == 2 ? '2' : row.type == 3 ? '3' : '1'}`}
 							/>
 						</div>
 					)

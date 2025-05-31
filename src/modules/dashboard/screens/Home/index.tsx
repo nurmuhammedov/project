@@ -16,6 +16,13 @@ const Index = () => {
 					<Button
 						theme={BUTTON_THEME.DANGER_OUTLINE}
 						icon={<Currency/>}
+						onClick={() => navigate('service')}
+					>
+						Service
+					</Button>
+					<Button
+						theme={BUTTON_THEME.DANGER_OUTLINE}
+						icon={<Currency/>}
 						onClick={() => navigate('currency-exchange')}
 					>
 						Currency exchange

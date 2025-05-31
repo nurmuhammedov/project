@@ -362,7 +362,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 							<div className="flex-1">
 								<Input
 									id="total"
-									label={`Total`}
+									label={`${t('Total')} (${t('Customer')?.toLowerCase()})`}
 									redLabel={exchangeOptions[1].value == tab}
 									disabled={true}
 									value={`${decimalToPrice(calculateTotalByRecords(watch('first_amount'), watch('records') as unknown as IRecord[]))} ${t(findName(currencyOptions, watch('currency'), 'code'))}`}
