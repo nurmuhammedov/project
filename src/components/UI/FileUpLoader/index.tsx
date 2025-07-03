@@ -74,7 +74,7 @@ const Index = forwardRef<HTMLInputElement, FileUploaderProps>(({
 								}
 							})
 							.then((res) => {
-								showMessage(`${res.data.name} ${t('File successfully accepted')}`, 'success')
+								showMessage(`${t('File successfully accepted')}`, 'success')
 								if (multi) {
 									if (Array.isArray(value) && value) {
 										onChange?.([...value, res.data] as IFile[])

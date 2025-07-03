@@ -1,21 +1,29 @@
 import {
 	Button,
 	Card,
-	Checkbox, DeleteModal,
-	Input, Loader,
+	Checkbox,
+	DeleteModal,
+	FileUploader,
+	Input,
+	Loader,
 	MaskInput,
-	NumberFormattedInput, PageTitle,
+	Modal,
+	NumberFormattedInput,
+	PageTitle, ReactTable,
 	Select
 } from 'components'
 import {currencyOptions} from 'constants/options'
 import useTypedSelector from 'hooks/useTypedSelector'
 import {ISelectOption} from 'interfaces/form.interface'
+import {interceptor} from 'libraries/index'
 import {ICustomerShortData} from 'modules/dashboard/interfaces'
 import AddPurchase from 'modules/products/components/AddPurchase'
 import {productExchangeTabOptions} from 'modules/products/helpers/options'
 import {purchaseItemSchema} from 'modules/products/helpers/yup'
 import {IPurchaseItem, ITemporaryListItem} from 'modules/products/interfaces/purchase.interface'
-import {decimalToInteger, decimalToPrice, findName, getSelectValue, sumDecimals} from 'utilities/common'
+import {Column} from 'react-table'
+import {showMessage} from 'utilities/alert'
+import {decimalToInteger, decimalToPrice, findName, getSelectValue, noop, sumDecimals} from 'utilities/common'
 import {Controller, useForm} from 'react-hook-form'
 import {getDate} from 'utilities/date'
 import {BUTTON_THEME, FIELD} from 'constants/fields'
@@ -23,7 +31,7 @@ import {yupResolver} from '@hookform/resolvers/yup'
 import {useAdd, useData, useDetail, useSearchParams} from 'hooks'
 import {useNavigate, useParams} from 'react-router-dom'
 import {useTranslation} from 'react-i18next'
-import {FC, useEffect} from 'react'
+import {FC, useEffect, useMemo, useState} from 'react'
 import styles from './styles.module.scss'
 import classNames from 'classnames'
 
@@ -34,11 +42,14 @@ interface IProperties {
 
 const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 	const {t} = useTranslation()
-	const {removeParams} = useSearchParams()
+	const {removeParams, addParams} = useSearchParams()
 	const {id = undefined} = useParams()
 	const navigate = useNavigate()
 	const {mutateAsync, isPending: isAdding} = useAdd('purchases')
 	const {store} = useTypedSelector(state => state.stores)
+	const [isXMLLoading, setIsXMLLoading] = useState<boolean>(false)
+	const [exelLoader, setIsLoading] = useState<boolean>(false)
+	const [wrongNames, setWrongNames] = useState<ITemporaryListItem[]>([])
 
 	const {
 		data: purchase,
@@ -117,7 +128,6 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 				supplier: purchase?.supplier?.id ?? undefined,
 				cost_currency: purchase?.cost_currency ?? undefined,
 				store: purchase?.store?.id ?? undefined,
-				// price_type: purchase?.price_type?.id ?? undefined,
 				currency: purchase?.currency ?? undefined,
 				purchase_date: purchase?.purchase_date ? getDate(purchase.purchase_date) : getDate(),
 				cost_amount: purchase?.cost_amount ?? undefined,
@@ -131,12 +141,109 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 		return <Loader/>
 	}
 
+	const columns: Column<ITemporaryListItem>[] = useMemo(
+		() => [
+			{
+				Header: t('№'),
+				accessor: (_, index: number) => (index + 1),
+				style: {
+					width: '3rem',
+					textAlign: 'center'
+				}
+			},
+			{
+				Header: t('Name'),
+				accessor: row => `${row?.name}`
+			},
+			{
+				Header: t('Price'),
+				accessor: row => decimalToPrice(row.price)
+			},
+			{
+				Header: t('Count'),
+				accessor: row => decimalToInteger(row?.unit_quantity)
+			}
+		],
+		[]
+	)
+
 	return (
 		<>
 			<PageTitle
 				title={t('Trade (income)')}
 			>
 				<div className="flex align-center gap-lg">
+					<Button
+						style={{marginTop: 'auto'}}
+						disabled={isXMLLoading}
+						onClick={() => {
+							setIsXMLLoading(true)
+							interceptor.get(`temporaries/import`, {
+								responseType: 'blob'
+							}).then(res => {
+								const blob = new Blob([res.data])
+								const link = document.createElement('a')
+								link.href = window.URL.createObjectURL(blob)
+								link.download = `${t(`${t('Template')}`)}.xlsx`
+								link.click()
+							}).finally(() => {
+								setIsXMLLoading(false)
+							})
+						}}
+						mini={true}
+					>
+						Template
+					</Button>
+					{
+						!watch('supplier') ?
+							<Button
+								style={{marginTop: 'auto'}}
+								disabled={exelLoader}
+								mini={true}
+								onClick={() => trigger?.(['supplier'])}
+							>
+								Import
+							</Button> :
+							<FileUploader
+								content={
+									<Button
+										style={{marginTop: 'auto'}}
+										disabled={exelLoader}
+										mini={true}
+									>
+										Import
+									</Button>
+								}
+								type="exel"
+								handleChange={(files) => {
+									const item = files[0]
+									setIsLoading(true)
+									const formData = new FormData()
+									formData.append('xlsx-file', item)
+									formData.append('name', item.name)
+									interceptor
+										.post(`temporaries/import?supplier=${watch('supplier')}`, formData, {
+											headers: {
+												'Content-Type': 'multipart/form-data'
+											}
+										})
+										.then(() => {
+											showMessage(`${t('File successfully accepted')}`, 'success')
+											refetchTemporaryList().then(noop)
+										})
+										.catch((err) => {
+											showMessage(`${item.name} ${t('File not accepted')}`, 'error')
+											setWrongNames(err?.response?.data?.wrong_names || [])
+											addParams({modal: 'wrongNames'})
+										})
+										.finally(() => {
+											setIsLoading(false)
+										})
+								}}
+								value={undefined}
+								id="series"
+							/>
+					}
 					<Button
 						onClick={() => navigate(-1)}
 						theme={BUTTON_THEME.DANGER_OUTLINE}
@@ -152,21 +259,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 				className={classNames(styles.root)}
 			>
 				<div className={classNames('grid gap-lg')} style={{paddingTop: '.5rem'}}>
-					{/*<div className="span-12">*/}
-					{/*	<CardTab*/}
-					{/*		disabled={retrieve}*/}
-					{/*		fallbackValue={productExchangeTabOptions[0]?.value}*/}
-					{/*		tabs={[{*/}
-					{/*			label: 'Making income',*/}
-					{/*			value: 'purchase',*/}
-					{/*			color: 'var(--teal-green)'*/}
-					{/*		}]}*/}
-					{/*	/>*/}
-					{/*</div>*/}
-
-
 					<div className="flex gap-lg span-12">
-
 						<div className="flex-5">
 							<Controller
 								name="supplier"
@@ -353,6 +446,17 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 					</div>
 				</div>
 			</Card>
+			<Modal
+				onClose={() => {
+					setWrongNames([])
+					removeParams('modal')
+				}}
+				title="Wrong names"
+				id="wrongNames"
+				style={{height: '40rem', width: '60rem'}}
+			>
+				<ReactTable columns={columns} data={wrongNames}/>
+			</Modal>
 			{
 				!retrieve &&
 				<DeleteModal

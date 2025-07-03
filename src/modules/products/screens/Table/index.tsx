@@ -112,8 +112,8 @@ const Index = () => {
 											'Content-Type': 'multipart/form-data'
 										}
 									})
-									.then((res) => {
-										showMessage(`${res.data.name} ${t('File successfully accepted')}`, 'success')
+									.then(() => {
+										showMessage(`${t('File successfully accepted')}`, 'success')
 										query.invalidateQueries({queryKey: ['products']}).then(noop)
 									})
 									.catch(() => {
@@ -150,8 +150,8 @@ const Index = () => {
 											'Content-Type': 'multipart/form-data'
 										}
 									})
-									.then((res) => {
-										showMessage(`${res.data.name} ${t('File successfully accepted')}`, 'success')
+									.then(() => {
+										showMessage(`${t('File successfully accepted')}`, 'success')
 										query.invalidateQueries({queryKey: ['products']}).then(noop)
 									})
 									.catch(() => {

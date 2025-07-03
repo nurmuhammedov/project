@@ -167,6 +167,9 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 				title={`${t(tab == exchangeOptions?.[0]?.value?.toString() ? 'Currency exchange (income)' : 'Currency exchange (loss)')}`}
 			>
 				<div className="flex align-center gap-lg">
+
+
+
 					<Button
 						onClick={() => navigate(-1)}
 						theme={BUTTON_THEME.DANGER_OUTLINE}

@@ -116,15 +116,6 @@ const Index = () => {
 		},
 		resolver: yupResolver(customerSchema)
 	})
-	//
-	// useEffect(() => {
-	// 	if (stores?.length && !isStoresLoading && stores?.find((store) => store?.is_main)?.value) {
-	// 		resetAdd((prevValues: InferType<typeof customerSchema>) => ({
-	// 			...prevValues,
-	// 			store: stores?.find((store) => store?.is_main)?.value as unknown as number ?? undefined
-	// 		}))
-	// 	}
-	// }, [stores])
 
 	useEffect(() => {
 		if (priceTypes?.length && !isPriceTypesLoading && priceTypes?.[0]?.value) {
@@ -280,8 +271,8 @@ const Index = () => {
 										'Content-Type': 'multipart/form-data'
 									}
 								})
-								.then((res) => {
-									showMessage(`${res.data.name} ${t('File successfully accepted')}`, 'success')
+								.then(() => {
+									showMessage(`${t('File successfully accepted')}`, 'success')
 									refetch().then(noop)
 								})
 								.catch(() => {
@@ -318,8 +309,8 @@ const Index = () => {
 										'Content-Type': 'multipart/form-data'
 									}
 								})
-								.then((res) => {
-									showMessage(`${res.data.name} ${t('File successfully accepted')}`, 'success')
+								.then(() => {
+									showMessage(`${t('File successfully accepted')}`, 'success')
 									refetch().then(noop)
 								})
 								.catch(() => {
