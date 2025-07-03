@@ -23,7 +23,12 @@ import {
 	ClientWarehouseDetail,
 	ProductsWarehouseReport,
 	StocksByPriceReport,
-	StockByPurchaseReport, SaleByCustomerReport, SalesTotalReport, Service
+	StockByPurchaseReport,
+	SaleByCustomerReport,
+	SalesTotalReport,
+	Service,
+	SaleTemporaries,
+	Temporaries
 } from 'modules'
 
 
@@ -170,6 +175,14 @@ function useAppRoutes() {
 									{
 										path: 'by-total',
 										element: <SalesTotalReport/>
+									},
+									{
+										path: 'by-sale-temporaries',
+										element: <SaleTemporaries/>
+									},
+									{
+										path: 'by-temporaries',
+										element: <Temporaries/>
 									}
 								]
 							},

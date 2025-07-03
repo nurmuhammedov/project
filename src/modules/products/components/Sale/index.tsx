@@ -1,13 +1,9 @@
-import {
-	Button,
-	Card,
-	CardTab,
-	DeleteModal,
-	Input, Loader,
-	MaskInput,
-	Select
-} from 'components'
+import {yupResolver} from '@hookform/resolvers/yup'
+import classNames from 'classnames'
+import {Button, Card, DeleteModal, Input, Loader, MaskInput, PageTitle, Select} from 'components'
+import {BUTTON_THEME, FIELD} from 'constants/fields'
 import {currencyOptions} from 'constants/options'
+import {useAdd, useData, useDetail, useSearchParams} from 'hooks'
 import useTypedSelector from 'hooks/useTypedSelector'
 import {ISelectOption} from 'interfaces/form.interface'
 import {ICustomerShortData} from 'modules/dashboard/interfaces'
@@ -15,17 +11,13 @@ import AddSale from 'modules/products/components/AddSale'
 import {productExchangeTabOptions} from 'modules/products/helpers/options'
 import {saleItemSchema} from 'modules/products/helpers/yup'
 import {IPurchaseItem, ITemporaryListItem} from 'modules/products/interfaces/purchase.interface'
-import {decimalToInteger, decimalToPrice, getSelectValue, sumDecimals} from 'utilities/common'
-import {Controller, useForm} from 'react-hook-form'
-import {getDate} from 'utilities/date'
-import {BUTTON_THEME, FIELD} from 'constants/fields'
-import {yupResolver} from '@hookform/resolvers/yup'
-import {useAdd, useData, useDetail, useSearchParams} from 'hooks'
-import {useParams} from 'react-router-dom'
-import {useTranslation} from 'react-i18next'
 import {FC, useEffect} from 'react'
+import {Controller, useForm} from 'react-hook-form'
+import {useTranslation} from 'react-i18next'
+import {useNavigate, useParams} from 'react-router-dom'
+import {decimalToInteger, decimalToPrice, getSelectValue, sumDecimals} from 'utilities/common'
+import {getDate} from 'utilities/date'
 import styles from '../Purchase/styles.module.scss'
-import classNames from 'classnames'
 
 
 interface IProperties {
@@ -39,6 +31,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 	const {mutateAsync, isPending: isAdding} = useAdd('sales')
 	const {store} = useTypedSelector(state => state.stores)
 	const {data: clients = []} = useData<ISelectOption[]>('customers/select', !!store?.value, {store: store?.value})
+	const navigate = useNavigate()
 
 	const {
 		data: saleDetail,
@@ -125,21 +118,37 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 
 	return (
 		<>
+			<PageTitle
+				title={t('Trade (loss)')}
+			>
+				<div className="flex align-center gap-lg">
+					<Button
+						onClick={() => navigate(-1)}
+						theme={BUTTON_THEME.DANGER_OUTLINE}
+					>
+						{t('Back')}
+					</Button>
+				</div>
+			</PageTitle>
 			<Card
 				shadow={true}
 				screen={true}
 				style={{padding: '.5rem 1.5rem 1.5rem'}}
 				className={classNames(styles.root)}
 			>
-				<div className={classNames('grid gap-lg')}>
+				<div className={classNames('grid gap-lg')} style={{paddingTop: '.5rem'}}>
 
-					<div className="span-12">
-						<CardTab
-							disabled={retrieve}
-							fallbackValue={productExchangeTabOptions[1]?.value}
-							tabs={productExchangeTabOptions}
-						/>
-					</div>
+					{/*<div className="span-12">*/}
+					{/*	<CardTab*/}
+					{/*		disabled={retrieve}*/}
+					{/*		fallbackValue={productExchangeTabOptions[1]?.value}*/}
+					{/*		tabs={[{*/}
+					{/*			label: 'Making loss',*/}
+					{/*			value: 'sale',*/}
+					{/*			color: 'var(--red-alert)'*/}
+					{/*		}]}*/}
+					{/*	/>*/}
+					{/*</div>*/}
 
 					<div className="flex gap-lg span-12 flex-wrap">
 
@@ -257,7 +266,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 
 				</div>
 
-				<div className={styles.footer} style={{direction: 'rtl'}}>
+				<div className={styles.footer}>
 
 					{
 						!retrieve &&

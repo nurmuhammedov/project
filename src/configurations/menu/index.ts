@@ -12,7 +12,44 @@ export const menu: IMenuItem[] = [
 		],
 		order: {
 			[ROLE_LIST.ADMIN]: 1
-		}
+		},
+		children: [
+			{
+				id: 'admin/home/product-exchange?tab=purchase',
+				label: 'Trade (income)',
+				href: '/admin/home/product-exchange?tab=purchase',
+				allowedRoles: [ROLE_LIST.ADMIN],
+				order: {[ROLE_LIST.ADMIN]: 1}
+			},
+			{
+				id: 'admin/home/product-exchange?tab=sale',
+				label: 'Trade (loss)',
+				href: '/admin/home/product-exchange?tab=sale',
+				allowedRoles: [ROLE_LIST.ADMIN],
+				order: {[ROLE_LIST.ADMIN]: 1}
+			},
+			{
+				id: 'admin/home/currency-exchange?tab=1',
+				label: 'Currency exchange (income)',
+				href: '/admin/home/currency-exchange?tab=1',
+				allowedRoles: [ROLE_LIST.ADMIN],
+				order: {[ROLE_LIST.ADMIN]: 2}
+			},
+			{
+				id: 'admin/home/currency-exchange?tab=2',
+				label: 'Currency exchange (loss)',
+				href: '/admin/home/currency-exchange?tab=2',
+				allowedRoles: [ROLE_LIST.ADMIN],
+				order: {[ROLE_LIST.ADMIN]: 2}
+			},
+			{
+				id: 'admin/home/service',
+				label: 'Service',
+				href: '/admin/home/service',
+				allowedRoles: [ROLE_LIST.ADMIN],
+				order: {[ROLE_LIST.ADMIN]: 2}
+			}
+		]
 	},
 	{
 		id: '/clients',
@@ -101,6 +138,20 @@ export const menu: IMenuItem[] = [
 				id: '/admin/reports/by-total',
 				label: 'Sales (total)',
 				href: '/admin/reports/by-total',
+				allowedRoles: [ROLE_LIST.ADMIN],
+				order: {[ROLE_LIST.ADMIN]: 2}
+			},
+			{
+				id: '/admin/reports/by-temporaries',
+				label: 'Temporaries (by purchase)',
+				href: '/admin/reports/by-temporaries',
+				allowedRoles: [ROLE_LIST.ADMIN],
+				order: {[ROLE_LIST.ADMIN]: 2}
+			},
+			{
+				id: '/admin/reports/by-sale-temporaries',
+				label: 'Temporaries (by sale)',
+				href: '/admin/reports/by-sale-temporaries',
 				allowedRoles: [ROLE_LIST.ADMIN],
 				order: {[ROLE_LIST.ADMIN]: 2}
 			}

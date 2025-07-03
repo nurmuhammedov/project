@@ -36,7 +36,7 @@ import {useEffect, useMemo, useState} from 'react'
 import {Controller, useForm} from 'react-hook-form'
 import {useTranslation} from 'react-i18next'
 import {Column} from 'react-table'
-import {findName, getSelectValue} from 'utilities/common'
+import {findName, getSelectValue, noop} from 'utilities/common'
 import {InferType} from 'yup'
 import {interceptor} from 'libraries/index'
 import {showMessage} from 'utilities/alert'
@@ -280,9 +280,9 @@ const Index = () => {
 										'Content-Type': 'multipart/form-data'
 									}
 								})
-								.then(async (res) => {
+								.then((res) => {
 									showMessage(`${res.data.name} ${t('File successfully accepted')}`, 'success')
-									await refetch()
+									refetch().then(noop)
 								})
 								.catch(() => {
 									showMessage(`${item.name} ${t('File not accepted')}`, 'error')
@@ -318,9 +318,9 @@ const Index = () => {
 										'Content-Type': 'multipart/form-data'
 									}
 								})
-								.then(async (res) => {
+								.then((res) => {
 									showMessage(`${res.data.name} ${t('File successfully accepted')}`, 'success')
-									await refetch()
+									refetch().then(noop)
 								})
 								.catch(() => {
 									showMessage(`${item.name} ${t('File not accepted')}`, 'error')

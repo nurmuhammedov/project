@@ -54,3 +54,37 @@ export interface ISalesByTotal {
 	type_name: string;
 	quantity: string;
 }
+
+interface Product {
+	id: number;
+	name: string;
+	measure: string;
+	is_serial: boolean;
+}
+
+interface Supplier {
+	id: number;
+	name: string;
+	store_name: string;
+}
+
+export interface IPurchasedProduct {
+	id: number;
+	product: Product;
+	supplier: Supplier;
+	total_quantity: string;
+	total_price: string;
+	price: string;
+	unit_quantity: string;
+	expiry_date: string | null;
+}
+
+export interface ISaleProduct {
+	id: number;
+	product: Product;
+	customer: IIDName;
+	store: IIDName;
+	total_quantity: string;
+	total_price: string;
+	price: string;
+}

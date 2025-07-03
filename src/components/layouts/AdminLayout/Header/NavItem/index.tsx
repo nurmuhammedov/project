@@ -12,7 +12,6 @@ const NavItem: FC<IMenuItem> = ({href, label, icon, children}) => {
 	const [isSubMenuOpen, setIsSubMenuOpen] = useState(false)
 	const navItemRef = useRef<HTMLDivElement>(null)
 
-	const isRootActive = href === '/' && location.pathname === '/'
 	const hasChildren = children && children.length > 0
 
 	const handleMouseEnter = () => {
@@ -36,12 +35,11 @@ const NavItem: FC<IMenuItem> = ({href, label, icon, children}) => {
 
 
 	const renderNavItem = (item: IMenuItem, isSubItem: boolean = false) => {
-		const itemIsActive = location.pathname === item.href.split('?')[0] || (item.href === '/' && location.pathname === '/')  || (hasChildren && !isSubItem && children.some(child => location.pathname.startsWith(child.href.split('?')[0])));
-
+		const itemIsActive = window?.location?.pathname + window?.location?.search === item.href
 		return (
 			<NavLink
 				to={item.href}
-				className={({isActive}: NavLinkRenderProps) => classNames(styles.navItem, {[styles.active]: (isSubItem ? isActive : itemIsActive) || (isRootActive && !isSubItem)})}
+				className={({isActive}: NavLinkRenderProps) => classNames(styles.navItem, {[styles.active]: (isSubItem && itemIsActive) || (!isSubItem && isActive)})}
 			>
 				{!!item.icon && <span className={classNames(styles.icon)}>{item.icon()}</span>}
 				<span className={styles.title}>{t(item.label)}</span>

@@ -1,3 +1,4 @@
+import {useQueryClient} from '@tanstack/react-query'
 import {Box, Cart, Plus} from 'assets/icons'
 import {Button, FileUploader, HorizontalTab, PageTitle} from 'components'
 import {useSearchParams} from 'hooks'
@@ -8,7 +9,7 @@ import ProductWarehouse from 'modules/products/components/ProductWarehouse'
 import {showMessage} from 'utilities/alert'
 import {useState} from 'react'
 import {useTranslation} from 'react-i18next'
-import {findName} from 'utilities/common'
+import {findName, noop} from 'utilities/common'
 
 
 const tabOptions: ISelectOption[] = [
@@ -27,6 +28,7 @@ const tabOptions: ISelectOption[] = [
 const Index = () => {
 	const {paramsObject: {tab = tabOptions[0]?.value}, addParams} = useSearchParams()
 	const {t} = useTranslation()
+	const query = useQueryClient()
 	const [isXMLLoading, setIsXMLLoading] = useState<boolean>(false)
 	const [exelLoader, setIsLoading] = useState<boolean>(false)
 
@@ -110,9 +112,9 @@ const Index = () => {
 											'Content-Type': 'multipart/form-data'
 										}
 									})
-									.then(async (res) => {
+									.then((res) => {
 										showMessage(`${res.data.name} ${t('File successfully accepted')}`, 'success')
-										// await refetch()
+										query.invalidateQueries({queryKey: ['products']}).then(noop)
 									})
 									.catch(() => {
 										showMessage(`${item.name} ${t('File not accepted')}`, 'error')
@@ -148,9 +150,9 @@ const Index = () => {
 											'Content-Type': 'multipart/form-data'
 										}
 									})
-									.then(async (res) => {
+									.then((res) => {
 										showMessage(`${res.data.name} ${t('File successfully accepted')}`, 'success')
-										// await refetch()
+										query.invalidateQueries({queryKey: ['products']}).then(noop)
 									})
 									.catch(() => {
 										showMessage(`${item.name} ${t('File not accepted')}`, 'error')

@@ -229,5 +229,11 @@
   "Sales (by customer)": "Sotilganlar (mijozlar bo‘yicha)",
   "Sales (total)": "Sotilganlar (umumiy)",
   "Reports": "Hisobotlar",
-  "Service": "Xizmat"
+  "Service": "Xizmat",
+  "Temporaries (by sale)": "Savdo partiyalari(chiqim)",
+  "Temporaries (by purchase)": "Savdo partiyalari(kirim)",
+  "Trade (income)": "Savdo (kirim)",
+  "Trade (loss)": "Savdo (chiqim)",
+  "Currency exchange (income)": "Valyuta ayrboshlash (kirim)",
+  "Currency exchange (loss)": "Valyuta ayrboshlash (chiqim)"
 }

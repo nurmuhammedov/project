@@ -1,6 +1,6 @@
 import {yupResolver} from '@hookform/resolvers/yup'
 import {Exchange} from 'assets/icons'
-import {Button, Card, CardTab, Form, Info, Input, Loader, NumberFormattedInput, PageTitle, Select} from 'components'
+import {Button, Card, Form, Info, Input, Loader, NumberFormattedInput, PageTitle, Select} from 'components'
 import {BUTTON_THEME, FIELD} from 'constants/fields'
 import {currencyOptions} from 'constants/options'
 import {useAdd, useData, useDetail, useSearchParams} from 'hooks'
@@ -30,7 +30,6 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 	const {paramsObject: {tab = currencyExchangeOptions[0]?.value}} = useSearchParams()
 	const {exchangeId = undefined} = useParams()
 	const {store} = useTypedSelector(state => state.stores)
-	// const {data: stores = [], isPending: isStoresLoading} = useData<ISelectOption[]>('stores/select')
 
 	const {
 		watch,
@@ -59,11 +58,6 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 		control,
 		name: 'records' as never
 	})
-
-	// const {
-	// 	data: serviceTypes = [],
-	// 	isPending: isServiceTypesLoading
-	// } = useData<ISelectOption[]>('service-types/select', expanse)
 
 	const {
 		data: customers = [],
@@ -116,16 +110,6 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 			}, 0)
 		}
 	}, [customer])
-
-	// useEffect(() => {
-	// 	if (stores?.length && !isStoresLoading && stores?.find((store) => store?.is_main)?.value) {
-	// 		reset((prevValues: InferType<typeof currencyExchangeSchema>) => ({
-	// 			...prevValues,
-	// 			store: stores?.find((store) => store?.is_main)?.value as unknown as number ?? undefined
-	// 		}))
-	// 	}
-	//
-	// }, [stores])
 
 	useEffect(() => {
 		if (watch('currency') && !retrieve) {
@@ -180,7 +164,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 	return (
 		<>
 			<PageTitle
-				title={`${t(exchangeOptions?.find(i => i?.value == tab)?.label?.toString() || 'Currency exchange')}`}
+				title={`${t(tab == exchangeOptions?.[0]?.value?.toString() ? 'Currency exchange (income)' : 'Currency exchange (loss)')}`}
 			>
 				<div className="flex align-center gap-lg">
 					<Button
@@ -191,17 +175,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 					</Button>
 				</div>
 			</PageTitle>
-			<Card style={{padding: '.5rem 1.5rem 1.5rem'}} screen={true}>
-				{
-					!retrieve &&
-					<CardTab
-						disabled={retrieve}
-						style={{marginBottom: '1rem'}}
-						fallbackValue={currencyExchangeOptions[0]?.value}
-						tabs={currencyExchangeOptions}
-					/>
-				}
-
+			<Card style={{padding: '1rem 1.5rem 1.5rem'}} screen={true}>
 				<Form
 					onSubmit={
 						handleSubmit((data) => {
@@ -213,9 +187,6 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 											reset(prevState => {
 												return {
 													...prevState,
-													// records: [],
-													// customer: undefined as unknown as number,
-													// currency: undefined as unknown as string,
 													records: transformTransactions(transactions, watch('currency'))?.map(item => ({
 														store_currency: item?.store_currency?.id,
 														store_amount: '0',
@@ -248,72 +219,6 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 						}
 
 						<div className="flex gap-lg span-12">
-							{/*<div className="flex-1">*/}
-							{/*	<Controller*/}
-							{/*		name="type"*/}
-							{/*		control={control}*/}
-							{/*		render={({field: {value, ref, onChange, onBlur}}) => (*/}
-							{/*			<Select*/}
-							{/*				ref={ref}*/}
-							{/*				id="type"*/}
-							{/*				label="Type"*/}
-							{/*				isDisabled={true}*/}
-							{/*				onBlur={onBlur}*/}
-							{/*				options={exchangeOptions}*/}
-							{/*				error={errors.type?.message}*/}
-							{/*				value={getSelectValue(exchangeOptions, value)}*/}
-							{/*				defaultValue={getSelectValue(exchangeOptions, value)}*/}
-							{/*				handleOnChange={(e) => onChange(e as string)}*/}
-							{/*			/>*/}
-							{/*		)}*/}
-							{/*	/>*/}
-							{/*</div>*/}
-							{/*{*/}
-							{/*	expanse ?*/}
-							{/*		<div className="flex-1">*/}
-							{/*			<Controller*/}
-							{/*				name="service_type"*/}
-							{/*				control={control}*/}
-							{/*				render={({field: {value, ref, onChange, onBlur}}) => (*/}
-							{/*					<Select*/}
-							{/*						ref={ref}*/}
-							{/*						id="service_type"*/}
-							{/*						label="Expense type"*/}
-							{/*						options={serviceTypes}*/}
-							{/*						onBlur={onBlur}*/}
-							{/*						isDisabled={retrieve}*/}
-							{/*						error={errors.service_type?.message}*/}
-							{/*						value={getSelectValue(serviceTypes, value)}*/}
-							{/*						defaultValue={getSelectValue(serviceTypes, value)}*/}
-							{/*						handleOnChange={(e) => onChange(e as string)}*/}
-							{/*					/>*/}
-							{/*				)}*/}
-							{/*			/>*/}
-							{/*		</div> : null*/}
-							{/*}*/}
-							{/*<div className="flex-1">*/}
-							{/*	<Controller*/}
-							{/*		name="store"*/}
-							{/*		control={control}*/}
-							{/*		render={({field: {value, ref, onChange, onBlur}}) => (*/}
-							{/*			<Select*/}
-							{/*				ref={ref}*/}
-							{/*				id="store"*/}
-							{/*				label="Store"*/}
-							{/*				options={stores}*/}
-							{/*				onBlur={onBlur}*/}
-							{/*				isDisabled={retrieve}*/}
-							{/*				error={errors.store?.message}*/}
-							{/*				value={getSelectValue(stores, value)}*/}
-							{/*				defaultValue={getSelectValue(stores, value)}*/}
-							{/*				handleOnChange={(e) => {*/}
-							{/*					setValue('customer', undefined as unknown as number)*/}
-							{/*					onChange(e as string)*/}
-							{/*				}}*/}
-							{/*			/>*/}
-							{/*		)}*/}
-							{/*	/>*/}
-							{/*</div>*/}
 							<div className="flex-1">
 								<Controller
 									name="customer"
@@ -379,33 +284,6 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 									{...register(`description`)}
 								/>
 							</div>
-							{/*<div className="flex-1">*/}
-							{/*	<Controller*/}
-							{/*		control={control}*/}
-							{/*		name="total"*/}
-							{/*		render={({field}) => (*/}
-							{/*			<NumberFormattedInput*/}
-							{/*				{...field}*/}
-							{/*				onChange={(e) => {*/}
-							{/*					setValue('first_amount', e)*/}
-							{/*					setValue('records', watch('records')?.map(item => ({*/}
-							{/*						store_currency: item?.store_currency,*/}
-							{/*						store_amount: '0',*/}
-							{/*						customer_amount: '0'*/}
-							{/*					})) ?? [])*/}
-							{/*					field.onChange(e)*/}
-							{/*				}}*/}
-							{/*				id="total"*/}
-							{/*				maxLength={15}*/}
-							{/*				disableGroupSeparators={false}*/}
-							{/*				allowDecimals={true}*/}
-							{/*				disabled={retrieve}*/}
-							{/*				label={`${t('Total')}`}*/}
-							{/*				error={errors?.total?.message}*/}
-							{/*			/>*/}
-							{/*		)}*/}
-							{/*	/>*/}
-							{/*</div>*/}
 						</div>
 						<div className="span-12 grid gap-2xl">
 							{
@@ -417,20 +295,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 											render={({field}) => (
 												<NumberFormattedInput
 													{...field}
-													// onChange={(e) => {
-													// 	if ((Number(watch('total') || 0) - Number(e)) > 0) {
-													// 		setValue(`records.0.customer_amount`, String(Number(watch('total') || 0) - Number(e)))
-													// 		setValue(`records.0.store_amount`, convertCurrency(Number(watch('total') || 0) - Number(e), 'fromStore', watch(`records.0.store_currency`), transactions)?.toString())
-													// 	} else {
-													// 		setValue('records', watch('records')?.map(item => ({
-													// 			store_currency: item?.store_currency,
-													// 			store_amount: '0',
-													// 			customer_amount: '0'
-													// 		})) ?? [])
-													// 		setValue('total', e)
-													// 	}
-													// 	field.onChange(e)
-													// }}
+
 													id="first_amount"
 													redLabel={exchangeOptions[1].value == tab}
 													maxLength={15}
@@ -443,18 +308,6 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 											)}
 										/>
 									</div>
-									// {
-									// 	retrieve &&
-									// 	<div className="flex-1">
-									// 		<Input
-									// 			id="all"
-									// 			disabled={true}
-									// 			placeholder=" "
-									// 			label={`${t(findName(currencyOptions, watch(`currency`)))?.toLowerCase()} (${t('Checkout')})`}
-									// 			value={decimalToPrice(detail?.amount || 0)}
-									// 		/>
-									// 	</div>
-									// }
 									: null
 							}
 
@@ -470,12 +323,6 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 													render={({field}) => (
 														<NumberFormattedInput
 															{...field}
-															// onChange={event => {
-															// 	const storeAmount = parseFloat(event || '0')
-															// 	setValue(`records.${index}.customer_amount`, convertCurrency(storeAmount, 'toStore', watch(`records.${index}.store_currency`), transactions)?.toString()
-															// 	)
-															// 	field.onChange(event as string)
-															// }}
 															id={`records.${index}.store_amount`}
 															maxLength={15}
 															disableGroupSeparators={false}
@@ -497,7 +344,6 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 														height: '1.7rem',
 														cursor: 'pointer'
 													}}
-													// onClick={() => handleDoubleClick(index, 'customer_amount')}
 												/>
 											</div>
 
@@ -508,35 +354,6 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 													render={({field}) => (
 														<NumberFormattedInput
 															{...field}
-															// onChange={(e) => {
-															// 	if (index === 0 && (watch('records')?.length || 0) - 1 > index) {
-															// 		if ((Number(watch('total') || 0) - (Number(watch('first_amount') || 0) + Number(e))) > 0) {
-															// 			setValue(`records.1.customer_amount`, String(Number(watch('total') || 0) - (Number(watch('first_amount') || 0) + Number(e))))
-															// 			setValue(`records.1.store_amount`, convertCurrency(Number(watch('total') || 0) - (Number(watch('first_amount') || 0) + Number(e)), 'fromStore', watch(`records.1.store_currency`), transactions)?.toString())
-															// 			// setValue('total', String(Number(watch('first_amount') || 0) + Number(e)))
-															// 		} else {
-															// 			setValue(`records.1.customer_amount`, '0')
-															// 			setValue(`records.2.customer_amount`, '0')
-															// 			setValue(`records.1.store_amount`, '0')
-															// 			setValue(`records.2.store_amount`, '0')
-															// 			setValue('total', String(Number(watch('first_amount') || 0) + Number(e)))
-															// 		}
-															// 	} else if (index === 1 && (watch('records')?.length || 0) - 1 > index) {
-															// 		if ((Number(watch('total') || 0) - (Number(watch('first_amount') || 0) + Number(watch(`records.0.customer_amount`) || 0) + Number(e))) > 0) {
-															// 			setValue(`records.2.customer_amount`, String(Number(watch('total') || 0) - (Number(watch('first_amount') || 0) + Number(watch(`records.0.customer_amount`) || 0) + Number(e))))
-															// 			setValue(`records.2.store_amount`, convertCurrency(Number(watch('total') || 0) - (Number(watch('first_amount') || 0) + Number(watch(`records.0.customer_amount`) || 0) + Number(e)), 'fromStore', watch(`records.2.store_currency`), transactions)?.toString())
-															// 		} else {
-															// 			setValue(`records.2.customer_amount`, '0')
-															// 			setValue(`records.2.store_amount`, '0')
-															// 			setValue('total', String(Number(watch('first_amount') || 0) + Number(watch(`records.0.customer_amount`) || 0) + Number(e)))
-															// 		}
-															// 	} else if (index === 2 && (watch('records')?.length || 0) - 1 >= index) {
-															// 		if (!((Number(watch('total') || 0) - (Number(watch('first_amount') || 0) + Number(watch(`records.0.customer_amount`) || 0) + Number(watch(`records.1.customer_amount`) || 0) + Number(e))) > 0)) {
-															// 			setValue('total', String(Number(watch('first_amount') || 0) + Number(watch(`records.0.customer_amount`) || 0) + Number(watch(`records.1.customer_amount`) || 0) + Number(e)))
-															// 		}
-															// 	}
-															// 	field.onChange(e)
-															// }}
 															id={`records.${index}.customer_amount`}
 															maxLength={15}
 															disableGroupSeparators={false}

@@ -1,10 +1,10 @@
 import {
 	Button,
 	Card,
-	CardTab, Checkbox, DeleteModal,
+	Checkbox, DeleteModal,
 	Input, Loader,
 	MaskInput,
-	NumberFormattedInput,
+	NumberFormattedInput, PageTitle,
 	Select
 } from 'components'
 import {currencyOptions} from 'constants/options'
@@ -18,10 +18,10 @@ import {IPurchaseItem, ITemporaryListItem} from 'modules/products/interfaces/pur
 import {decimalToInteger, decimalToPrice, findName, getSelectValue, sumDecimals} from 'utilities/common'
 import {Controller, useForm} from 'react-hook-form'
 import {getDate} from 'utilities/date'
-import {FIELD} from 'constants/fields'
+import {BUTTON_THEME, FIELD} from 'constants/fields'
 import {yupResolver} from '@hookform/resolvers/yup'
 import {useAdd, useData, useDetail, useSearchParams} from 'hooks'
-import {useParams} from 'react-router-dom'
+import {useNavigate, useParams} from 'react-router-dom'
 import {useTranslation} from 'react-i18next'
 import {FC, useEffect} from 'react'
 import styles from './styles.module.scss'
@@ -36,6 +36,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 	const {t} = useTranslation()
 	const {removeParams} = useSearchParams()
 	const {id = undefined} = useParams()
+	const navigate = useNavigate()
 	const {mutateAsync, isPending: isAdding} = useAdd('purchases')
 	const {store} = useTypedSelector(state => state.stores)
 
@@ -132,20 +133,38 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 
 	return (
 		<>
+			<PageTitle
+				title={t('Trade (income)')}
+			>
+				<div className="flex align-center gap-lg">
+					<Button
+						onClick={() => navigate(-1)}
+						theme={BUTTON_THEME.DANGER_OUTLINE}
+					>
+						{t('Back')}
+					</Button>
+				</div>
+			</PageTitle>
 			<Card
 				shadow={true}
 				screen={true}
 				style={{padding: '.5rem 1.5rem 1.5rem'}}
 				className={classNames(styles.root)}
 			>
-				<div className={classNames('grid gap-lg')}>
-					<div className="span-12">
-						<CardTab
-							disabled={retrieve}
-							fallbackValue={productExchangeTabOptions[0]?.value}
-							tabs={productExchangeTabOptions}
-						/>
-					</div>
+				<div className={classNames('grid gap-lg')} style={{paddingTop: '.5rem'}}>
+					{/*<div className="span-12">*/}
+					{/*	<CardTab*/}
+					{/*		disabled={retrieve}*/}
+					{/*		fallbackValue={productExchangeTabOptions[0]?.value}*/}
+					{/*		tabs={[{*/}
+					{/*			label: 'Making income',*/}
+					{/*			value: 'purchase',*/}
+					{/*			color: 'var(--teal-green)'*/}
+					{/*		}]}*/}
+					{/*	/>*/}
+					{/*</div>*/}
+
+
 					<div className="flex gap-lg span-12">
 
 						<div className="flex-5">
