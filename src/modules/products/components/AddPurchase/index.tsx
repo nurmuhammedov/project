@@ -82,6 +82,10 @@ const Index: FC<IProperties> = ({
 				accessor: row => `${row?.product?.name}`
 			},
 			{
+				Header: t('Code'),
+				accessor: row => row?.code || ''
+			},
+			{
 				Header: t('Price'),
 				accessor: row => decimalToPrice(row.price)
 			},
@@ -419,7 +423,7 @@ const Index: FC<IProperties> = ({
 																mini={true}
 																type="submit"
 																disabled={isAdding || isUpdating || retrieve}
-																onClick={()=> onSubmit()}
+																onClick={() => onSubmit()}
 															/>
 															<Button
 																theme={BUTTON_THEME.DANGER_OUTLINE}

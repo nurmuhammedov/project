@@ -152,7 +152,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 				}
 			},
 			{
-				Header: t('Name'),
+				Header: `${t('Name')}/${t('Code')}`,
 				accessor: row => `${row?.name}`
 			},
 			{
@@ -178,7 +178,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 						disabled={isXMLLoading}
 						onClick={() => {
 							setIsXMLLoading(true)
-							interceptor.get(`temporaries/import`, {
+							interceptor.get(`temporaries/import?main-column=code`, {
 								responseType: 'blob'
 							}).then(res => {
 								const blob = new Blob([res.data])
@@ -192,7 +192,28 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 						}}
 						mini={true}
 					>
-						Template
+						{`${t('Template')} (${t('Code')?.toLowerCase()})`}
+					</Button>
+					<Button
+						style={{marginTop: 'auto'}}
+						disabled={isXMLLoading}
+						onClick={() => {
+							setIsXMLLoading(true)
+							interceptor.get(`temporaries/import?main-column=name`, {
+								responseType: 'blob'
+							}).then(res => {
+								const blob = new Blob([res.data])
+								const link = document.createElement('a')
+								link.href = window.URL.createObjectURL(blob)
+								link.download = `${t(`${t('Template')}`)}.xlsx`
+								link.click()
+							}).finally(() => {
+								setIsXMLLoading(false)
+							})
+						}}
+						mini={true}
+					>
+						{`${t('Template')} (${t('Name')?.toLowerCase()})`}
 					</Button>
 					{
 						!watch('supplier') ?
@@ -222,19 +243,25 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 									formData.append('xlsx-file', item)
 									formData.append('name', item.name)
 									interceptor
-										.post(`temporaries/import?supplier=${watch('supplier')}`, formData, {
+										.post<{
+											wrong_names: ITemporaryListItem[]
+										}>(`temporaries/import?supplier=${watch('supplier')}`, formData, {
 											headers: {
 												'Content-Type': 'multipart/form-data'
 											}
 										})
-										.then(() => {
-											showMessage(`${t('File successfully accepted')}`, 'success')
+										.then((response) => {
 											refetchTemporaryList().then(noop)
+											if (response?.data?.wrong_names?.length) {
+												showMessage(`${item.name} ${t('File not accepted')}`, 'error')
+												setWrongNames(response?.data?.wrong_names || [])
+												addParams({modal: 'wrongNames'})
+											} else {
+												showMessage(`${t('File successfully accepted')}`, 'success')
+											}
 										})
-										.catch((err) => {
+										.catch(() => {
 											showMessage(`${item.name} ${t('File not accepted')}`, 'error')
-											setWrongNames(err?.response?.data?.wrong_names || [])
-											addParams({modal: 'wrongNames'})
 										})
 										.finally(() => {
 											setIsLoading(false)

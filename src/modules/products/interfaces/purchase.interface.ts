@@ -19,6 +19,7 @@ export interface ITemporaryListItem {
 	price_type: IIDName;
 	currency: string;
 	name: string;
+	code: number;
 	purchase_date: string;
 	items_count: string | number;
 	date: string;
