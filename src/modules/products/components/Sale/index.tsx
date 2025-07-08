@@ -1,6 +1,17 @@
 import {yupResolver} from '@hookform/resolvers/yup'
 import classNames from 'classnames'
-import {Button, Card, DeleteModal, Input, Loader, MaskInput, PageTitle, Select} from 'components'
+import {
+	Button,
+	Card,
+	DeleteModal,
+	FileUploader,
+	Input,
+	Loader,
+	MaskInput, Modal,
+	PageTitle,
+	ReactTable,
+	Select
+} from 'components'
 import {BUTTON_THEME, FIELD} from 'constants/fields'
 import {currencyOptions} from 'constants/options'
 import {useAdd, useData, useDetail, useSearchParams} from 'hooks'
@@ -11,13 +22,16 @@ import AddSale from 'modules/products/components/AddSale'
 import {productExchangeTabOptions} from 'modules/products/helpers/options'
 import {saleItemSchema} from 'modules/products/helpers/yup'
 import {IPurchaseItem, ITemporaryListItem} from 'modules/products/interfaces/purchase.interface'
-import {FC, useEffect} from 'react'
+import {FC, useEffect, useMemo, useState} from 'react'
 import {Controller, useForm} from 'react-hook-form'
 import {useTranslation} from 'react-i18next'
 import {useNavigate, useParams} from 'react-router-dom'
-import {decimalToInteger, decimalToPrice, getSelectValue, sumDecimals} from 'utilities/common'
+import {decimalToInteger, decimalToPrice, getSelectValue, noop, sumDecimals} from 'utilities/common'
 import {getDate} from 'utilities/date'
 import styles from '../Purchase/styles.module.scss'
+import {interceptor} from 'libraries/index'
+import {showMessage} from 'utilities/alert'
+import {Column} from 'react-table'
 
 
 interface IProperties {
@@ -26,12 +40,15 @@ interface IProperties {
 
 const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 	const {t} = useTranslation()
-	const {removeParams} = useSearchParams()
+	const {removeParams, addParams} = useSearchParams()
 	const {id: productId = undefined} = useParams()
 	const {mutateAsync, isPending: isAdding} = useAdd('sales')
 	const {store} = useTypedSelector(state => state.stores)
 	const {data: clients = []} = useData<ISelectOption[]>('customers/select', !!store?.value, {store: store?.value})
 	const navigate = useNavigate()
+	const [exelLoader, setIsLoading] = useState<boolean>(false)
+	const [wrongNames, setWrongNames] = useState<ITemporaryListItem[]>([])
+	const [isXMLLoading, setIsXMLLoading] = useState<boolean>(false)
 
 	const {
 		data: saleDetail,
@@ -112,6 +129,33 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 		}
 	}, [store?.value, retrieve])
 
+	const columns: Column<ITemporaryListItem>[] = useMemo(
+		() => [
+			{
+				Header: t('№'),
+				accessor: (_, index: number) => (index + 1),
+				style: {
+					width: '3rem',
+					textAlign: 'center'
+				}
+			},
+			{
+				Header: `${t('Name')}/${t('Code')}`,
+				accessor: row => `${row?.name}`
+			},
+			{
+				Header: t('Price'),
+				accessor: row => decimalToPrice(row.price)
+			},
+			{
+				Header: t('Count'),
+				accessor: row => decimalToInteger(row?.unit_quantity)
+			}
+		],
+		[]
+	)
+
+
 	if (isSaleDetailLoading && retrieve) {
 		return <Loader/>
 	}
@@ -122,6 +166,109 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 				title={t('Trade (loss)')}
 			>
 				<div className="flex align-center gap-lg">
+					<Button
+						style={{marginTop: 'auto'}}
+						disabled={isXMLLoading}
+						onClick={() => {
+							setIsXMLLoading(true)
+							interceptor.get(`temporaries/import?main-column=code`, {
+								responseType: 'blob'
+							}).then(res => {
+								const blob = new Blob([res.data])
+								const link = document.createElement('a')
+								link.href = window.URL.createObjectURL(blob)
+								link.download = `${t(`${t('Template')}`)}.xlsx`
+								link.click()
+							}).finally(() => {
+								setIsXMLLoading(false)
+							})
+						}}
+						mini={true}
+					>
+						{`${t('Template')} (${t('Code')?.toLowerCase()})`}
+					</Button>
+					<Button
+						style={{marginTop: 'auto'}}
+						disabled={isXMLLoading}
+						onClick={() => {
+							setIsXMLLoading(true)
+							interceptor.get(`temporaries/import?main-column=name`, {
+								responseType: 'blob'
+							}).then(res => {
+								const blob = new Blob([res.data])
+								const link = document.createElement('a')
+								link.href = window.URL.createObjectURL(blob)
+								link.download = `${t(`${t('Template')}`)}.xlsx`
+								link.click()
+							}).finally(() => {
+								setIsXMLLoading(false)
+							})
+						}}
+						mini={true}
+					>
+						{`${t('Template')} (${t('Name')?.toLowerCase()})`}
+					</Button>
+					{
+						!watch('customer') ?
+							<Button
+								style={{marginTop: 'auto'}}
+								disabled={exelLoader}
+								mini={true}
+								onClick={() => trigger?.(['customer'])}
+							>
+								Import
+							</Button> :
+							<FileUploader
+								content={
+									<Button
+										style={{marginTop: 'auto'}}
+										disabled={exelLoader}
+										mini={true}
+									>
+										Import
+									</Button>
+								}
+								type="exel"
+								handleChange={(files) => {
+									const item = files[0]
+									setIsLoading(true)
+									const formData = new FormData()
+									formData.append('xlsx-file', item)
+									formData.append('name', item.name)
+									interceptor
+										.post<{
+											wrong_names: ITemporaryListItem[],
+											not_enough_quantity: ITemporaryListItem[],
+										}>(`sale-temporaries/import?customer=${watch('customer')}&store=${store?.value}`, formData, {
+											headers: {
+												'Content-Type': 'multipart/form-data'
+											}
+										})
+										.then((response) => {
+											refetchTemporaryList().then(noop)
+											if (response?.data?.wrong_names?.length) {
+												showMessage(`${item.name} ${t('File not accepted')}`, 'error')
+												setWrongNames(response?.data?.wrong_names || [])
+												addParams({modal: 'wrongNames'})
+											} else if (response?.data?.not_enough_quantity?.length) {
+												showMessage(`${item.name} ${t('File not accepted')}`, 'error')
+												setWrongNames(response?.data?.not_enough_quantity || [])
+												addParams({modal: 'wrongNames'})
+											} else {
+												showMessage(`${t('File successfully accepted')}`, 'success')
+											}
+										})
+										.catch(() => {
+											showMessage(`${item.name} ${t('File not accepted')}`, 'error')
+										})
+										.finally(() => {
+											setIsLoading(false)
+										})
+								}}
+								value={undefined}
+								id="series"
+							/>
+					}
 					<Button
 						onClick={() => navigate(-1)}
 						theme={BUTTON_THEME.DANGER_OUTLINE}
@@ -310,7 +457,17 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 					</div>
 				</div>
 			</Card>
-
+			<Modal
+				onClose={() => {
+					setWrongNames([])
+					removeParams('modal')
+				}}
+				title="Wrong names"
+				id="wrongNames"
+				style={{height: '40rem', width: '60rem'}}
+			>
+				<ReactTable columns={columns} data={wrongNames}/>
+			</Modal>
 			{
 				!retrieve && temporaryList?.length > 0 &&
 				<DeleteModal

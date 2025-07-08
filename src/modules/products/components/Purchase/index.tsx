@@ -137,10 +137,6 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 		}
 	}, [purchase, isPurchaseLoading, retrieve])
 
-	if (isPurchaseLoading && retrieve) {
-		return <Loader/>
-	}
-
 	const columns: Column<ITemporaryListItem>[] = useMemo(
 		() => [
 			{
@@ -166,6 +162,12 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 		],
 		[]
 	)
+
+
+	if (isPurchaseLoading && retrieve) {
+		return <Loader/>
+	}
+
 
 	return (
 		<>

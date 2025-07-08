@@ -1,6 +1,6 @@
-import {FC, useState, useRef, useEffect} from 'react'
+import {FC, useState, useRef} from 'react'
 import {useTranslation} from 'react-i18next'
-import {NavLink, NavLinkRenderProps, useLocation} from 'react-router-dom'
+import {NavLink, NavLinkRenderProps} from 'react-router-dom'
 import classNames from 'classnames'
 import styles from './styles.module.scss'
 import {IMenuItem} from 'interfaces/configuration.interface'
@@ -8,7 +8,6 @@ import {IMenuItem} from 'interfaces/configuration.interface'
 
 const NavItem: FC<IMenuItem> = ({href, label, icon, children}) => {
 	const {t} = useTranslation()
-	const location = useLocation()
 	const [isSubMenuOpen, setIsSubMenuOpen] = useState(false)
 	const navItemRef = useRef<HTMLDivElement>(null)
 
@@ -26,12 +25,12 @@ const NavItem: FC<IMenuItem> = ({href, label, icon, children}) => {
 		}
 	}
 
-	useEffect(() => {
-		const isActiveParent = hasChildren && children.some(child => location.pathname.startsWith(child.href.split('?')[0]))
-		if (isActiveParent) {
-			setIsSubMenuOpen(true)
-		}
-	}, [location.pathname, hasChildren, children])
+	// useEffect(() => {
+	// 	const isActiveParent = hasChildren && children.some(child => location.pathname.startsWith(child.href.split('?')[0]))
+	// 	if (isActiveParent) {
+	// 		setIsSubMenuOpen(true)
+	// 	}
+	// }, [location.pathname, hasChildren, children])
 
 
 	const renderNavItem = (item: IMenuItem, isSubItem: boolean = false) => {
