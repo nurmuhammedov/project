@@ -6,6 +6,7 @@ import {useSearchParams} from 'hooks'
 import {productExchangeTabOptions} from 'modules/products/helpers/options'
 import {FC} from 'react'
 import {useNavigate} from 'react-router-dom'
+import Transfer from 'modules/products/components/Transfer'
 
 
 interface IProperties {
@@ -32,7 +33,8 @@ const Index: FC<IProperties> = ({detail = false}) => {
 			{
 				tab === 'purchase' ? <Purchase detail={detail}/> :
 					tab === 'sale' ? <Sale detail={detail}/> :
-						null
+						tab === 'transfer' ? <Transfer detail={detail}/> :
+							null
 			}
 
 		</>

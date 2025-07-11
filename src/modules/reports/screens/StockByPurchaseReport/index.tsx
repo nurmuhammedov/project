@@ -49,10 +49,10 @@ const Stores = () => {
 				Header: t('Product'),
 				accessor: (row) => row?.product?.name || ''
 			},
-			{
-				Header: t('Code'),
-				accessor: 'code'
-			},
+			// {
+			// 	Header: t('Code'),
+			// 	accessor: 'code'
+			// },
 			{
 				Header: t('Store'),
 				accessor: (row) => row?.store?.name || ''

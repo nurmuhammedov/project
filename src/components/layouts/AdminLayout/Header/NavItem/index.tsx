@@ -38,7 +38,7 @@ const NavItem: FC<IMenuItem> = ({href, label, icon, children}) => {
 		return (
 			<NavLink
 				to={item.href}
-				className={({isActive}: NavLinkRenderProps) => classNames(styles.navItem, {[styles.active]: (isSubItem && itemIsActive) || (!isSubItem && isActive)})}
+				className={({isActive}: NavLinkRenderProps) => classNames(styles.navItem, {[styles.active]: ((isSubItem && itemIsActive) || (!isSubItem && isActive)) && !hasChildren})}
 			>
 				{!!item.icon && <span className={classNames(styles.icon)}>{item.icon()}</span>}
 				<span className={styles.title}>{t(item.label)}</span>

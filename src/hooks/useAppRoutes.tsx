@@ -128,6 +128,41 @@ function useAppRoutes() {
 								]
 							},
 							{
+								path: 'trade',
+								children: [
+									{
+										index: true,
+										element: <ProductExchange/>
+									},
+									{
+										path: 'service',
+										element: <Service/>
+									},
+									{
+										path: 'product-exchange',
+										children: [
+											{
+												index: true,
+												element: <ProductExchange/>
+											}
+										]
+									},
+									{
+										path: 'daily-currency',
+										element: <DailyCurrency/>
+									},
+									{
+										path: 'currency-exchange',
+										children: [
+											{
+												index: true,
+												element: <CurrencyExchange/>
+											}
+										]
+									}
+								]
+							},
+							{
 								path: 'products',
 								children: [
 									{
@@ -140,10 +175,6 @@ function useAppRoutes() {
 											{
 												index: true,
 												element: <ProductExchange/>
-											},
-											{
-												path: ':id',
-												element: <ProductExchange detail={true}/>
 											}
 										]
 									}

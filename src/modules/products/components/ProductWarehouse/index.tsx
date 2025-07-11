@@ -63,11 +63,11 @@ const ProductWarehouse = () => {
 			{
 				Header: t('Brand'),
 				accessor: (row) => row.brand_name
-			},
-			{
-				Header: t('Code'),
-				accessor: (row) => row.code
 			}
+			// {
+			// 	Header: t('Code'),
+			// 	accessor: (row) => row.code
+			// }
 			// {
 			// 	Header: t('Actions'),
 			// 	accessor: (row) => (

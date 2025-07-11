@@ -63,3 +63,14 @@ export const saleItemSchema = yup.object().shape({
 	price_type: yup.number().required('This field is required'),
 	comment: yup.string().transform(value => value ? String(value) : '').trim().nullable()
 })
+
+export const temporaryTransferItemSchema = yup.object().shape({
+	unit_quantity: yup.string().trim().required('This field is required'),
+	product: yup.number().required('This field is required'),
+});
+
+export const transferItemSchema = yup.object().shape({
+	to_store: yup.number().required('This field is required'),
+	date: isNotFutureDate,
+	comment: yup.string().transform(value => value ? String(value) : '').trim().nullable()
+});

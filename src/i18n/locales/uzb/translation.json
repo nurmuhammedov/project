@@ -131,6 +131,8 @@
   "ruble": "рубль",
   "Ruble": "Рубль",
   "Transfer": "Перечисления",
+  "Swap": "Ўтказма",
+  "To store": "Дўконга",
   "Tashkent city": "Тошкент шаҳри",
   "Tashkent region": "Тошкент вилояти",
   "Samarkand region": "Самарқанд вилояти",
@@ -237,5 +239,7 @@
   "File not accepted": "файли қабул қилинмади",
   "Trade (loss)": "Савдо (чиқим)",
   "Currency exchange (income)": "Валюта айрбошлаш (кирим)",
+  "Reports(Trade)": "Ҳисоботлар (савдо)",
+  "Reports(Products)": "Ҳисоботлар (маҳсулотлар)",
   "Currency exchange (loss)": "Валюта айрбошлаш (чиқим)"
 }

@@ -47,10 +47,10 @@ const Stores = () => {
 				Header: t('Product'),
 				accessor: 'product_name'
 			},
-			{
-				Header: t('Code'),
-				accessor: 'code'
-			},
+			// {
+			// 	Header: t('Code'),
+			// 	accessor: 'code'
+			// },
 			{
 				Header: t('Store'),
 				accessor: 'store_name'

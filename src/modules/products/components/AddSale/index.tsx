@@ -40,10 +40,10 @@ interface IProperties {
 	clientId?: number | string;
 	refetchTemporaryList?: () => void;
 	focus?: UseFormSetFocus<InferType<typeof saleItemSchema>>;
+	trigger?: UseFormTrigger<InferType<typeof saleItemSchema>>;
 	isTemporaryListFetching: boolean;
 	detailItems?: ITemporaryListItem[];
 	temporaryList?: ITemporaryListItem[];
-	trigger?: UseFormTrigger<InferType<typeof saleItemSchema>>;
 	currency?: string | number;
 	detail?: boolean;
 }
@@ -463,7 +463,7 @@ const Index: FC<IProperties> = ({
 														mini={true}
 														type="submit"
 														disabled={isAdding || isUpdating || retrieve}
-														onClick={()=> onSubmit()}
+														onClick={() => onSubmit()}
 													/>
 													<Button
 														theme={BUTTON_THEME.DANGER_OUTLINE}

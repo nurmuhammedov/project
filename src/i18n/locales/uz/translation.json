@@ -131,6 +131,8 @@
   "ruble": "rubl",
   "Ruble": "Rubl",
   "Transfer": "Perechisleniya",
+  "Swap": "O‘tkazma",
+  "To store": "Do‘konga",
   "Tashkent city": "Toshkent shahri",
   "Tashkent region": "Toshkent viloyati",
   "Samarkand region": "Samarqand viloyati",
@@ -237,5 +239,7 @@
   "Trade (loss)": "Savdo (chiqim)",
   "Currency exchange (income)": "Valyuta ayrboshlash (kirim)",
   "File not accepted": "fayli qabul qilinmadi",
+  "Reports(Trade)": "Hisobotlar (savdo)",
+  "Reports(Products)": "Hisobotlar (mahsulotlar)",
   "Currency exchange (loss)": "Valyuta ayrboshlash (chiqim)"
 }
