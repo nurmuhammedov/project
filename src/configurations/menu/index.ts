@@ -81,9 +81,9 @@ export const menu: IMenuItem[] = [
 		}
 	},
 	{
-		id: '/database',
-		label: 'Database',
-		href: '/admin/database',
+		id: '/admin/reports/by-warehouse',
+		label: 'Reports(Products)',
+		href: '/admin/reports/by-warehouse',
 		allowedRoles: [
 			ROLE_LIST.ADMIN
 		],
@@ -92,37 +92,25 @@ export const menu: IMenuItem[] = [
 		},
 		children: [
 			{
-				id: '/clients',
-				label: 'Customers',
-				href: '/admin/clients',
-				allowedRoles: [
-					ROLE_LIST.ADMIN
-				],
-				order: {
-					[ROLE_LIST.ADMIN]: 1
-				}
+				id: '/admin/reports/by-warehouse',
+				label: 'Products warehouse',
+				href: '/admin/reports/by-warehouse',
+				allowedRoles: [ROLE_LIST.ADMIN],
+				order: {[ROLE_LIST.ADMIN]: 1}
 			},
 			{
-				id: '/stores',
-				label: 'Stores',
-				href: '/admin/stores',
-				allowedRoles: [
-					ROLE_LIST.ADMIN
-				],
-				order: {
-					[ROLE_LIST.ADMIN]: 1
-				}
+				id: '/admin/reports/by-price',
+				label: 'Remaining stock (by price)',
+				href: '/admin/reports/by-price',
+				allowedRoles: [ROLE_LIST.ADMIN],
+				order: {[ROLE_LIST.ADMIN]: 2}
 			},
 			{
-				id: '/database',
-				label: 'Database',
-				href: '/admin/database',
-				allowedRoles: [
-					ROLE_LIST.ADMIN
-				],
-				order: {
-					[ROLE_LIST.ADMIN]: 1
-				}
+				id: '/admin/reports/by-purchase',
+				label: 'Product balance (by purchase)',
+				href: '/admin/reports/by-purchase',
+				allowedRoles: [ROLE_LIST.ADMIN],
+				order: {[ROLE_LIST.ADMIN]: 2}
 			}
 		]
 	},
@@ -168,9 +156,9 @@ export const menu: IMenuItem[] = [
 		]
 	},
 	{
-		id: '/admin/reports/by-warehouse',
-		label: 'Reports(Products)',
-		href: '/admin/reports/by-warehouse',
+		id: '/database',
+		label: 'Database',
+		href: '/admin/database',
 		allowedRoles: [
 			ROLE_LIST.ADMIN
 		],
@@ -179,25 +167,37 @@ export const menu: IMenuItem[] = [
 		},
 		children: [
 			{
-				id: '/admin/reports/by-warehouse',
-				label: 'Products warehouse',
-				href: '/admin/reports/by-warehouse',
-				allowedRoles: [ROLE_LIST.ADMIN],
-				order: {[ROLE_LIST.ADMIN]: 1}
+				id: '/clients',
+				label: 'Customers',
+				href: '/admin/clients',
+				allowedRoles: [
+					ROLE_LIST.ADMIN
+				],
+				order: {
+					[ROLE_LIST.ADMIN]: 1
+				}
 			},
 			{
-				id: '/admin/reports/by-price',
-				label: 'Remaining stock (by price)',
-				href: '/admin/reports/by-price',
-				allowedRoles: [ROLE_LIST.ADMIN],
-				order: {[ROLE_LIST.ADMIN]: 2}
+				id: '/stores',
+				label: 'Stores',
+				href: '/admin/stores',
+				allowedRoles: [
+					ROLE_LIST.ADMIN
+				],
+				order: {
+					[ROLE_LIST.ADMIN]: 1
+				}
 			},
 			{
-				id: '/admin/reports/by-purchase',
-				label: 'Product balance (by purchase)',
-				href: '/admin/reports/by-purchase',
-				allowedRoles: [ROLE_LIST.ADMIN],
-				order: {[ROLE_LIST.ADMIN]: 2}
+				id: '/database',
+				label: 'Database',
+				href: '/admin/database',
+				allowedRoles: [
+					ROLE_LIST.ADMIN
+				],
+				order: {
+					[ROLE_LIST.ADMIN]: 1
+				}
 			}
 		]
 	}

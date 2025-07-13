@@ -6,7 +6,11 @@ import {
 	Form,
 	Select,
 	NumberFormattedInput,
-	Loader, ReactTable, EditButton, DeleteButton, Input,
+	Loader,
+	ReactTable,
+	EditButton,
+	DeleteButton,
+	Input,
 	Button
 } from 'components'
 import HR from 'components/HR'
@@ -22,17 +26,25 @@ import {
 import {measurementUnits} from 'modules/database/helpers/options'
 import styles from 'modules/products/components/Purchase/styles.module.scss'
 import {purchaseItemSchema, temporaryItemSchema} from 'modules/products/helpers/yup'
-import {ITemporaryListItem, IValidationData} from 'modules/products/interfaces/purchase.interface'
+import {IPurchaseItem, ITemporaryListItem, IValidationData} from 'modules/products/interfaces/purchase.interface'
 import React, {FC, useEffect, useMemo, useState} from 'react'
 import {Controller, useFieldArray, useForm, UseFormSetFocus, UseFormTrigger} from 'react-hook-form'
 import {Column} from 'react-table'
 import {showMessage} from 'utilities/alert'
-import {cleanParams, decimalToInteger, decimalToNumber, decimalToPrice, getSelectValue} from 'utilities/common'
+import {
+	cleanParams,
+	decimalToInteger,
+	decimalToNumber,
+	decimalToPrice,
+	getSelectValue,
+	sumDecimals
+} from 'utilities/common'
 import {ISelectOption} from 'interfaces/form.interface'
 import {getDate} from 'utilities/date'
 import {useTranslation} from 'react-i18next'
 import {ISearchParams} from 'interfaces/params.interface'
 import {InferType} from 'yup'
+import {currencyOptions} from 'constants/options'
 
 
 interface IProperties {
@@ -42,6 +54,8 @@ interface IProperties {
 	isTemporaryListFetching: boolean,
 	detail?: boolean,
 	detailItems?: ITemporaryListItem[],
+	purchase?: IPurchaseItem,
+	parentWatch?: (t: string) => string,
 	temporaryList?: ITemporaryListItem[],
 	trigger?: UseFormTrigger<InferType<typeof purchaseItemSchema>>,
 }
@@ -53,6 +67,8 @@ const Index: FC<IProperties> = ({
 	                                focus: parentFocus,
 	                                detail: retrieve = false,
 	                                detailItems,
+	                                parentWatch,
+	                                purchase,
 	                                temporaryList,
 	                                isTemporaryListFetching
                                 }) => {
@@ -442,10 +458,8 @@ const Index: FC<IProperties> = ({
 																			expiry_date: ''
 																		}
 																	)
-
 																}}
 															/>
-
 														</div>
 													}
 												</div>
@@ -456,7 +470,24 @@ const Index: FC<IProperties> = ({
 						}
 
 						<div className="span-12">
-							<div className={styles.title}>{t('Products')}</div>
+							<div className="flex gap-lg align-center justify-between">
+								<div className={styles.title}>{t('Products')}:</div>
+								<div className={styles['price-wrapper']}>
+									<div className={styles.price}>
+										<p>{`${t('Total')}`}:</p>
+										<span>{decimalToInteger(sumDecimals((retrieve ? purchase?.items : temporaryList)?.map(i => i?.unit_quantity ?? '0.00') ?? []))}</span>
+									</div>
+									<div className={styles.price}>
+										<p>{t('Products')}:</p>
+										<span>{decimalToPrice(sumDecimals((retrieve ? purchase?.items : temporaryList)?.map(i => i?.total_price ?? '0.00') ?? []))} {t(currencyOptions?.find(i => i?.value == (retrieve ? purchase?.currency : parentWatch?.('currency')))?.label?.toString() || '')?.toLowerCase() ?? ''}</span>
+									</div>
+									<div className={styles.price}>
+										<p>{t('Expense quantity')}:</p>
+										<span>{decimalToPrice(retrieve ? purchase?.cost_amount || '0' : parentWatch?.('cost_amount') || '0')} {t(currencyOptions?.find(i => i?.value == (retrieve ? purchase?.cost_currency : parentWatch?.('cost_currency')))?.label?.toString() || '')?.toLowerCase() ?? ''}</span>
+									</div>
+								</div>
+							</div>
+
 							<ReactTable
 								columns={columns} data={retrieve ? detailItems ?? [] : temporaryList ?? []}
 								isLoading={isTemporaryListFetching}

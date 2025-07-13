@@ -8,6 +8,7 @@
   justify-content: space-between;
   gap: 0.625rem;
   border-radius: 1rem;
+  text-align: start;
   padding: 1rem;
   color: var(--dark-teal);
   background: var(--white);

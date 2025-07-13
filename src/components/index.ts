@@ -2,6 +2,7 @@ import HorizontalTab from './HorizontalTab'
 import TemporaryItem from './TemporaryItem'
 import DetailButton from './DetailButton'
 import DeleteButton from './DeleteButton'
+import ScrollButton from './ScrollButton'
 import VerticalTab from './VerticalTab'
 import DeleteModal from './DeleteModal'
 import Pagination from './Pagination'
@@ -34,6 +35,7 @@ export {
 	TemporaryItem,
 	DeleteButton,
 	DetailButton,
+	ScrollButton,
 	VerticalTab,
 	DeleteModal,
 	Pagination,

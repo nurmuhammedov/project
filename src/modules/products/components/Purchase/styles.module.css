@@ -5,7 +5,6 @@
   font-style: normal;
   font-weight: 400;
   line-height: 160%; /* 1.2rem */
-  margin-bottom: 0.3rem;
 }
 .root .not-found {
   color: var(--dark-slate);
@@ -19,33 +18,32 @@
 }
 .root .footer {
   display: grid;
-  grid-template-columns: 1fr 2fr;
+  grid-template-columns: 1fr;
   gap: 1rem;
   margin-top: auto;
 }
-.root .footer .price-wrapper {
+.root .price-wrapper {
   flex: 1 0 0;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
   flex-direction: row;
   gap: 1rem;
 }
-.root .footer .price-wrapper .price, .root .footer .price-wrapper .total-price {
+.root .price-wrapper .price, .root .price-wrapper .total-price {
   display: flex;
   gap: 0.5rem;
   white-space: nowrap;
 }
-.root .footer .price-wrapper .price p, .root .footer .price-wrapper .price span, .root .footer .price-wrapper .total-price p, .root .footer .price-wrapper .total-price span {
+.root .price-wrapper .price p, .root .price-wrapper .price span, .root .price-wrapper .total-price p, .root .price-wrapper .total-price span {
   color: var(--light-gray-2);
   font-family: Golos, Arial, Helvetica, sans-serif;
-  font-size: 1.125rem;
-  white-space: nowrap;
+  font-size: 1rem;
   font-style: normal;
   font-weight: 400;
-  line-height: 150%; /* 1.6875rem */
+  line-height: 160%; /* 1.2rem */
 }
-.root .footer .price-wrapper .price span, .root .footer .price-wrapper .total-price span {
+.root .price-wrapper .price span, .root .price-wrapper .total-price span {
   color: var(--dark-slate);
 }
 

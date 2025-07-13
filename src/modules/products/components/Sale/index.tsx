@@ -9,7 +9,7 @@ import {
 	Loader,
 	MaskInput, Modal,
 	PageTitle,
-	ReactTable,
+	ReactTable, ScrollButton,
 	Select
 } from 'components'
 import {BUTTON_THEME, FIELD} from 'constants/fields'
@@ -26,7 +26,7 @@ import {FC, useEffect, useMemo, useState} from 'react'
 import {Controller, useForm} from 'react-hook-form'
 import {useTranslation} from 'react-i18next'
 import {useNavigate, useParams} from 'react-router-dom'
-import {decimalToInteger, decimalToPrice, getSelectValue, noop, sumDecimals} from 'utilities/common'
+import {decimalToInteger, decimalToPrice, getSelectValue, noop} from 'utilities/common'
 import {getDate} from 'utilities/date'
 import styles from '../Purchase/styles.module.scss'
 import {interceptor} from 'libraries/index'
@@ -403,6 +403,8 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 							trigger={trigger}
 							focus={setFocus}
 							detail={retrieve}
+							saleDetail={saleDetail}
+							parentWatch={watch}
 							detailItems={saleDetail?.items}
 							temporaryList={temporaryList}
 							isTemporaryListFetching={retrieve ? isSaleDetailLoading : isTemporaryListFetching}
@@ -445,16 +447,16 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 						</Button>
 					}
 
-					<div className={styles['price-wrapper']} style={{direction: 'ltr'}}>
-						<div className={styles.price}>
-							<p>{`${t('Total')} ${t('Count')?.toLowerCase()}`}:</p>
-							<span>{decimalToInteger(sumDecimals((retrieve ? saleDetail?.items : temporaryList)?.map(i => i?.total_quantity ?? '0.00') ?? []))}</span>
-						</div>
-						<div className={styles.price}>
-							<p>{t('Products')}:</p>
-							<span>{decimalToPrice(sumDecimals((retrieve ? saleDetail?.items : temporaryList)?.map(i => i?.total_price ?? '0.00') ?? []))} {t(currencyOptions?.find(i => i?.value == (retrieve ? saleDetail?.currency : watch('currency')))?.label?.toString() || '')?.toLowerCase() ?? ''}</span>
-						</div>
-					</div>
+					{/*<div className={styles['price-wrapper']}>*/}
+					{/*	<div className={styles.price}>*/}
+					{/*		<p>{`${t('Total')} ${t('Count')?.toLowerCase()}`}:</p>*/}
+					{/*		<span>{decimalToInteger(sumDecimals((retrieve ? saleDetail?.items : temporaryList)?.map(i => i?.total_quantity ?? '0.00') ?? []))}</span>*/}
+					{/*	</div>*/}
+					{/*	<div className={styles.price}>*/}
+					{/*		<p>{t('Products')}:</p>*/}
+					{/*		<span>{decimalToPrice(sumDecimals((retrieve ? saleDetail?.items : temporaryList)?.map(i => i?.total_price ?? '0.00') ?? []))} {t(currencyOptions?.find(i => i?.value == (retrieve ? saleDetail?.currency : watch('currency')))?.label?.toString() || '')?.toLowerCase() ?? ''}</span>*/}
+					{/*	</div>*/}
+					{/*</div>*/}
 				</div>
 			</Card>
 			<Modal
@@ -476,6 +478,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 					removedParams={['updateId', 'type']}
 				/>
 			}
+			<ScrollButton/>
 		</>
 	)
 }

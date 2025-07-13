@@ -9,7 +9,7 @@ import {
 	MaskInput,
 	Modal,
 	NumberFormattedInput,
-	PageTitle, ReactTable,
+	PageTitle, ReactTable, ScrollButton,
 	Select
 } from 'components'
 import {currencyOptions} from 'constants/options'
@@ -23,7 +23,7 @@ import {purchaseItemSchema} from 'modules/products/helpers/yup'
 import {IPurchaseItem, ITemporaryListItem} from 'modules/products/interfaces/purchase.interface'
 import {Column} from 'react-table'
 import {showMessage} from 'utilities/alert'
-import {decimalToInteger, decimalToPrice, findName, getSelectValue, noop, sumDecimals} from 'utilities/common'
+import {decimalToInteger, decimalToPrice, findName, getSelectValue, noop} from 'utilities/common'
 import {Controller, useForm} from 'react-hook-form'
 import {getDate} from 'utilities/date'
 import {BUTTON_THEME, FIELD} from 'constants/fields'
@@ -419,6 +419,8 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 							trigger={trigger}
 							detail={retrieve}
 							focus={setFocus}
+							purchase={purchase}
+							parentWatch={watch}
 							detailItems={purchase?.items ?? []}
 							temporaryList={temporaryList}
 							isTemporaryListFetching={retrieve ? isPurchaseLoading : isTemporaryListFetching}
@@ -458,21 +460,6 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 							{t(productExchangeTabOptions[0]?.label)}
 						</Button>
 					}
-
-					<div className={styles['price-wrapper']}>
-						<div className={styles.price}>
-							<p>{`${t('Total')}`}:</p>
-							<span>{decimalToInteger(sumDecimals((retrieve ? purchase?.items : temporaryList)?.map(i => i?.unit_quantity ?? '0.00') ?? []))}</span>
-						</div>
-						<div className={styles.price}>
-							<p>{t('Products')}:</p>
-							<span>{decimalToPrice(sumDecimals((retrieve ? purchase?.items : temporaryList)?.map(i => i?.total_price ?? '0.00') ?? []))} {t(currencyOptions?.find(i => i?.value == (retrieve ? purchase?.currency : watch('currency')))?.label?.toString() || '')?.toLowerCase() ?? ''}</span>
-						</div>
-						<div className={styles.price}>
-							<p>{t('Expense quantity')}:</p>
-							<span>{decimalToPrice(retrieve ? purchase?.cost_amount || '0' : watch('cost_amount') || '0')} {t(currencyOptions?.find(i => i?.value == (retrieve ? purchase?.cost_currency : watch('cost_currency')))?.label?.toString() || '')?.toLowerCase() ?? ''}</span>
-						</div>
-					</div>
 				</div>
 			</Card>
 			<Modal
@@ -494,6 +481,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 					removedParams={['updateId', 'type']}
 				/>
 			}
+			<ScrollButton/>
 		</>
 	)
 }

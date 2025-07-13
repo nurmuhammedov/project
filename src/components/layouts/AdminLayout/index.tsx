@@ -62,6 +62,7 @@ const Index: FC<IProperties> = ({minHeight = 15.5}) => {
 			<Header/>
 			<div
 				className={styles.children}
+				id="children"
 				style={{
 					background: `linear-gradient(to bottom, var(--deep-forest) ${dynamicMinHeight}rem, var(--light-gray-1) ${dynamicMinHeight}rem)`
 				}}
