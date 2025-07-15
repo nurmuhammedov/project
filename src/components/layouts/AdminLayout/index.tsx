@@ -2,6 +2,7 @@ import {Outlet, useLocation} from 'react-router-dom'
 import {FC, useEffect, useState} from 'react'
 import styles from './styles.module.scss'
 import Header from './Header'
+import {ScrollButton} from 'components'
 
 
 interface IProperties {
@@ -69,6 +70,7 @@ const Index: FC<IProperties> = ({minHeight = 15.5}) => {
 			>
 				<Outlet/>
 			</div>
+			<ScrollButton/>
 		</div>
 	)
 }

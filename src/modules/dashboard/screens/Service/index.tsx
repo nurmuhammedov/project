@@ -117,7 +117,7 @@ const ExpenseTransaction: FC<IProperties> = ({detail: retrieve = false}) => {
 				first_amount: Math.abs(Number(detail?.records?.find(item => item?.store_currency === item?.customer_currency)?.customer_amount || 0)).toString(),
 				type: 3 as const,
 				description: detail?.description,
-				date: detail?.date ? detail.date.split('T')[0] : new Date().toISOString().split('T')[0]
+				date: detail?.date ? getDate(detail.date) : new Date().toISOString().split('T')[0]
 			})
 		}
 	}, [detail, retrieve, reset])

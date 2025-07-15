@@ -37,7 +37,7 @@ import {
 	cleanParams,
 	decimalToInteger,
 	decimalToNumber,
-	decimalToPrice,
+	decimalToPrice, getSelectOptionsWithBrandName,
 	getSelectValue,
 	sumDecimals
 } from 'utilities/common'
@@ -84,7 +84,7 @@ const Index: FC<IProperties> = ({
 	} = useSearchParams()
 	const {mutateAsync: del, isPending: isDeleteLoading} = useDelete('sale-temporaries/')
 
-	const {data: products = []} = useData<ISelectOption[]>('products/select', !retrieve)
+	const {data: products = []} = useData<ISelectOption[]>(`stores/${store?.value}/stock/select`, !retrieve && !!store?.value)
 
 	const columns: Column<ITemporaryListItem>[] = useMemo(
 		() => [
@@ -98,7 +98,11 @@ const Index: FC<IProperties> = ({
 			},
 			{
 				Header: t('Name'),
-				accessor: row => `${row?.product?.name}`
+				accessor: row => `${row?.product?.name}${row?.product?.brand_name ? ` (${row?.product?.brand_name})` : ``}`
+			},
+			{
+				Header: t('Code'),
+				accessor: row => row?.code || ''
 			},
 			{
 				Header: t('Price'),
@@ -194,7 +198,7 @@ const Index: FC<IProperties> = ({
 							name={`temp_quantities.${index}.quantity`}
 							render={({field, fieldState: {error}}) => (
 								<NumberFormattedInput
-									disabled={!!updateId || retrieve}
+									disabled={retrieve}
 									{...field}
 									id={`temp_quantity_input_${row.id}`}
 									placeholder={t('Quantity')}
@@ -238,11 +242,11 @@ const Index: FC<IProperties> = ({
 	} = useDetail<IPurchasesItem[]>(`residues/${watch('product')}/`, 'purchase-items', !!watch('product') && !retrieve, {store: store?.value})
 
 
-	const {
-		data: productCount
-	} = useDetail<{
-		quantity: number
-	}>(`residues/`, `${watch('product')}`, !!watch('product') && !retrieve, {store: store?.value})
+	// const {
+	// 	data: productCount
+	// } = useDetail<{
+	// 	quantity: number
+	// }>(`residues/`, `${watch('product')}`, !!watch('product') && !retrieve, {store: store?.value})
 
 	const {
 		data: validationData,
@@ -266,6 +270,35 @@ const Index: FC<IProperties> = ({
 			})
 		}
 	}, [detail, isDetailLoading, retrieve])
+
+
+	useEffect(() => {
+		if (detail && !isDetailLoading && !retrieve && !!purchases?.length) {
+			const originalTempQuantities = detail.temp_quantities || []
+			const sortedTempQuantities = purchases.map(purchaseItem => {
+				const tempItem = originalTempQuantities.find(
+					(t) => t.purchase_item === purchaseItem.id
+				)
+
+				return {
+					purchase_item: purchaseItem.id,
+					quantity: tempItem
+						? decimalToInteger(tempItem.quantity)
+						: ''
+				}
+			})
+
+			reset({
+				product: detail.product.id,
+				price: detail.price,
+				serial_numbers: detail.serial_numbers || [],
+				temp_quantities: sortedTempQuantities,
+				unit_quantity: measurementUnits.find(i => i.id == detail.product?.measure)?.type == 'int'
+					? decimalToNumber(detail.total_quantity)
+					: detail.total_quantity
+			})
+		}
+	}, [detail, isDetailLoading, retrieve, purchases])
 
 	useEffect(() => {
 		if (validationData && !isValidationDataLoading && !updateId && !retrieve) {
@@ -409,14 +442,14 @@ const Index: FC<IProperties> = ({
 											<Select
 												ref={ref}
 												id="product"
-												label={`${t('Product')}${productCount?.quantity ? ` (${t('Total')?.toLowerCase()} - ${productCount?.quantity})` : ''}`}
+												label={`${t('Product')} (${t('Total')?.toLowerCase()} ${t('Count')?.toLowerCase()} - ${products?.find(i => i?.value == watch('product'))?.quantity || 0})`}
 												redLabel={true}
 												onBlur={onBlur}
-												options={products}
 												isDisabled={!!updateId || retrieve}
 												error={errors.product?.message}
-												value={getSelectValue(products, value)}
-												defaultValue={getSelectValue(products, value)}
+												options={getSelectOptionsWithBrandName(products)}
+												value={getSelectValue(getSelectOptionsWithBrandName(products), value)}
+												defaultValue={getSelectValue(getSelectOptionsWithBrandName(products), value)}
 												handleOnChange={(e) => onChange(e as string)}
 											/>
 										)
@@ -517,11 +550,11 @@ const Index: FC<IProperties> = ({
 								<div className={styles.title}>{t('Products')}:</div>
 								<div className={styles['price-wrapper']}>
 									<div className={styles.price}>
-										<p>{`${t('Total')} ${t('Count')?.toLowerCase()}`}:</p>
+										<p>{`${t('Products all count')}`}:</p>
 										<span>{decimalToInteger(sumDecimals((retrieve ? saleDetail?.items : temporaryList)?.map(i => i?.total_quantity ?? '0.00') ?? []))}</span>
 									</div>
 									<div className={styles.price}>
-										<p>{t('Products')}:</p>
+										<p>{t('Summa')}:</p>
 										<span>{decimalToPrice(sumDecimals((retrieve ? saleDetail?.items : temporaryList)?.map(i => i?.total_price ?? '0.00') ?? []))} {t(currencyOptions?.find(i => i?.value == (retrieve ? saleDetail?.currency : parentWatch?.('currency')))?.label?.toString() || '')?.toLowerCase() ?? ''}</span>
 									</div>
 								</div>

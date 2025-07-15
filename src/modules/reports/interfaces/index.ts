@@ -5,12 +5,15 @@ export interface IStockByPrice {
 	brand_name: string;
 	code: string;
 	currency: string;
+	refer_currency: string;
 	price: string;
+	converted_price: string;
 	product_id: number;
 	product_name: string;
 	store_id: number;
 	store_name: string;
 	total_price: string;
+	converted_total_price: string;
 	total_quantity: string;
 	type_name: string;
 }

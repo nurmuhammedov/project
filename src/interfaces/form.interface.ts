@@ -30,6 +30,7 @@ export interface IButton extends ButtonHTMLAttributes<HTMLButtonElement> {
 	mini?: boolean,
 	navigate?: string,
 	icon?: React.ReactNode,
+	svg?: React.ReactNode,
 	iconPosition?: 'left' | 'right',
 }
 
@@ -40,6 +41,8 @@ export interface ISelectOption {
 	icon?: React.ReactNode;
 	code?: string;
 	is_main?: boolean;
+	brand_name?: string | null;
+	quantity?: string | number;
 	color?: string;
 }
 

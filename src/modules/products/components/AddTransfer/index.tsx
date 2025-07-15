@@ -30,7 +30,7 @@ import {
 	UseFormTrigger
 } from 'react-hook-form'
 import {Column} from 'react-table'
-import {cleanParams, decimalToInteger, getSelectValue} from 'utilities/common'
+import {cleanParams, decimalToInteger, getSelectOptionsWithBrandName, getSelectValue} from 'utilities/common'
 import {ISelectOption} from 'interfaces/form.interface'
 import {useTranslation} from 'react-i18next'
 import {ISearchParams} from 'interfaces/params.interface'
@@ -90,7 +90,11 @@ const AddTransfer: FC<IProperties> = ({
 			},
 			{
 				Header: t('Name'),
-				accessor: (row) => `${row?.product?.name}`
+				accessor: row => `${row?.product?.name}${row?.product?.brand_name ? ` (${row?.product?.brand_name})` : ``}`
+			},
+			{
+				Header: t('Code'),
+				accessor: row => row?.code || ''
 			},
 			{
 				Header: t('Count'),
@@ -227,11 +231,11 @@ const AddTransfer: FC<IProperties> = ({
 												id="product"
 												label="Product"
 												onBlur={onBlur}
-												options={products}
+												options={getSelectOptionsWithBrandName(products)}
+												value={getSelectValue(getSelectOptionsWithBrandName(products), value)}
+												defaultValue={getSelectValue(getSelectOptionsWithBrandName(products), value)}
 												isDisabled={!!updateId || retrieve}
 												error={errors.product?.message}
-												value={getSelectValue(products, value)}
-												defaultValue={getSelectValue(products, value)}
 												handleOnChange={(e) => onChange(e as string)}
 											/>
 										)}

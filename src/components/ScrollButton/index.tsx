@@ -1,14 +1,14 @@
 import React, {useState, useEffect, useRef} from 'react'
 import {Button} from 'components/UI'
 import styles from './styles.module.scss'
-import {useTranslation} from 'react-i18next'
 import {BUTTON_THEME} from 'constants/fields'
+import classNames from 'classnames'
+import {SelectIcon} from 'assets/icons'
 
 
 const ScrollButton: React.FC = () => {
 	const [isAtBottom, setIsAtBottom] = useState(false)
 	const [isVisible, setIsVisible] = useState(false)
-	const {t} = useTranslation()
 
 	const scrollableElementRef = useRef<HTMLElement | null>(null)
 
@@ -66,14 +66,13 @@ const ScrollButton: React.FC = () => {
 
 	return (
 		<div
-			className={styles.scrollButton}
+			className={classNames(styles.scrollButton, {[styles.btn]: isAtBottom})}
 		>
 			<Button
 				theme={BUTTON_THEME.PRIMARY}
 				onClick={isAtBottom ? scrollToTop : scrollToBottom}
-			>
-				{isAtBottom ? t('Up') : t('Down')}
-			</Button>
+				svg={<SelectIcon/>}
+			/>
 		</div>
 	)
 }

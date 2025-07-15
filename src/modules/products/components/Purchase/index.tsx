@@ -9,13 +9,13 @@ import {
 	MaskInput,
 	Modal,
 	NumberFormattedInput,
-	PageTitle, ReactTable, ScrollButton,
+	PageTitle, ReactTable,
 	Select
 } from 'components'
 import {currencyOptions} from 'constants/options'
 import useTypedSelector from 'hooks/useTypedSelector'
 import {ISelectOption} from 'interfaces/form.interface'
-import {interceptor} from 'libraries/index'
+import {interceptor} from 'libraries'
 import {ICustomerShortData} from 'modules/dashboard/interfaces'
 import AddPurchase from 'modules/products/components/AddPurchase'
 import {productExchangeTabOptions} from 'modules/products/helpers/options'
@@ -481,7 +481,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 					removedParams={['updateId', 'type']}
 				/>
 			}
-			<ScrollButton/>
+			{/*<ScrollButton/>*/}
 		</>
 	)
 }

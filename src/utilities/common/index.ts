@@ -31,6 +31,13 @@ export function getSelectValue(options: ISelectOption[], value: string | number 
 	return options.find((item) => item?.value == value) ?? null
 }
 
+export function getSelectOptionsWithBrandName(options: ISelectOption[]): ISelectOption[] {
+	return options.map((item) => ({
+		value: item?.value,
+		label: `${item?.label}${item?.brand_name ? ` (${item?.brand_name})` : ``}`
+	})) || []
+}
+
 export function decimalToInteger(value?: string | number): string {
 	const intValue = Math.floor(Number(value || 0))
 	return intValue.toLocaleString('en-US').split(',').join(' ')

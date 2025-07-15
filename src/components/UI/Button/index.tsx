@@ -13,6 +13,7 @@ const Index: React.FC<IButton> = ({
 	                                  disabled,
 	                                  type = 'button',
 	                                  icon,
+	                                  svg,
 	                                  mini = false,
 	                                  iconPosition = 'left',
 	                                  navigate: redirect = '',
@@ -52,6 +53,9 @@ const Index: React.FC<IButton> = ({
 			}
 			{
 				t(children as string)
+			}
+			{
+				svg
 			}
 		</button>
 	)

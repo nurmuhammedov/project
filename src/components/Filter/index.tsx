@@ -19,6 +19,7 @@ export type FilterFieldType =
 	| 'price_type'
 	| 'service_type'
 	| 'currency'
+	| 'single_currency'
 	| 'product_type'
 	| 'brand'
 	| 'country'
@@ -43,6 +44,7 @@ const fieldLabels: Record<FilterFieldType, string> = {
 	price_type: 'Price type',
 	service_type: 'Service type',
 	currency: 'Currency',
+	single_currency: 'Currency',
 	product_type: 'Type',
 	brand: 'Brand',
 	country: 'Country',
@@ -51,7 +53,7 @@ const fieldLabels: Record<FilterFieldType, string> = {
 	is_user: 'Employee',
 	region: 'Region',
 	purchase_date: 'Date',
-	product: 'Product',
+	product: 'Product'
 }
 
 function useDebouncedValue<T>(value: T, delay: number): T {
@@ -172,13 +174,13 @@ const DynamicFilter: FC<DynamicFilterProps> = ({fieldsToShow, width = true}) => 
 		addParams({[paramKey]: formattedForURL}, 'page')
 	}
 
-	const parseMultiValue = (paramValue: string | number | boolean| null | undefined) => {
+	const parseMultiValue = (paramValue: string | number | boolean | null | undefined) => {
 		return paramValue?.toString()?.split(',')?.map((i: string) => isNaN(Number(i)) ? i : Number(i))
 	}
 
 	const handleMultiChange = (paramKey: FilterFieldType) => (selectedValue: string | number | boolean | string[] | number[] | boolean[] | null) => {
-		addParams({ [paramKey]: selectedValue?.toString() ?? undefined }, 'page');
-	};
+		addParams({[paramKey]: selectedValue?.toString() ?? undefined}, 'page')
+	}
 
 
 	const renderField = (field: FilterFieldType) => {
@@ -320,6 +322,16 @@ const DynamicFilter: FC<DynamicFilterProps> = ({fieldsToShow, width = true}) => 
 						options={isSerialOptions}
 						value={getSelectValue(isSerialOptions, paramsObject.is_serial)}
 						handleOnChange={(selectedValue) => addParams({is_serial: selectedValue as unknown as string ?? undefined}, 'page')}
+						{...commonSelectProps}
+					/>
+				)
+			case 'single_currency':
+				return (
+					<Select
+						id={selectId}
+						options={currencyOptions}
+						value={getSelectValue(currencyOptions, paramsObject.currency)}
+						handleOnChange={(selectedValue) => addParams({currency: selectedValue as unknown as string ?? undefined}, 'page')}
 						{...commonSelectProps}
 					/>
 				)

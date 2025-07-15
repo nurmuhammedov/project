@@ -2,7 +2,7 @@ import Filter from 'components/Filter'
 import {currencyOptions} from 'constants/options'
 import {IStockByPrice} from 'modules/reports/interfaces'
 import {Column} from 'react-table'
-import {useMemo} from 'react'
+import {useMemo, useState} from 'react'
 import {decimalToInteger, decimalToPrice, findName} from 'utilities/common'
 import {useTranslation} from 'react-i18next'
 import {usePaginatedData, usePagination, useSearchParams} from 'hooks'
@@ -10,16 +10,18 @@ import {
 	Card,
 	Pagination,
 	ReactTable,
-	PageTitle
+	PageTitle, Button
 } from 'components'
+import {interceptor} from 'libraries/index'
 
 
 const Stores = () => {
 	const {page, pageSize} = usePagination()
 	const {t} = useTranslation()
 	const {
-		paramsObject: {product_type = undefined, ...params}
+		paramsObject: {product_type = undefined, currency = undefined, ...params}
 	} = useSearchParams()
+	const [isXMLLoading, setIsXMLLoading] = useState<boolean>(false)
 
 	const {
 		data,
@@ -29,6 +31,7 @@ const Stores = () => {
 		...params,
 		page,
 		type: product_type,
+		refer_currency: currency,
 		page_size: pageSize
 	})
 
@@ -65,26 +68,60 @@ const Stores = () => {
 			},
 			{
 				Header: t('Price'),
-				accessor: row => `${decimalToPrice(row?.price || 0)} ${t(findName(currencyOptions, row?.currency, 'code')).toLowerCase()}`
+				accessor: row => currency ? `${decimalToPrice(row?.converted_price || 0)} ${t(findName(currencyOptions, row?.refer_currency, 'code')).toLowerCase()}` : `${decimalToPrice(row?.price || 0)} ${t(findName(currencyOptions, row?.currency, 'code')).toLowerCase()}`
 			},
 			{
 				Header: `${t('Total')} ${t('Count')?.toLowerCase()}`,
-				accessor: row => `${decimalToInteger(row?.total_quantity || 0)}`
-			},
+				accessor:
+					row => `${decimalToInteger(row?.total_quantity || 0)}`
+			}
+			,
 			{
 				Header: `${t('Total')} ${t('Price')?.toLowerCase()}`,
-				accessor: row => `${decimalToPrice(row?.total_price || 0)} ${t(findName(currencyOptions, row?.currency, 'code')).toLowerCase()}`
+				accessor:
+					row => currency ? `${decimalToPrice(row?.converted_total_price || 0)} ${t(findName(currencyOptions, row?.refer_currency, 'code')).toLowerCase()}` : `${decimalToPrice(row?.total_price || 0)} ${t(findName(currencyOptions, row?.currency, 'code')).toLowerCase()}`
 			}
 		],
-		[page, pageSize]
+		[page, pageSize, currency]
 	)
 
 	return (
 		<>
-			<PageTitle title="Remaining stock (by price)"/>
+			<PageTitle title="Remaining stock (by price)">
+				<div className="flex items-center gap-lg">
+					<Button
+						style={{marginTop: 'auto'}}
+						disabled={isXMLLoading}
+						onClick={() => {
+							setIsXMLLoading(true)
+							interceptor.get(`stocks/by-price/export`, {
+								responseType: 'blob',
+								params: {
+									...params,
+									page,
+									type: product_type,
+									refer_currency: currency,
+									page_size: pageSize
+								}
+							}).then(res => {
+								const blob = new Blob([res.data])
+								const link = document.createElement('a')
+								link.href = window.URL.createObjectURL(blob)
+								link.download = `${t(`${t('Remaining stock (by price)')}`)}.xlsx`
+								link.click()
+							}).finally(() => {
+								setIsXMLLoading(false)
+							})
+						}}
+						mini={true}
+					>
+						Export
+					</Button>
+				</div>
+			</PageTitle>
 			<Card screen={true} className="span-9 gap-xl">
 				<div className="flex justify-between align-center">
-					<Filter fieldsToShow={['search', 'product', 'store', 'product_type', 'currency']}/>
+					<Filter fieldsToShow={['search', 'product', 'store', 'product_type', 'single_currency']}/>
 				</div>
 
 				<div className="flex flex-col gap-md flex-1">

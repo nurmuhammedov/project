@@ -35,7 +35,7 @@ import {
 	cleanParams,
 	decimalToInteger,
 	decimalToNumber,
-	decimalToPrice,
+	decimalToPrice, getSelectOptionsWithBrandName,
 	getSelectValue,
 	sumDecimals
 } from 'utilities/common'
@@ -95,7 +95,7 @@ const Index: FC<IProperties> = ({
 			},
 			{
 				Header: t('Name'),
-				accessor: row => `${row?.product?.name}`
+				accessor: row => `${row?.product?.name}${row?.product?.brand_name ? ` (${row?.product?.brand_name})` : ``}`
 			},
 			{
 				Header: t('Code'),
@@ -349,11 +349,11 @@ const Index: FC<IProperties> = ({
 												id="product"
 												label="Product"
 												onBlur={onBlur}
-												options={products}
+												options={getSelectOptionsWithBrandName(products)}
 												isDisabled={!!updateId || retrieve}
 												error={errors.product?.message}
-												value={getSelectValue(products, value)}
-												defaultValue={getSelectValue(products, value)}
+												value={getSelectValue(getSelectOptionsWithBrandName(products), value)}
+												defaultValue={getSelectValue(getSelectOptionsWithBrandName(products), value)}
 												handleOnChange={(e) => onChange(e as string)}
 											/>
 										)
@@ -474,11 +474,11 @@ const Index: FC<IProperties> = ({
 								<div className={styles.title}>{t('Products')}:</div>
 								<div className={styles['price-wrapper']}>
 									<div className={styles.price}>
-										<p>{`${t('Total')}`}:</p>
+										<p>{`${t('Products all count')}`}:</p>
 										<span>{decimalToInteger(sumDecimals((retrieve ? purchase?.items : temporaryList)?.map(i => i?.unit_quantity ?? '0.00') ?? []))}</span>
 									</div>
 									<div className={styles.price}>
-										<p>{t('Products')}:</p>
+										<p>{t('Summa')}:</p>
 										<span>{decimalToPrice(sumDecimals((retrieve ? purchase?.items : temporaryList)?.map(i => i?.total_price ?? '0.00') ?? []))} {t(currencyOptions?.find(i => i?.value == (retrieve ? purchase?.currency : parentWatch?.('currency')))?.label?.toString() || '')?.toLowerCase() ?? ''}</span>
 									</div>
 									<div className={styles.price}>

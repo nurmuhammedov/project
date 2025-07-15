@@ -9,7 +9,7 @@ import {
 	Loader,
 	MaskInput, Modal,
 	PageTitle,
-	ReactTable, ScrollButton,
+	ReactTable,
 	Select
 } from 'components'
 import {BUTTON_THEME, FIELD} from 'constants/fields'
@@ -478,7 +478,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 					removedParams={['updateId', 'type']}
 				/>
 			}
-			<ScrollButton/>
+			{/*<ScrollButton/>*/}
 		</>
 	)
 }

@@ -210,7 +210,10 @@ const Index = () => {
 						onClick={() => {
 							setIsXMLLoading(true)
 							interceptor.get(`customers/download/template`, {
-								responseType: 'blob'
+								responseType: 'blob',
+								params: {
+									...params, page: page, page_size: pageSize
+								}
 							}).then(res => {
 								const blob = new Blob([res.data])
 								const link = document.createElement('a')
@@ -232,7 +235,10 @@ const Index = () => {
 						onClick={() => {
 							setIsXMLLoading(true)
 							interceptor.get(`customers/export`, {
-								responseType: 'blob'
+								responseType: 'blob',
+								params: {
+									...params, page: page, page_size: pageSize
+								}
 							}).then(res => {
 								const blob = new Blob([res.data])
 								const link = document.createElement('a')
@@ -269,6 +275,9 @@ const Index = () => {
 								.post(`customers/import/new`, formData, {
 									headers: {
 										'Content-Type': 'multipart/form-data'
+									},
+									params: {
+										...params, page: page, page_size: pageSize
 									}
 								})
 								.then(() => {
@@ -307,6 +316,9 @@ const Index = () => {
 								.post(`customers/import`, formData, {
 									headers: {
 										'Content-Type': 'multipart/form-data'
+									},
+									params: {
+										...params, page: page, page_size: pageSize
 									}
 								})
 								.then(() => {
