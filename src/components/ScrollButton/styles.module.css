@@ -1,0 +1,19 @@
+.scrollButton {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 0.75rem;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.scrollButton button svg {
+  transition: transform 0.2s linear;
+}
+
+.btn button svg {
+  transform: rotate(180deg);
+}
+
+/*# sourceMappingURL=styles.module.css.map */

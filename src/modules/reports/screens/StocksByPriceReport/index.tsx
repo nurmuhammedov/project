@@ -48,7 +48,8 @@ const Stores = () => {
 			},
 			{
 				Header: t('Product'),
-				accessor: 'product_name'
+				// accessor: 'product_name',
+				accessor: (row) => `${row?.product_name}${row?.brand_name ? ` - (${row?.brand_name})` : ``}`
 			},
 			// {
 			// 	Header: t('Code'),
@@ -58,10 +59,10 @@ const Stores = () => {
 				Header: t('Store'),
 				accessor: 'store_name'
 			},
-			{
-				Header: t('Brand'),
-				accessor: 'brand_name'
-			},
+			// {
+			// 	Header: t('Brand'),
+			// 	accessor: 'brand_name'
+			// },
 			{
 				Header: t('Type'),
 				accessor: 'type_name'
@@ -107,7 +108,7 @@ const Stores = () => {
 								const blob = new Blob([res.data])
 								const link = document.createElement('a')
 								link.href = window.URL.createObjectURL(blob)
-								link.download = `${t(`${t('Remaining stock (by price)')}`)}.xlsx`
+								link.download = `${t('Remaining stock (by price)')}.xlsx`
 								link.click()
 							}).finally(() => {
 								setIsXMLLoading(false)

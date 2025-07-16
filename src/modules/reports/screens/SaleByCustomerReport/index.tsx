@@ -2,7 +2,7 @@ import Filter from 'components/Filter'
 import {currencyOptions} from 'constants/options'
 import {ISaleByCustomer} from 'modules/reports/interfaces'
 import {Column} from 'react-table'
-import {useMemo} from 'react'
+import {useMemo, useState} from 'react'
 import {decimalToInteger, decimalToPrice, findName} from 'utilities/common'
 import {useTranslation} from 'react-i18next'
 import {usePaginatedData, usePagination, useSearchParams} from 'hooks'
@@ -10,9 +10,10 @@ import {
 	Card,
 	Pagination,
 	ReactTable,
-	PageTitle
+	PageTitle, Button
 } from 'components'
 import {getDate} from 'utilities/date'
+import {interceptor} from 'libraries/index'
 
 
 const Stores = () => {
@@ -21,6 +22,7 @@ const Stores = () => {
 	const {
 		paramsObject: {product_type = undefined, ...params}
 	} = useSearchParams()
+	const [isXMLLoading, setIsXMLLoading] = useState<boolean>(false)
 
 	const {
 		data,
@@ -46,7 +48,9 @@ const Stores = () => {
 			},
 			{
 				Header: t('Product'),
-				accessor: (row) => row?.product?.name || ''
+				// accessor: (row) => row?.product?.name || '',
+				accessor: (row) => `${row?.product?.name}${row?.brand?.name ? ` - (${row?.brand?.name})` : ``}`
+
 			},
 			{
 				Header: t('Store'),
@@ -60,10 +64,10 @@ const Stores = () => {
 				Header: t('Type'),
 				accessor: (row) => row?.type?.name || ''
 			},
-			{
-				Header: t('Brand'),
-				accessor: (row) => row?.brand?.name || ''
-			},
+			// {
+			// 	Header: t('Brand'),
+			// 	accessor: (row) => row?.brand?.name || ''
+			// },
 			{
 				Header: t('Price'),
 				accessor: row => `${decimalToPrice(row?.price || 0)} ${t(findName(currencyOptions, row?.currency, 'code')).toLowerCase()}`
@@ -86,7 +90,37 @@ const Stores = () => {
 
 	return (
 		<>
-			<PageTitle title="Sales (by customer)"/>
+			<PageTitle title="Sales (by customer)">
+				<div className="flex items-center gap-lg">
+					<Button
+						style={{marginTop: 'auto'}}
+						disabled={isXMLLoading}
+						onClick={() => {
+							setIsXMLLoading(true)
+							interceptor.get(`sale-items/export`, {
+								responseType: 'blob',
+								params: {
+									...params,
+									page,
+									type: product_type,
+									page_size: pageSize
+								}
+							}).then(res => {
+								const blob = new Blob([res.data])
+								const link = document.createElement('a')
+								link.href = window.URL.createObjectURL(blob)
+								link.download = `${t('Sales (by customer)')}.xlsx`
+								link.click()
+							}).finally(() => {
+								setIsXMLLoading(false)
+							})
+						}}
+						mini={true}
+					>
+						Export
+					</Button>
+				</div>
+			</PageTitle>
 			<Card screen={true} className="span-9 gap-xl">
 				<div className="flex justify-between align-center">
 					<Filter

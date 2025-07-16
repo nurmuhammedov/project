@@ -1,7 +1,7 @@
 import Filter from 'components/Filter'
 import {ISaleProduct} from 'modules/reports/interfaces'
 import {Column} from 'react-table'
-import {useMemo} from 'react'
+import {useMemo, useState} from 'react'
 import {decimalToInteger, decimalToPrice} from 'utilities/common'
 import {useTranslation} from 'react-i18next'
 import {usePaginatedData, usePagination, useSearchParams} from 'hooks'
@@ -9,8 +9,9 @@ import {
 	Card,
 	// Pagination,
 	ReactTable,
-	PageTitle
+	PageTitle, Button
 } from 'components'
+import {interceptor} from 'libraries/index'
 
 
 const Stores = () => {
@@ -19,6 +20,7 @@ const Stores = () => {
 	const {
 		paramsObject: {product_type = undefined, customer = undefined, ...params}
 	} = useSearchParams()
+	const [isXMLLoading, setIsXMLLoading] = useState<boolean>(false)
 
 	const {
 		data,
@@ -74,16 +76,46 @@ const Stores = () => {
 
 	return (
 		<>
-			<PageTitle title="Temporaries (by sale)"/>
+			<PageTitle title="Temporaries (by sale)">
+				<div className="flex items-center gap-lg">
+					<Button
+						style={{marginTop: 'auto'}}
+						disabled={isXMLLoading}
+						onClick={() => {
+							setIsXMLLoading(true)
+							interceptor.get(`sale-temporaries/all/export`, {
+								responseType: 'blob',
+								params: {
+									...params,
+									page,
+									type: product_type,
+									supplier: customer,
+									page_size: pageSize
+								}
+							}).then(res => {
+								const blob = new Blob([res.data])
+								const link = document.createElement('a')
+								link.href = window.URL.createObjectURL(blob)
+								link.download = `${t('Temporaries (by sale)')}.xlsx`
+								link.click()
+							}).finally(() => {
+								setIsXMLLoading(false)
+							})
+						}}
+						mini={true}
+					>
+						Export
+					</Button>
+				</div>
+			</PageTitle>
 			<Card screen={true} className="span-9 gap-xl">
 				<div className="flex justify-between align-center">
 					<Filter
-						fieldsToShow={['search']}/>
+						fieldsToShow={['search', 'store', 'customer']}/>
 				</div>
 
 				<div className="flex flex-col gap-md flex-1">
 					<ReactTable columns={columns} data={data} isLoading={isLoading}/>
-					{/*<Pagination totalPages={totalPages}/>*/}
 				</div>
 			</Card>
 		</>

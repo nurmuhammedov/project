@@ -1,7 +1,7 @@
 import Filter from 'components/Filter'
 import {ISalesByTotal} from 'modules/reports/interfaces'
 import {Column} from 'react-table'
-import {useMemo} from 'react'
+import {useMemo, useState} from 'react'
 import {decimalToInteger} from 'utilities/common'
 import {useTranslation} from 'react-i18next'
 import {usePaginatedData, usePagination, useSearchParams} from 'hooks'
@@ -9,8 +9,9 @@ import {
 	Card,
 	Pagination,
 	ReactTable,
-	PageTitle
+	PageTitle, Button
 } from 'components'
+import {interceptor} from 'libraries/index'
 
 
 const Stores = () => {
@@ -19,6 +20,7 @@ const Stores = () => {
 	const {
 		paramsObject: {product_type = undefined, ...params}
 	} = useSearchParams()
+	const [isXMLLoading, setIsXMLLoading] = useState<boolean>(false)
 
 	const {
 		data,
@@ -44,7 +46,8 @@ const Stores = () => {
 			},
 			{
 				Header: t('Product'),
-				accessor: (row) => row?.product_name || ''
+				// accessor: (row) => row?.product_name || '',
+				accessor: (row) => `${row?.product_name}${row?.brand_name ? ` - (${row?.brand_name})` : ``}`
 			},
 			{
 				Header: t('Code'),
@@ -58,10 +61,10 @@ const Stores = () => {
 				Header: t('Type'),
 				accessor: (row) => row?.type_name || ''
 			},
-			{
-				Header: t('Brand'),
-				accessor: (row) => row?.brand_name || ''
-			},
+			// {
+			// 	Header: t('Brand'),
+			// 	accessor: (row) => row?.brand_name || ''
+			// },
 			{
 				Header: `${t('Count')}`,
 				accessor: row => `${decimalToInteger(row?.quantity || 0)}`
@@ -72,11 +75,42 @@ const Stores = () => {
 
 	return (
 		<>
-			<PageTitle title="Sales (total)"/>
+			<PageTitle title="Sales (total)">
+				<div className="flex items-center gap-lg">
+					<Button
+						style={{marginTop: 'auto'}}
+						disabled={isXMLLoading}
+						onClick={() => {
+							setIsXMLLoading(true)
+							interceptor.get(`sale-items/by-product/export`, {
+								responseType: 'blob',
+								params: {
+									...params,
+									page,
+									type: product_type,
+									page_size: pageSize
+								}
+							}).then(res => {
+								const blob = new Blob([res.data])
+								const link = document.createElement('a')
+								link.href = window.URL.createObjectURL(blob)
+								link.download = `${t('Sales (total)')}.xlsx`
+								link.click()
+							}).finally(() => {
+								setIsXMLLoading(false)
+							})
+						}}
+						mini={true}
+					>
+						Export
+					</Button>
+				</div>
+			</PageTitle>
 			<Card screen={true} className="span-9 gap-xl">
 				<div className="flex justify-between align-center">
 					<Filter
-						fieldsToShow={['search', 'product', 'store', 'product_type', 'brand', 'from_date', 'to_date']}/>
+						fieldsToShow={['search', 'product', 'store', 'product_type', 'brand', 'from_date', 'to_date']}
+					/>
 				</div>
 
 				<div className="flex flex-col gap-md flex-1">

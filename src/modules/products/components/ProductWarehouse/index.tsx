@@ -42,7 +42,7 @@ const ProductWarehouse = () => {
 			},
 			{
 				Header: t('Product'),
-				accessor: (row) => row.product_name
+				accessor: (row) => `${row?.product_name}${row?.brand_name ? ` - (${row?.brand_name})` : ``}`
 			},
 			{
 				Header: `${t('Total')} ${t('Count')?.toLowerCase()}`,
@@ -60,10 +60,6 @@ const ProductWarehouse = () => {
 				Header: t('Type'),
 				accessor: (row) => row.type_name
 			},
-			{
-				Header: t('Brand'),
-				accessor: (row) => row.brand_name
-			}
 			// {
 			// 	Header: t('Code'),
 			// 	accessor: (row) => row.code
