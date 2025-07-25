@@ -1,7 +1,10 @@
-const Index = () => {
+import {CSSProperties, FC} from 'react'
+
+
+const Index: FC<{ style?: CSSProperties }> = ({style = {}}) => {
 	return (
 		<svg
-			style={{maxWidth: '1.5rem', minWidth: '1.5rem', width: '100%', height: 'auto'}}
+			style={{maxWidth: '1.5rem', minWidth: '1.5rem', width: '100%', height: 'auto', ...style}}
 			xmlns="http://www.w3.org/2000/svg"
 			viewBox="0 0 24 24"
 			fill="none"

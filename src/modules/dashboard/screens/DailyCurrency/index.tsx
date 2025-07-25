@@ -1,24 +1,20 @@
 import {yupResolver} from '@hookform/resolvers/yup'
-import {Exchange, Plus, Search} from 'assets/icons'
+import {Exchange, Plus, SelectIcon} from 'assets/icons'
 import {
 	Button,
 	Card,
-	EditButton,
-	EditModal,
 	Form,
-	HR,
 	Input,
 	Modal,
 	NumberFormattedInput,
 	PageTitle,
-	Pagination,
 	ReactTable,
 	Select
 } from 'components'
 import {BUTTON_THEME, FIELD} from 'constants/fields'
 import {currencyOptions} from 'constants/options'
-import {useAdd, useDetail, usePaginatedData, usePagination, useSearchParams, useUpdate} from 'hooks'
-import {dailyCurrencySchema} from 'modules/dashboard/helpers/yup'
+import {useAdd, useData, usePaginatedData, usePagination, useSearchParams} from 'hooks'
+import {dailyCurrencySchema, dailyCurrencySchema2} from 'modules/dashboard/helpers/yup'
 import {IDailyCurrency} from 'modules/dashboard/interfaces'
 import {useEffect, useMemo} from 'react'
 import {Controller, useForm} from 'react-hook-form'
@@ -31,9 +27,7 @@ import {InferType} from 'yup'
 
 
 const DEFAULT_FORM_VALUES = {
-	rate: '1',
-	base_currency: undefined,
-	target_currency: undefined
+	rate: '1'
 }
 
 const Index = () => {
@@ -43,32 +37,35 @@ const Index = () => {
 	const {
 		addParams,
 		removeParams,
-		paramsObject: {updateId = undefined}
+		paramsObject: {modal = undefined}
 	} = useSearchParams()
 
 
-	const {data, totalPages, isPending: isLoading, refetch} = usePaginatedData<IDailyCurrency[]>(`exchange-rates`)
+	const {data, isPending: isLoading, refetch} = usePaginatedData<IDailyCurrency[]>(`exchange-rates`)
 
-	const {mutateAsync: addDailyCurrency, isPending: isAdding} = useAdd('exchange-rates')
+	const {mutateAsync: addDailyCurrency, isPending: isAdding} = useAdd('exchange-rates/main')
 
 	const {
 		mutateAsync: updateDailyCurrency,
 		isPending: isUpdating
-	} = useUpdate('exchange-rates/', updateId, 'patch')
+	} = useAdd('exchange-rates/other')
+
 
 	const {
 		data: detail,
-		isPending: isDetailLoading,
-		isFetching
-	} = useDetail<IDailyCurrency>('exchange-rates/', updateId)
+		isPending: isDetailLoading
+	} = useData<{ rate: string }>('exchange-rates/main', modal == 'dailyCurrency')
+
+	const {
+		data: rateDetail,
+		isPending: isRateDetailLoading
+	} = useData<{ transfer_rate: string, p2p_rate: string }>('exchange-rates/other', modal == 'TRANSFER')
 
 
 	const {
 		handleSubmit: handleAddSubmit,
 		reset: resetAdd,
 		control: controlAdd,
-		watch: watchAdd,
-		setValue: setValueAdd,
 		formState: {errors: addErrors}
 	} = useForm<InferType<typeof dailyCurrencySchema>>({
 		mode: 'onTouched',
@@ -80,13 +77,14 @@ const Index = () => {
 		handleSubmit: handleEditSubmit,
 		reset: resetEdit,
 		control: controlEdit,
-		watch: watchEdit,
-		setValue: setValueEdit,
 		formState: {errors: editErrors}
-	} = useForm<InferType<typeof dailyCurrencySchema>>({
+	} = useForm<InferType<typeof dailyCurrencySchema2>>({
 		mode: 'onTouched',
-		defaultValues: DEFAULT_FORM_VALUES,
-		resolver: yupResolver(dailyCurrencySchema)
+		defaultValues: {
+			p2p_rate: '1',
+			transfer_rate: '1'
+		},
+		resolver: yupResolver(dailyCurrencySchema2)
 	})
 
 	const columns: Column<IDailyCurrency>[] = useMemo(
@@ -110,14 +108,6 @@ const Index = () => {
 			{
 				Header: t('Date'),
 				accessor: row => formatDate(row.updated_at)
-			},
-			{
-				Header: t('Actions'),
-				accessor: row => (
-					<div className="flex items-start gap-lg">
-						<EditButton id={row.id}/>
-					</div>
-				)
 			}
 		],
 		[page, pageSize]
@@ -125,17 +115,24 @@ const Index = () => {
 
 	useEffect(() => {
 		if (detail && !isDetailLoading) {
-			resetEdit({
-				rate: detail.rate,
-				base_currency: detail.base_currency,
-				target_currency: detail.target_currency
+			resetAdd({
+				rate: detail.rate
 			})
 		}
 	}, [detail])
 
+	useEffect(() => {
+		if (rateDetail && !isRateDetailLoading) {
+			resetEdit({
+				transfer_rate: rateDetail.transfer_rate,
+				p2p_rate: rateDetail.p2p_rate
+			})
+		}
+	}, [rateDetail])
+
 	return (
 		<>
-			<PageTitle title="Exchange rate history">
+			<PageTitle title="Update currency">
 				<div className="flex align-center gap-lg">
 					<Button
 						onClick={() => navigate(-1)}
@@ -148,25 +145,40 @@ const Index = () => {
 
 			<Card screen={true} className="span-9 gap-2xl">
 				<div className="flex justify-between align-center">
-					<Input id="search" icon={<Search/>} placeholder="Search" radius={true} style={{width: 400}}/>
-					<Button
-						icon={<Plus/>}
-						onClick={() => addParams({modal: 'dailyCurrency'})}
-						theme={BUTTON_THEME.PRIMARY}
-					>
-						Update currency
-					</Button>
+					<div></div>
+					<div className="flex justify-end gap-lg align-center">
+						<Button
+							icon={<Plus/>}
+							onClick={() => addParams({modal: 'TRANSFER'})}
+							theme={BUTTON_THEME.OUTLINE}
+						>
+							{`${t('Click')}/${t('Transfer')}`}
+						</Button>
+						<Button
+							icon={<Plus/>}
+							onClick={() => addParams({modal: 'dailyCurrency'})}
+							theme={BUTTON_THEME.OUTLINE}
+						>
+							Update currency
+						</Button>
+						<Button
+							onClick={() => navigate(`history`)}
+							theme={BUTTON_THEME.PRIMARY}
+							icon={<SelectIcon style={{transform: 'rotate(-90deg)'}}/>}
+							iconPosition="right"
+						>
+							History
+						</Button>
+					</div>
 				</div>
-				<ReactTable columns={columns} data={data} isLoading={isLoading}/>
-				<HR/>
-				<Pagination totalPages={totalPages}/>
+				<ReactTable columns={columns} data={data?.slice(0, 3)} isLoading={isLoading}/>
 			</Card>
 
 			<Modal title="Update currency" id="dailyCurrency" style={{height: '30rem', width: '60rem'}}>
 				<Form
 					onSubmit={handleAddSubmit((data) => {
 							addDailyCurrency(data).then(async () => {
-								resetAdd()
+								// resetAdd()
 								removeParams('modal')
 								await refetch()
 							})
@@ -185,25 +197,13 @@ const Index = () => {
 								/>
 							</div>
 							<div className="span-8">
-								<Controller
-									name="base_currency"
-									control={controlAdd}
-									render={({field: {value, ref, onChange, onBlur}}) => (
-										<Select
-											ref={ref}
-											id="base_currency"
-											label="Currency"
-											options={currencyOptions}
-											onBlur={onBlur}
-											error={addErrors.base_currency?.message}
-											value={getSelectValue(currencyOptions, value)}
-											defaultValue={getSelectValue(currencyOptions, value)}
-											handleOnChange={(e) => {
-												onChange(e as string)
-												setValueAdd('target_currency', undefined as unknown as string)
-											}}
-										/>
-									)}
+								<Select
+									id="base_currency"
+									label="Currency"
+									disabled={true}
+									options={currencyOptions}
+									value={getSelectValue(currencyOptions, 'USD')}
+									defaultValue={getSelectValue(currencyOptions, 'USD')}
 								/>
 							</div>
 
@@ -232,22 +232,13 @@ const Index = () => {
 								/>
 							</div>
 							<div className="span-7">
-								<Controller
-									name="target_currency"
-									control={controlAdd}
-									render={({field: {value, ref, onChange, onBlur}}) => (
-										<Select
-											ref={ref}
-											id="target_currency"
-											label="Currency"
-											options={currencyOptions?.filter(item => item?.value != watchAdd('base_currency'))}
-											onBlur={onBlur}
-											error={addErrors.target_currency?.message}
-											value={getSelectValue(currencyOptions, value)}
-											defaultValue={getSelectValue(currencyOptions, value)}
-											handleOnChange={(e) => onChange(e as string)}
-										/>
-									)}
+								<Select
+									id="target_currency"
+									label="Currency"
+									disabled={true}
+									options={currencyOptions}
+									value={getSelectValue(currencyOptions, 'UZS')}
+									defaultValue={getSelectValue(currencyOptions, 'UZS')}
 								/>
 							</div>
 						</div>
@@ -259,12 +250,12 @@ const Index = () => {
 				</Form>
 			</Modal>
 
-			<EditModal isLoading={isFetching || !detail} style={{height: '30rem', width: '60rem'}}>
+			<Modal title={`${t('Click')}/${t('Transfer')}`} style={{height: '30rem', width: '60rem'}} id="TRANSFER">
 				<Form
 					onSubmit={handleEditSubmit((data) => {
 							updateDailyCurrency(data).then(async () => {
-								resetEdit()
-								removeParams('modal', 'updateId')
+								// resetEdit()
+								removeParams('modal')
 								await refetch()
 							})
 						}
@@ -282,29 +273,15 @@ const Index = () => {
 								/>
 							</div>
 							<div className="span-8">
-								<Controller
-									name="base_currency"
-									control={controlEdit}
-									render={({field: {value, ref, onChange, onBlur}}) => (
-										<Select
-											ref={ref}
-											id="baseCurrencyEdit"
-											label="Currency"
-											options={currencyOptions}
-											onBlur={onBlur}
-											isDisabled={true}
-											error={editErrors.base_currency?.message}
-											value={getSelectValue(currencyOptions, value)}
-											defaultValue={getSelectValue(currencyOptions, value)}
-											handleOnChange={(e) => {
-												onChange(e as string)
-												setValueEdit('target_currency', undefined as unknown as string)
-											}}
-										/>
-									)}
+								<Select
+									id="baseCurrencyEdit"
+									label="Currency"
+									options={currencyOptions}
+									isDisabled={true}
+									value={getSelectValue(currencyOptions, 'P2P')}
+									defaultValue={getSelectValue(currencyOptions, 'P2P')}
 								/>
 							</div>
-
 						</div>
 
 						<div className="span-1 flex justify-center">
@@ -315,38 +292,83 @@ const Index = () => {
 							<div className="span-5">
 								<Controller
 									control={controlEdit}
-									name="rate"
+									name="p2p_rate"
 									render={({field}) => (
 										<NumberFormattedInput
-											id="rateEdit"
+											id="p2p_rate"
 											maxLength={9}
 											disableGroupSeparators={false}
 											allowDecimals={true}
 											label="Value"
-											error={editErrors?.rate?.message}
+											error={editErrors?.p2p_rate?.message}
 											{...field}
 										/>
 									)}
 								/>
 							</div>
 							<div className="span-7">
+								<Select
+									id="targetCurrencyEdit"
+									label="Currency"
+									options={currencyOptions}
+									isDisabled={true}
+									value={getSelectValue(currencyOptions, 'UZS')}
+									defaultValue={getSelectValue(currencyOptions, 'UZS')}
+								/>
+							</div>
+						</div>
+						<div className="grid gap-lg span-5">
+							<div className="span-4">
+								<Input
+									label="Value"
+									id="baseCurrencyEdit1"
+									placeholder=" "
+									disabled={true}
+									value="1"
+								/>
+							</div>
+							<div className="span-8">
+								<Select
+									id="baseCurrencyEdit1"
+									label="Currency"
+									options={currencyOptions}
+									isDisabled={true}
+									value={getSelectValue(currencyOptions, 'TRANSFER')}
+									defaultValue={getSelectValue(currencyOptions, 'TRANSFER')}
+								/>
+							</div>
+						</div>
+
+						<div className="span-1 flex justify-center">
+							<Exchange style={{transform: 'translateY(2.5rem)', height: '1.7rem'}}/>
+						</div>
+
+						<div className="grid gap-lg span-6">
+							<div className="span-5">
 								<Controller
-									name="target_currency"
 									control={controlEdit}
-									render={({field: {value, ref, onChange, onBlur}}) => (
-										<Select
-											ref={ref}
-											id="targetCurrencyEdit"
-											label="Currency"
-											options={currencyOptions?.filter(item => item?.value != watchEdit('base_currency'))}
-											onBlur={onBlur}
-											isDisabled={true}
-											error={editErrors.target_currency?.message}
-											value={getSelectValue(currencyOptions, value)}
-											defaultValue={getSelectValue(currencyOptions, value)}
-											handleOnChange={(e) => onChange(e as string)}
+									name="transfer_rate"
+									render={({field}) => (
+										<NumberFormattedInput
+											id="transfer_rate"
+											maxLength={9}
+											disableGroupSeparators={false}
+											allowDecimals={true}
+											label="Value"
+											error={editErrors?.transfer_rate?.message}
+											{...field}
 										/>
 									)}
+								/>
+							</div>
+							<div className="span-7">
+								<Select
+									id="targetCurrencyEdit1"
+									label="Currency"
+									options={currencyOptions}
+									isDisabled={true}
+									value={getSelectValue(currencyOptions, 'UZS')}
+									defaultValue={getSelectValue(currencyOptions, 'UZS')}
 								/>
 							</div>
 						</div>
@@ -356,7 +378,7 @@ const Index = () => {
 						Edit
 					</Button>
 				</Form>
-			</EditModal>
+			</Modal>
 		</>
 	)
 }

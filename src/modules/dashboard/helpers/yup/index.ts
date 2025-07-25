@@ -4,8 +4,15 @@ import * as yup from 'yup'
 
 export const dailyCurrencySchema = yup.object().shape({
 	rate: yup.string().trim().required('This field is required'),
-	base_currency: yup.string().trim().required('This field is required'),
-	target_currency: yup.string().trim().required('This field is required')
+	// base_currency: yup.string().trim().required('This field is required'),
+	// target_currency: yup.string().trim().required('This field is required')
+})
+
+export const dailyCurrencySchema2 = yup.object().shape({
+	p2p_rate: yup.string().trim().required('This field is required'),
+	transfer_rate: yup.string().trim().required('This field is required'),
+	// base_currency: yup.string().trim().required('This field is required'),
+	// target_currency: yup.string().trim().required('This field is required')
 })
 
 

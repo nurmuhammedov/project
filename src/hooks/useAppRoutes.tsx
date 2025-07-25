@@ -28,7 +28,8 @@ import {
 	SalesTotalReport,
 	Service,
 	SaleTemporaries,
-	Temporaries
+	Temporaries,
+	DailyCurrencyHistory
 } from 'modules'
 
 
@@ -92,7 +93,21 @@ function useAppRoutes() {
 									},
 									{
 										path: 'daily-currency',
-										element: <DailyCurrency/>
+										children: [
+											{
+												index: true,
+												element: <DailyCurrency/>
+											},
+											{
+												path: 'history',
+												children: [
+													{
+														index: true,
+														element: <DailyCurrencyHistory/>
+													}
+												]
+											}
+										]
 									},
 									{
 										path: 'currency-exchange',

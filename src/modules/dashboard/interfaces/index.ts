@@ -6,6 +6,8 @@ export interface IDailyCurrency {
 	rate: string
 	base_currency: string
 	target_currency: string
+	total_amount: string
+	currency: string
 	created_at: string
 	updated_at: string
 }
@@ -69,3 +71,11 @@ export interface IBalanceChange {
 	date: string;
 }
 
+
+export interface IExchangeRate {
+	id: number;
+	rate: string;
+	base_currency: string;
+	target_currency: string;
+	created_at: string;
+}
