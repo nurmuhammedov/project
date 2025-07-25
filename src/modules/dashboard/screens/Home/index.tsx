@@ -6,6 +6,7 @@ import ProductsExchange from 'modules/dashboard/components/ProductsExchange'
 // import {useTranslation} from 'react-i18next'
 import {useNavigate} from 'react-router-dom'
 import Currencies from 'modules/dashboard/components/Currencies'
+import Cashier from 'modules/dashboard/components/Checkout'
 
 
 const Index = () => {
@@ -54,7 +55,10 @@ const Index = () => {
 			</PageTitle>
 			<div className="grid gap-lg">
 				<div className="grid gap-lg space-12">
+					<Cashier className="span-4"/>
 					<Currencies className="span-4"/>
+				</div>
+				<div className="grid gap-lg space-12">
 				</div>
 				<div className="grid gap-lg space-12">
 					<ExchangesHistory className="span-6"/>

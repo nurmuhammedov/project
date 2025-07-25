@@ -7,12 +7,17 @@
 
     .currencies {
       color: var(--dark-slate);
-      font-family: Manrope, Arial, Helvetica, sans-serif;
-      font-size: 2.25rem;
+      font-family: Golos, Arial, Helvetica, sans-serif;
+      font-size: 1.875rem;
       font-style: normal;
       font-weight: 700;
       line-height: 150%; /* 3.375rem */
-      letter-spacing: -0.0675rem;
+      letter-spacing: 0.0675rem;
+
+      span {
+        font-size: 1.875rem;
+        color: var(--slate-gray);
+      }
     }
   }
 }

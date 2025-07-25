@@ -25,7 +25,7 @@ const Index: FC<IProperties> = ({style, className}) => {
 			<CardTitle
 				title="Exchange rate"
 				subTitle="Exchange rate history"
-				onClick={() => navigate(`daily-currency`)}
+				onClick={() => navigate(`daily-currency/history`)}
 			/>
 			<div style={{marginTop: '2.12rem'}} className="flex flex-col gap-lg">
 				<div className={styles['currencies-wrapper']}>

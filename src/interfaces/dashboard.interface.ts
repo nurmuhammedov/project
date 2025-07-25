@@ -1,8 +1,8 @@
 interface ICheckoutItem {
 	readonly c_id: number;
 	name: string;
-	label: string;
-	summa: string;
+	currency: string;
+	total_amount: string;
 	created_at: string;
 }
 
