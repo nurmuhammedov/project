@@ -2,7 +2,7 @@ import {currencyOptions} from 'constants/options'
 import {usePaginatedData} from 'hooks/index'
 import useTypedSelector from 'hooks/useTypedSelector'
 import {ITemporaryListItem} from 'modules/products/interfaces/purchase.interface'
-import {Card, CardTitle, DetailButton, ReactTable} from 'components'
+import {Card, CardTitle, DetailButton, EditButton, ReactTable} from 'components'
 import {CSSProperties, FC, useMemo} from 'react'
 import {useNavigate} from 'react-router-dom'
 import {decimalToPrice, findName} from 'utilities/common'
@@ -74,6 +74,10 @@ const Index: FC<IProperties> = ({style, className}) => {
 							<DetailButton
 								id={row.id}
 								url={`product-exchange/history/${row.id}?tab=purchase`}
+							/>
+							<EditButton
+								id={row.id}
+								url={`product-exchange/history/edit/${row.id}?tab=purchase`}
 							/>
 						</div>
 					),

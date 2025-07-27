@@ -69,12 +69,12 @@ const Stores = () => {
 			// 	accessor: (row) => row?.brand?.name || ''
 			// },
 			{
-				Header: t('Price'),
-				accessor: row => `${decimalToPrice(row?.price || 0)} ${t(findName(currencyOptions, row?.currency, 'code')).toLowerCase()}`
-			},
-			{
 				Header: `${t('Total')} ${t('Count')?.toLowerCase()}`,
 				accessor: row => `${decimalToInteger(row?.total_quantity || 0)}`
+			},
+			{
+				Header: t('Price'),
+				accessor: row => `${decimalToPrice(row?.price || 0)} ${t(findName(currencyOptions, row?.currency, 'code')).toLowerCase()}`
 			},
 			{
 				Header: `${t('Total')} ${t('Price')?.toLowerCase()}`,

@@ -105,12 +105,12 @@ const Index: FC<IProperties> = ({
 				accessor: row => row?.code || ''
 			},
 			{
-				Header: t('Price'),
-				accessor: row => decimalToPrice(row.price)
-			},
-			{
 				Header: t('Total'),
 				accessor: row => `${decimalToInteger(row?.total_quantity)} ${t(measurementUnits.find(i => i.id == row.product.measure)?.label?.toString() || '')}`
+			},
+			{
+				Header: t('Price'),
+				accessor: row => decimalToPrice(row.price)
 			},
 			{
 				Header: `${t('Total')} ${t('Price')?.toLowerCase()}`,

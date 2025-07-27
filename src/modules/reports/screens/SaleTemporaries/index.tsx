@@ -58,16 +58,16 @@ const Stores = () => {
 				accessor: (row) => row?.customer?.name || ''
 			},
 			{
+				Header: t('Count'),
+				accessor: row => `${decimalToInteger(row?.total_quantity || 0)}`
+			},
+			{
 				Header: t('Price'),
 				accessor: row => `${decimalToPrice(row?.price || 0)}`
 			},
 			{
 				Header: `${t('Total')} ${t('Price')?.toLowerCase()}`,
 				accessor: row => `${decimalToPrice(row?.total_price || 0)}`
-			},
-			{
-				Header: t('Count'),
-				accessor: row => `${decimalToInteger(row?.total_quantity || 0)}`
 			}
 		],
 		[page, pageSize]

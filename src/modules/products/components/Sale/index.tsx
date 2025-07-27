@@ -144,12 +144,12 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 				accessor: row => `${row?.name}`
 			},
 			{
-				Header: t('Price'),
-				accessor: row => decimalToPrice(row.price)
-			},
-			{
 				Header: t('Count'),
 				accessor: row => decimalToInteger(row?.unit_quantity)
+			},
+			{
+				Header: t('Price'),
+				accessor: row => decimalToPrice(row.price)
 			}
 		],
 		[]

@@ -86,6 +86,15 @@ function useAppRoutes() {
 													{
 														path: ':id',
 														element: <ProductExchange detail={true}/>
+													},
+													{
+														path: 'edit',
+														children: [
+															{
+																path: ':id',
+																element: <ProductExchange edit={true}/>
+															}
+														]
 													}
 												]
 											}
@@ -272,6 +281,29 @@ function useAppRoutes() {
 											{
 												index: true,
 												element: <ClientDetail/>
+											},
+											{
+												path: 'product-exchange',
+												children: [
+													{
+														path: 'history',
+														children: [
+															{
+																path: ':id',
+																element: <ProductExchange detail={true}/>
+															},
+															{
+																path: 'edit',
+																children: [
+																	{
+																		path: ':id',
+																		element: <ProductExchange edit={true}/>
+																	}
+																]
+															}
+														]
+													}
+												]
 											},
 											{
 												path: ':exchangeId',

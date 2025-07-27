@@ -68,15 +68,14 @@ const Stores = () => {
 				accessor: 'type_name'
 			},
 			{
-				Header: t('Price'),
-				accessor: row => currency ? `${decimalToPrice(row?.converted_price || 0)} ${t(findName(currencyOptions, row?.refer_currency, 'code')).toLowerCase()}` : `${decimalToPrice(row?.price || 0)} ${t(findName(currencyOptions, row?.currency, 'code')).toLowerCase()}`
-			},
-			{
 				Header: `${t('Total')} ${t('Count')?.toLowerCase()}`,
 				accessor:
 					row => `${decimalToInteger(row?.total_quantity || 0)}`
-			}
-			,
+			},
+			{
+				Header: t('Price'),
+				accessor: row => currency ? `${decimalToPrice(row?.converted_price || 0)} ${t(findName(currencyOptions, row?.refer_currency, 'code')).toLowerCase()}` : `${decimalToPrice(row?.price || 0)} ${t(findName(currencyOptions, row?.currency, 'code')).toLowerCase()}`
+			},
 			{
 				Header: `${t('Total')} ${t('Price')?.toLowerCase()}`,
 				accessor:

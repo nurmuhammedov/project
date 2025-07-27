@@ -37,10 +37,6 @@ const Index: FC<IProperties> = ({style, className}) => {
 						textAlign: 'center'
 					}
 				},
-				// {
-				// 	Header: t('Store'),
-				// 	accessor: row => row?.store?.name
-				// },
 				{
 					Header: t('Amount'),
 					accessor: row => `${decimalToPrice(row?.amount || 0)} ${t(findName(currencyOptions, row?.currency, 'code')).toLowerCase()}`

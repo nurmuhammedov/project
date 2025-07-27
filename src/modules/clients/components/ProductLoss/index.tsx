@@ -4,7 +4,7 @@ import {
 	Card,
 	Input,
 	ReactTable,
-	Pagination
+	Pagination, DetailButton
 } from 'components/index'
 import {currencyOptions} from 'constants/options'
 import {ITemporaryListItem} from 'modules/products/interfaces/purchase.interface'
@@ -56,6 +56,20 @@ const Index = () => {
 				{
 					Header: t('Date'),
 					accessor: row => getDate(row.sale_date ?? '')
+				},
+				{
+					Header: t('Actions'),
+					accessor: row => (
+						<div className="flex items-start gap-lg">
+							<DetailButton
+								id={row.id}
+								url={`product-exchange/history/${row.id}?tab=sale`}
+							/>
+						</div>
+					),
+					style: {
+						width: '5rem'
+					}
 				}
 			],
 		[]

@@ -73,16 +73,16 @@ const Stores = () => {
 			// 	accessor: (row) => row?.brand?.name || ''
 			// },
 			{
+				Header: t('Count'),
+				accessor: row => `${decimalToInteger(row?.quantity || 0)}/${decimalToInteger(row?.total_quantity || 0)}`
+			},
+			{
 				Header: t('Price'),
 				accessor: row => `${decimalToPrice(row?.price || 0)} ${t(findName(currencyOptions, row?.currency, 'code')).toLowerCase()}`
 			},
 			{
 				Header: `${t('Total')} ${t('Price')?.toLowerCase()}`,
 				accessor: row => `${decimalToPrice(row?.quantity_price || 0)} ${t(findName(currencyOptions, row?.currency, 'code')).toLowerCase()}`
-			},
-			{
-				Header: t('Count'),
-				accessor: row => `${decimalToInteger(row?.quantity || 0)}/${decimalToInteger(row?.total_quantity || 0)}`
 			},
 			{
 				Header: t('Date'),

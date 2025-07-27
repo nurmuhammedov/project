@@ -28,7 +28,7 @@ import {Controller, useForm} from 'react-hook-form'
 import {getDate} from 'utilities/date'
 import {BUTTON_THEME, FIELD} from 'constants/fields'
 import {yupResolver} from '@hookform/resolvers/yup'
-import {useAdd, useData, useDetail, useSearchParams} from 'hooks'
+import {useAdd, useData, useDetail, useSearchParams, useUpdate} from 'hooks'
 import {useNavigate, useParams} from 'react-router-dom'
 import {useTranslation} from 'react-i18next'
 import {FC, useEffect, useMemo, useState} from 'react'
@@ -38,14 +38,16 @@ import classNames from 'classnames'
 
 interface IProperties {
 	detail?: boolean
+	edit?: boolean
 }
 
-const Index: FC<IProperties> = ({detail: retrieve = false}) => {
+const Index: FC<IProperties> = ({detail: retrieve = false, edit = false}) => {
 	const {t} = useTranslation()
 	const {removeParams, addParams} = useSearchParams()
 	const {id = undefined} = useParams()
 	const navigate = useNavigate()
 	const {mutateAsync, isPending: isAdding} = useAdd('purchases')
+	const {mutateAsync: update, isPending: isUpdating} = useUpdate('purchases/', id, 'put')
 	const {store} = useTypedSelector(state => state.stores)
 	const [isXMLLoading, setIsXMLLoading] = useState<boolean>(false)
 	const [exelLoader, setIsLoading] = useState<boolean>(false)
@@ -54,7 +56,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 	const {
 		data: purchase,
 		isPending: isPurchaseLoading
-	} = useDetail<IPurchaseItem>('purchases/', id, !!(id && retrieve))
+	} = useDetail<IPurchaseItem>('purchases/', id, !!(id && (retrieve || edit)))
 
 	const {
 		watch,
@@ -84,15 +86,15 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 		data: temporaryList = [],
 		isFetching: isTemporaryListFetching,
 		refetch: refetchTemporaryList
-	} = useData<ITemporaryListItem[]>('temporaries', !!watch('supplier') && !retrieve, {supplier: watch('supplier')})
+	} = useData<ITemporaryListItem[]>('temporaries', !!watch('supplier') && !retrieve && !edit, {supplier: watch('supplier')})
 
 	const {
 		data: detail,
 		isPending: isDetailLoading
-	} = useData<ICustomerShortData>(`customers/${watch('supplier')}/short-data`, !!watch('supplier') && !retrieve)
+	} = useData<ICustomerShortData>(`customers/${watch('supplier')}/short-data`, !!watch('supplier') && !retrieve && !edit)
 
 	useEffect(() => {
-		if (detail && !isDetailLoading && !retrieve) {
+		if (detail && !isDetailLoading && !retrieve && !edit) {
 			reset((prevValues) => ({
 				...prevValues,
 				cost_currency: detail?.currency ?? undefined,
@@ -122,7 +124,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 	}, [store?.value, retrieve])
 
 	useEffect(() => {
-		if (purchase && !isPurchaseLoading && retrieve) {
+		if (purchase && !isPurchaseLoading && (retrieve || edit)) {
 			reset((prevValues) => ({
 				...prevValues,
 				supplier: purchase?.supplier?.id ?? undefined,
@@ -132,10 +134,10 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 				purchase_date: purchase?.purchase_date ? getDate(purchase.purchase_date) : getDate(),
 				cost_amount: purchase?.cost_amount ?? undefined,
 				comment: purchase?.comment ?? undefined,
-				isExpanseExist: !!purchase?.cost_amount
+				isExpanseExist: Number(purchase?.cost_amount) != 0
 			}))
 		}
-	}, [purchase, isPurchaseLoading, retrieve])
+	}, [purchase, isPurchaseLoading, retrieve, edit])
 
 	const columns: Column<ITemporaryListItem>[] = useMemo(
 		() => [
@@ -152,12 +154,12 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 				accessor: row => `${row?.name}`
 			},
 			{
-				Header: t('Price'),
-				accessor: row => decimalToPrice(row.price)
-			},
-			{
 				Header: t('Count'),
 				accessor: row => decimalToInteger(row?.unit_quantity)
+			},
+			{
+				Header: t('Price'),
+				accessor: row => decimalToPrice(row.price)
 			}
 		],
 		[]
@@ -172,106 +174,111 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 	return (
 		<>
 			<PageTitle
-				title={t('Trade (income)')}
+				title={edit ? 'Edit' : t('Trade (income)')}
 			>
 				<div className="flex align-center gap-lg">
-					<Button
-						style={{marginTop: 'auto'}}
-						disabled={isXMLLoading}
-						onClick={() => {
-							setIsXMLLoading(true)
-							interceptor.get(`temporaries/import?main-column=code`, {
-								responseType: 'blob'
-							}).then(res => {
-								const blob = new Blob([res.data])
-								const link = document.createElement('a')
-								link.href = window.URL.createObjectURL(blob)
-								link.download = `${t(`${t('Template')}`)}.xlsx`
-								link.click()
-							}).finally(() => {
-								setIsXMLLoading(false)
-							})
-						}}
-						mini={true}
-					>
-						{`${t('Template')} (${t('Code')?.toLowerCase()})`}
-					</Button>
-					<Button
-						style={{marginTop: 'auto'}}
-						disabled={isXMLLoading}
-						onClick={() => {
-							setIsXMLLoading(true)
-							interceptor.get(`temporaries/import?main-column=name`, {
-								responseType: 'blob'
-							}).then(res => {
-								const blob = new Blob([res.data])
-								const link = document.createElement('a')
-								link.href = window.URL.createObjectURL(blob)
-								link.download = `${t(`${t('Template')}`)}.xlsx`
-								link.click()
-							}).finally(() => {
-								setIsXMLLoading(false)
-							})
-						}}
-						mini={true}
-					>
-						{`${t('Template')} (${t('Name')?.toLowerCase()})`}
-					</Button>
 					{
-						!watch('supplier') ?
+						!retrieve && !edit &&
+						<>
 							<Button
 								style={{marginTop: 'auto'}}
-								disabled={exelLoader}
+								disabled={isXMLLoading}
+								onClick={() => {
+									setIsXMLLoading(true)
+									interceptor.get(`temporaries/import?main-column=code`, {
+										responseType: 'blob'
+									}).then(res => {
+										const blob = new Blob([res.data])
+										const link = document.createElement('a')
+										link.href = window.URL.createObjectURL(blob)
+										link.download = `${t(`${t('Template')}`)}.xlsx`
+										link.click()
+									}).finally(() => {
+										setIsXMLLoading(false)
+									})
+								}}
 								mini={true}
-								onClick={() => trigger?.(['supplier'])}
 							>
-								Import
-							</Button> :
-							<FileUploader
-								content={
+								{`${t('Template')} (${t('Code')?.toLowerCase()})`}
+							</Button>
+							<Button
+								style={{marginTop: 'auto'}}
+								disabled={isXMLLoading}
+								onClick={() => {
+									setIsXMLLoading(true)
+									interceptor.get(`temporaries/import?main-column=name`, {
+										responseType: 'blob'
+									}).then(res => {
+										const blob = new Blob([res.data])
+										const link = document.createElement('a')
+										link.href = window.URL.createObjectURL(blob)
+										link.download = `${t(`${t('Template')}`)}.xlsx`
+										link.click()
+									}).finally(() => {
+										setIsXMLLoading(false)
+									})
+								}}
+								mini={true}
+							>
+								{`${t('Template')} (${t('Name')?.toLowerCase()})`}
+							</Button>
+							{
+								!watch('supplier') ?
 									<Button
 										style={{marginTop: 'auto'}}
 										disabled={exelLoader}
 										mini={true}
+										onClick={() => trigger?.(['supplier'])}
 									>
 										Import
-									</Button>
-								}
-								type="exel"
-								handleChange={(files) => {
-									const item = files[0]
-									setIsLoading(true)
-									const formData = new FormData()
-									formData.append('xlsx-file', item)
-									formData.append('name', item.name)
-									interceptor
-										.post<{
-											wrong_names: ITemporaryListItem[]
-										}>(`temporaries/import?supplier=${watch('supplier')}`, formData, {
-											headers: {
-												'Content-Type': 'multipart/form-data'
-											}
-										})
-										.then((response) => {
-											refetchTemporaryList().then(noop)
-											if (response?.data?.wrong_names?.length) {
-												showMessage(`${item.name} ${t('File not accepted')}`, 'error')
-												setWrongNames(response?.data?.wrong_names || [])
-												addParams({modal: 'wrongNames'})
-											} else {
-												showMessage(`${t('File successfully accepted')}`, 'success')
-											}
-										})
-										.catch(() => {
-											showMessage(`${item.name} ${t('File not accepted')}`, 'error')
-										})
-										.finally(() => {
-											setIsLoading(false)
-										})
-								}}
-								value={undefined}
-								id="series"
-							/>
+									</Button> :
+									<FileUploader
+										content={
+											<Button
+												style={{marginTop: 'auto'}}
+												disabled={exelLoader}
+												mini={true}
+											>
+												Import
+											</Button>
+										}
+										type="exel"
+										handleChange={(files) => {
+											const item = files[0]
+											setIsLoading(true)
+											const formData = new FormData()
+											formData.append('xlsx-file', item)
+											formData.append('name', item.name)
+											interceptor
+												.post<{
+													wrong_names: ITemporaryListItem[]
+												}>(`temporaries/import?supplier=${watch('supplier')}`, formData, {
+													headers: {
+														'Content-Type': 'multipart/form-data'
+													}
+												})
+												.then((response) => {
+													refetchTemporaryList().then(noop)
+													if (response?.data?.wrong_names?.length) {
+														showMessage(`${item.name} ${t('File not accepted')}`, 'error')
+														setWrongNames(response?.data?.wrong_names || [])
+														addParams({modal: 'wrongNames'})
+													} else {
+														showMessage(`${t('File successfully accepted')}`, 'success')
+													}
+												})
+												.catch(() => {
+													showMessage(`${item.name} ${t('File not accepted')}`, 'error')
+												})
+												.finally(() => {
+													setIsLoading(false)
+												})
+										}}
+										value={undefined}
+										id="series"
+									/>
+							}
+						</>
 					}
 					<Button
 						onClick={() => navigate(-1)}
@@ -287,7 +294,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 				style={{padding: '.5rem 1.5rem 1.5rem'}}
 				className={classNames(styles.root)}
 			>
-				<div className={classNames('grid gap-lg')} style={{paddingTop: '.5rem'}}>
+				<div className={classNames('grid gap-lg')} style={{paddingTop: '.5rem', marginBottom: '1rem'}}>
 					<div className="flex gap-lg span-12">
 						<div className="flex-5">
 							<Controller
@@ -321,7 +328,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 										id="currency"
 										label="Currency"
 										onBlur={onBlur}
-										isDisabled={retrieve}
+										isDisabled={retrieve || edit}
 										options={currencyOptions}
 										error={errors.currency?.message}
 										value={getSelectValue(currencyOptions, value)}
@@ -332,7 +339,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 							/>
 						</div>
 						{
-							!!watch('isExpanseExist') &&
+							!!watch('isExpanseExist') && !retrieve && !edit &&
 							<>
 								<div className="flex-3">
 									<Controller
@@ -344,7 +351,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 												id="cost_currency"
 												label="Expense currency"
 												onBlur={onBlur}
-												isDisabled={retrieve || !watch('isExpanseExist')}
+												isDisabled={retrieve || !watch('isExpanseExist') || edit}
 												options={currencyOptions}
 												error={errors.cost_currency?.message}
 												value={getSelectValue(currencyOptions, value)}
@@ -364,7 +371,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 												id="cost_amount"
 												maxLength={13}
 												disableGroupSeparators={false}
-												disabled={retrieve || !watch('isExpanseExist')}
+												disabled={retrieve || !watch('isExpanseExist') || edit}
 												allowDecimals={true}
 												label={watch('cost_currency') ? t('Expense quantity in', {currency: t(findName(currencyOptions, watch('cost_currency'))).toLowerCase() ?? ''}) : 'Expense quantity'}
 												error={errors?.cost_amount?.message}
@@ -403,14 +410,17 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 								{...register(`comment`)}
 							/>
 						</div>
-						<div className="flex-1 flex align-end">
-							<Checkbox
-								id="isExpanseExist"
-								title="Expense"
-								disabled={retrieve}
-								{...register('isExpanseExist')}
-							/>
-						</div>
+						{
+							!edit && !retrieve &&
+							<div className="flex-1 flex align-end">
+								<Checkbox
+									id="isExpanseExist"
+									title="Expense"
+									disabled={retrieve}
+									{...register('isExpanseExist')}
+								/>
+							</div>
+						}
 					</div>
 
 					<div className="span-12">
@@ -419,6 +429,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 							trigger={trigger}
 							detail={retrieve}
 							focus={setFocus}
+							edit={edit}
 							purchase={purchase}
 							parentWatch={watch}
 							detailItems={purchase?.items ?? []}
@@ -437,27 +448,39 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 							type={FIELD.BUTTON}
 							onClick={
 								handleSubmit((data) => {
-									mutateAsync({
-										...data,
-										store: store?.value ? Number(store?.value) : null,
-										temporary_items: temporaryList?.map(i => i?.id)
-									}).then(async () => {
-										removeParams('updateId', 'type')
-										reset({
-											cost_currency: undefined,
-											cost_amount: '',
-											comment: '',
-											store: store?.value ? Number(store?.value) : undefined,
-											currency: undefined,
-											supplier: undefined,
-											purchase_date: getDate()
+									if (edit) {
+										update({
+											comment: data?.comment ?? null,
+											purchase_date: data?.purchase_date,
+											supplier: data?.supplier
+										}).then(async () => {
+											navigate(-1)
 										})
-										await refetchTemporaryList()
-									})
+									} else {
+										mutateAsync({
+											...data,
+											cost_amount: data?.cost_amount ?? '0',
+											cost_currency: data?.cost_currency ?? data?.currency,
+											store: store?.value ? Number(store?.value) : null,
+											temporary_items: temporaryList?.map(i => i?.id)
+										}).then(async () => {
+											removeParams('updateId', 'type')
+											reset({
+												cost_currency: undefined,
+												cost_amount: '',
+												comment: '',
+												store: store?.value ? Number(store?.value) : undefined,
+												currency: undefined,
+												supplier: undefined,
+												purchase_date: getDate()
+											})
+											await refetchTemporaryList?.()
+										})
+									}
 								})}
-							disabled={isAdding || retrieve || temporaryList?.length < 1}
+							disabled={isAdding || isUpdating || retrieve || (temporaryList?.length < 1 && (purchase?.items.length || 0) < 1)}
 						>
-							{t(productExchangeTabOptions[0]?.label)}
+							{edit ? 'Edit' : t(productExchangeTabOptions[0]?.label)}
 						</Button>
 					}
 				</div>
