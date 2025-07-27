@@ -264,12 +264,20 @@ const Index = () => {
 					<div className="grid gap-lg">
 						<div className="grid gap-lg span-5">
 							<div className="span-4">
-								<Input
-									label="Value"
-									id="baseCurrencyEdit"
-									placeholder=" "
-									disabled={true}
-									value="1"
+								<Controller
+									control={controlEdit}
+									name="p2p_rate"
+									render={({field}) => (
+										<NumberFormattedInput
+											id="p2p_rate"
+											maxLength={9}
+											disableGroupSeparators={false}
+											allowDecimals={true}
+											label="Value"
+											error={editErrors?.p2p_rate?.message}
+											{...field}
+										/>
+									)}
 								/>
 							</div>
 							<div className="span-8">
@@ -290,20 +298,12 @@ const Index = () => {
 
 						<div className="grid gap-lg span-6">
 							<div className="span-5">
-								<Controller
-									control={controlEdit}
-									name="p2p_rate"
-									render={({field}) => (
-										<NumberFormattedInput
-											id="p2p_rate"
-											maxLength={9}
-											disableGroupSeparators={false}
-											allowDecimals={true}
-											label="Value"
-											error={editErrors?.p2p_rate?.message}
-											{...field}
-										/>
-									)}
+								<Input
+									label="Value"
+									id="baseCurrencyEdit"
+									placeholder=" "
+									disabled={true}
+									value="1"
 								/>
 							</div>
 							<div className="span-7">
@@ -319,12 +319,20 @@ const Index = () => {
 						</div>
 						<div className="grid gap-lg span-5">
 							<div className="span-4">
-								<Input
-									label="Value"
-									id="baseCurrencyEdit1"
-									placeholder=" "
-									disabled={true}
-									value="1"
+								<Controller
+									control={controlEdit}
+									name="transfer_rate"
+									render={({field}) => (
+										<NumberFormattedInput
+											id="transfer_rate"
+											maxLength={9}
+											disableGroupSeparators={false}
+											allowDecimals={true}
+											label="Value"
+											error={editErrors?.transfer_rate?.message}
+											{...field}
+										/>
+									)}
 								/>
 							</div>
 							<div className="span-8">
@@ -345,20 +353,12 @@ const Index = () => {
 
 						<div className="grid gap-lg span-6">
 							<div className="span-5">
-								<Controller
-									control={controlEdit}
-									name="transfer_rate"
-									render={({field}) => (
-										<NumberFormattedInput
-											id="transfer_rate"
-											maxLength={9}
-											disableGroupSeparators={false}
-											allowDecimals={true}
-											label="Value"
-											error={editErrors?.transfer_rate?.message}
-											{...field}
-										/>
-									)}
+								<Input
+									label="Value"
+									id="baseCurrencyEdit1"
+									placeholder=" "
+									disabled={true}
+									value="1"
 								/>
 							</div>
 							<div className="span-7">

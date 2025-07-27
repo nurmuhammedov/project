@@ -10,6 +10,7 @@ interface ICustomProps {
 	isLoading?: boolean;
 	screen?: boolean;
 	spacing?: boolean;
+	activeIndex?: number;
 	className?: string;
 	handleRow?: (id: string | number) => void;
 }
@@ -40,6 +41,7 @@ const Index = <T extends object>({
 	                                 isLoading,
 	                                 className,
 	                                 screen = true,
+	                                 activeIndex = undefined,
 	                                 spacing = false
                                  }: ITableOptions<T>) => {
 	const {
@@ -107,6 +109,7 @@ const Index = <T extends object>({
 											className={classes.row}
 											{...row.getRowProps()}
 											key={index}
+											style={{backgroundColor: row.index === activeIndex ? 'var(--light-gray-3)' : 'transparent'}}
 										>
 											{
 												row.cells.map((cell, index) => {

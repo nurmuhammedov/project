@@ -79,7 +79,8 @@ const Index = forwardRef<SelectInstance<ISelectOption>, ISelect>((props, ref) =>
 	}, [props.icon])
 
 	return (
-		<Input id={props.id} label={props.label} redLabel={props.redLabel} error={props.error} disabled={props.disabled}>
+		<Input id={props.id} label={props.label} redLabel={props.redLabel} error={props.error}
+		       disabled={props.disabled}>
 			<Select
 				styles={getSelectStyles(!!props.error, props.top) as StylesConfig<ISelectOption, boolean, GroupBase<ISelectOption>>}
 				menuPlacement={props.top ? 'top' : 'bottom'}
@@ -88,7 +89,7 @@ const Index = forwardRef<SelectInstance<ISelectOption>, ISelect>((props, ref) =>
 				isSearchable={true}
 				isClearable={false}
 				{...props}
-				placeholder={props.placeholder ? t(props.placeholder) : t('Choose')}
+				placeholder={props.isDisabled ? '' : props.placeholder ? t(props.placeholder) : t('Choose')}
 				ref={ref as LegacyRef<SelectInstance<ISelectOption, boolean, GroupBase<ISelectOption>>>}
 				onChange={(value) => {
 					if (Array.isArray(value)) {

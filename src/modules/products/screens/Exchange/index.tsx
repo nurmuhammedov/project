@@ -35,7 +35,7 @@ const Index: FC<IProperties> = ({detail = false, edit = false}) => {
 			{/*}*/}
 			{
 				tab === 'purchase' ? <Purchase edit={edit} detail={detail}/> :
-					tab === 'sale' ? <Sale detail={detail}/> :
+					tab === 'sale' ? <Sale edit={edit} detail={detail}/> :
 						tab === 'transfer' ? <Transfer detail={detail}/> :
 							null
 			}

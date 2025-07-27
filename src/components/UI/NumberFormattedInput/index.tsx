@@ -21,6 +21,7 @@ interface IProps {
 	onChange?: (event: string) => void;
 	handleDelete?: () => void;
 	onDoubleClick?: () => void;
+	onFocus?: () => void;
 	onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
 	onBlur?: (event: FocusEvent<HTMLInputElement>) => void;
 }

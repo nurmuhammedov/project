@@ -11,7 +11,7 @@ export interface ITemporaryListItem {
 	package_quantity?: number;
 	unit_quantity?: string;
 	serial_numbers?: string[];
-	temp_quantities?: { quantity: string, purchase_item: number }[];
+	temp_quantities?: { quantity: string, purchase_item: number, serial_numbers: string[] }[];
 	store: IIDName;
 	expiry_date?: string | null;
 	supplier: IIDName;
