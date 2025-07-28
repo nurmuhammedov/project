@@ -107,7 +107,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false, edit = false}) => {
 	}, [detail, retrieve])
 
 	useEffect(() => {
-		if (store?.value && !retrieve) {
+		if (store?.value && !retrieve && !edit) {
 			setTimeout(() => {
 				setFocus('supplier')
 			}, 0)

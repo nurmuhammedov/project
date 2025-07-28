@@ -101,10 +101,10 @@ const Index: FC<IProperties> = ({detail: retrieve = false, edit = false}) => {
 				sale_date: getDate()
 			}))
 		}
-	}, [customerDetail, isCustomerDetailLoading, retrieve])
+	}, [customerDetail, isCustomerDetailLoading, retrieve, edit])
 
 	useEffect(() => {
-		if (saleDetail && !isSaleDetailLoading && (retrieve || edit)) {
+		if (saleDetail && (retrieve || edit)) {
 			reset((prevValues) => ({
 				...prevValues,
 				customer: saleDetail?.customer?.id ?? undefined,
@@ -117,7 +117,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false, edit = false}) => {
 	}, [saleDetail, isSaleDetailLoading, retrieve, edit])
 
 	useEffect(() => {
-		if (store?.value && !retrieve) {
+		if (store?.value && !retrieve && !edit) {
 			setTimeout(() => {
 				setFocus('customer')
 			}, 0)
@@ -459,7 +459,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false, edit = false}) => {
 										})
 									}
 								})}
-							disabled={isAdding || isUpdating || retrieve ||  (temporaryList?.length < 1 && (saleDetail?.items.length || 0) < 1)}
+							disabled={isAdding || isUpdating || retrieve || (temporaryList?.length < 1 && (saleDetail?.items.length || 0) < 1)}
 						>
 							{edit ? 'Edit' : t(productExchangeTabOptions[1]?.label)}
 						</Button>

@@ -4,7 +4,7 @@ import {
 	Card,
 	Input,
 	ReactTable,
-	Pagination, DetailButton
+	Pagination, DetailButton, EditButton
 } from 'components/index'
 import {currencyOptions} from 'constants/options'
 import {ITemporaryListItem} from 'modules/products/interfaces/purchase.interface'
@@ -64,6 +64,10 @@ const Index = () => {
 							<DetailButton
 								id={row.id}
 								url={`product-exchange/history/${row.id}?tab=sale`}
+							/>
+							<EditButton
+								id={row.id}
+								url={`product-exchange/history/edit/${row.id}?tab=sale`}
 							/>
 						</div>
 					),
