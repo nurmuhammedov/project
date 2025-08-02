@@ -42,8 +42,12 @@ const Index = () => {
 				},
 				// {
 				// 	Header: t('Store'),
-				// 	accessor: row => row?.store?.name
+				// 	accessor: row => row?.store?.name || ''
 				// },
+				{
+					Header: t('Customer'),
+					accessor: row => row?.customer?.name || ''
+				},
 				{
 					Header: t('Amount'),
 					accessor: row => `${decimalToPrice(row?.amount || 0)} ${t(findName(currencyOptions, row?.currency) || '')?.toLowerCase()}`

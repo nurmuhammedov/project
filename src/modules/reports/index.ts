@@ -5,6 +5,7 @@ import SaleByCustomerReport from './screens/SaleByCustomerReport'
 import SalesTotalReport from './screens/SalesTotalReport'
 import SaleTemporaries from './screens/SaleTemporaries'
 import Temporaries from './screens/Temporaries'
+import TransferReport from './screens/Transfer'
 
 
 export {
@@ -12,6 +13,7 @@ export {
 	StocksByPriceReport,
 	SalesTotalReport,
 	SaleTemporaries,
+	TransferReport,
 	Temporaries,
 	SaleByCustomerReport,
 	StockByPurchaseReport

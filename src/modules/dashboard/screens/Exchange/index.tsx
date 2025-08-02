@@ -335,6 +335,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 															label={`${t(findName(currencyOptions, watch(`records.${index}.store_currency`)))} (${t('Checkout')?.toLowerCase()})`}
 															error={errors?.records?.[index]?.store_amount?.message}
 															onDoubleClick={() => handleDoubleClick(index, 'customer_amount')}
+															onBlur={() => handleDoubleClick(index, 'customer_amount')}
 														/>
 													)}
 												/>

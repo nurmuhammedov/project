@@ -1,6 +1,6 @@
 import {BUTTON_THEME} from 'constants/fields'
 import {exchangeOptions} from 'modules/dashboard/helpers/options'
-import {Button, Card, CardTab, PageTitle} from 'components'
+import {Button, Card, PageTitle} from 'components'
 import {useSearchParams} from 'hooks'
 import ProductIncome from 'modules/dashboard/screens/ProductIncome'
 import ProductLoss from 'modules/dashboard/screens/ProductLoss'
@@ -15,7 +15,8 @@ const Index = () => {
 
 	return (
 		<>
-			<PageTitle title={t('Trade')}>
+			<PageTitle
+				title={tab == '1' ? t('Product exchange history (income)') : t('Product exchange history (sale)')}>
 				<div className="flex align-center gap-lg">
 					<Button
 						onClick={() => navigate(-1)}
@@ -26,12 +27,12 @@ const Index = () => {
 				</div>
 			</PageTitle>
 
-			<Card screen={true} style={{paddingTop: '0'}} className="span-12 gap-md flex-1">
-				<CardTab
-					// style={{marginBottom: '1rem'}}
-					fallbackValue={exchangeOptions[0]?.value}
-					tabs={exchangeOptions}
-				/>
+			<Card screen={true} className="span-12 gap-md flex-1">
+				{/*<CardTab*/}
+				{/*	// style={{marginBottom: '1rem'}}*/}
+				{/*	fallbackValue={exchangeOptions[0]?.value}*/}
+				{/*	tabs={exchangeOptions}*/}
+				{/*/>*/}
 				{
 					tab == '1' ? <ProductIncome/> :
 						tab == '2' ? <ProductLoss/> :

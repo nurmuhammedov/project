@@ -126,6 +126,27 @@ export const menu: IMenuItem[] = [
 		},
 		children: [
 			{
+				id: '/admin/home/product-exchange/history',
+				label: 'Product exchange history (income)',
+				href: '/admin/home/product-exchange/history',
+				allowedRoles: [ROLE_LIST.ADMIN],
+				order: {[ROLE_LIST.ADMIN]: 2}
+			},
+			{
+				id: '/admin/home/product-exchange/history?tab=2',
+				label: 'Product exchange history (sale)',
+				href: '/admin/home/product-exchange/history?tab=2',
+				allowedRoles: [ROLE_LIST.ADMIN],
+				order: {[ROLE_LIST.ADMIN]: 2}
+			},
+			{
+				id: '/admin/home/currency-exchange/history?tab=currencies',
+				label: 'Currency exchange history',
+				href: '/admin/home/currency-exchange/history?tab=currencies',
+				allowedRoles: [ROLE_LIST.ADMIN],
+				order: {[ROLE_LIST.ADMIN]: 2}
+			},
+			{
 				id: '/admin/reports/by-customer',
 				label: 'Sales (by customer)',
 				href: '/admin/reports/by-customer',
@@ -150,6 +171,13 @@ export const menu: IMenuItem[] = [
 				id: '/admin/reports/by-sale-temporaries',
 				label: 'Temporaries (by sale)',
 				href: '/admin/reports/by-sale-temporaries',
+				allowedRoles: [ROLE_LIST.ADMIN],
+				order: {[ROLE_LIST.ADMIN]: 2}
+			},
+			{
+				id: '/admin/reports/by-transfer',
+				label: 'Transfer history',
+				href: '/admin/reports/by-transfer',
 				allowedRoles: [ROLE_LIST.ADMIN],
 				order: {[ROLE_LIST.ADMIN]: 2}
 			}

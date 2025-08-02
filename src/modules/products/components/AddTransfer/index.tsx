@@ -1,88 +1,103 @@
 import {yupResolver} from '@hookform/resolvers/yup'
-import {Delete, Edit, Plus} from 'assets/icons'
+import {Delete, Edit, FileUploader as FileUploaderIcon, Plus} from 'assets/icons'
 import {
 	Button,
-	Loader,
-	ReactTable,
-	EditButton,
 	DeleteButton,
-	Form
+	EditButton,
+	FileUploader,
+	Form,
+	Input,
+	Loader,
+	NumberFormattedInput,
+	ReactTable,
+	Select
 } from 'components'
 import {BUTTON_THEME} from 'constants/fields'
-import {
-	useAdd,
-	useData,
-	useDelete,
-	useDetail,
-	useSearchParams,
-	useUpdate
-} from 'hooks'
+import {useAdd, useData, useDelete, useDetail, useSearchParams, useUpdate} from 'hooks'
+import useTypedSelector from 'hooks/useTypedSelector'
+import {measurementUnits} from 'modules/database/helpers/options'
 import styles from 'modules/products/components/Purchase/styles.module.scss'
-import {temporaryTransferItemSchema, transferItemSchema} from 'modules/products/helpers/yup'
+import {temporaryTransferItemSchema} from 'modules/products/helpers/yup'
 import {
+	IPurchaseItem,
+	IPurchasesItem,
 	ITemporaryListItem,
 	IValidationData
 } from 'modules/products/interfaces/purchase.interface'
-import {FC, useEffect, useMemo} from 'react'
-import {
-	useForm,
-	UseFormSetFocus,
-	UseFormTrigger
-} from 'react-hook-form'
+import React, {FC, useEffect, useMemo, useState, useRef, KeyboardEventHandler} from 'react'
+import {Controller, useForm} from 'react-hook-form'
 import {Column} from 'react-table'
-import {cleanParams, decimalToInteger, getSelectOptionsWithBrandName, getSelectValue} from 'utilities/common'
+import {showMessage} from 'utilities/alert'
+import {
+	cleanParams,
+	decimalToInteger,
+	decimalToNumber,
+	decimalToPrice,
+	getSelectOptionsWithBrandName,
+	getSelectValue,
+	sumDecimals
+} from 'utilities/common'
 import {ISelectOption} from 'interfaces/form.interface'
 import {useTranslation} from 'react-i18next'
 import {ISearchParams} from 'interfaces/params.interface'
-import {
-	Controller
-} from 'react-hook-form'
-import {
-	Select,
-	NumberFormattedInput
-} from 'components'
-import {measurementUnits} from 'modules/database/helpers/options'
-import {InferType} from 'yup'
-import useTypedSelector from 'hooks/useTypedSelector'
+import {getDate} from 'utilities/date'
+import {currencyOptions} from 'constants/options'
+import {useQueryClient} from '@tanstack/react-query'
 
 
 interface IProperties {
 	refetchTemporaryList?: () => void;
+	// focus?: UseFormSetFocus<InferType<typeof transferItemSchema>>;
+	// trigger?: UseFormTrigger<InferType<typeof transferItemSchema>>;
 	isTemporaryListFetching: boolean;
 	detailItems?: ITemporaryListItem[];
+	parentWatch?: (t: string) => string;
+	saleDetail?: IPurchaseItem;
 	temporaryList?: ITemporaryListItem[];
-	focus?: UseFormSetFocus<InferType<typeof transferItemSchema>>;
-	trigger?: UseFormTrigger<InferType<typeof transferItemSchema>>;
+	currency?: string | number;
 	detail?: boolean;
+	edit?: boolean;
 }
 
-const AddTransfer: FC<IProperties> = ({
-	                                      refetchTemporaryList,
-	                                      detailItems,
-	                                      temporaryList,
-	                                      isTemporaryListFetching,
-	                                      detail: retrieve = false
-                                      }) => {
+const Index: FC<IProperties> = ({
+	                                detailItems,
+	                                parentWatch,
+	                                saleDetail,
+	                                temporaryList,
+	                                edit = false,
+	                                isTemporaryListFetching,
+	                                detail: retrieve = false
+                                }) => {
 	const {t} = useTranslation()
+	const [series, setSeries] = useState('')
+	const [activeBatchIndex, setActiveBatchIndex] = useState<number>(0)
+	const [type, setType] = useState<string | number>('')
+	const [brand, setBrand] = useState<string | number>('')
+	const queryClient = useQueryClient()
+	const activeIndexRef = useRef(activeBatchIndex)
+	const {store} = useTypedSelector(state => state.stores)
 	const {
 		removeParams,
 		paramsObject: {updateId = undefined}
 	} = useSearchParams()
-	const {mutateAsync: del, isPending: isDeleteLoading} = useDelete(
-		'movements/temporaries/'
-	)
-	const {store} = useTypedSelector(state => state.stores)
+	const {
+		mutateAsync: del,
+		isPending: isDeleteLoading
+	} = useDelete(edit ? 'movements/items/' : 'movements/temporaries/')
 
-	const {data: products = []} = useData<ISelectOption[]>(
-		'products/select',
-		!retrieve
-	)
+	const {data: products = []} = useData<ISelectOption[]>(`stores/${store?.value}/stock/select`, !retrieve && !!store?.value, {
+		edit: edit ? 'true' : '',
+		type,
+		brand
+	})
+	const {data: types = []} = useData<ISelectOption[]>('product-types/select', !retrieve && !edit)
+	const {data: brands = []} = useData<ISelectOption[]>('brands/select', !retrieve && !edit)
 
 	const columns: Column<ITemporaryListItem>[] = useMemo(
 		() => [
 			{
 				Header: t('№'),
-				accessor: (_, index: number) => index + 1,
+				accessor: (_, index: number) => (index + 1),
 				style: {
 					width: '3rem',
 					textAlign: 'center'
@@ -92,41 +107,38 @@ const AddTransfer: FC<IProperties> = ({
 				Header: t('Name'),
 				accessor: row => `${row?.product?.name}${row?.product?.brand_name ? ` (${row?.product?.brand_name})` : ``}`
 			},
+			// {
+			// 	Header: t('Code'),
+			// 	accessor: row => row?.product?.code || ''
+			// },
 			{
-				Header: t('Code'),
-				accessor: row => row?.code || ''
+				Header: t('Total'),
+				accessor: row => `${decimalToInteger(row?.total_quantity)} ${t(measurementUnits.find(i => i.id == row.product.measure)?.label?.toString() || '')}`
 			},
-			{
-				Header: t('Count'),
-				accessor: (row) =>
-					`${decimalToInteger(row?.total_quantity)} ${t(
-						measurementUnits.find((i) => i.id == row.product.measure)?.label?.toString() ||
-						''
-					)}`
-			},
-			...(!retrieve
-				? [
-					{
-						Header: t('Actions'),
-						accessor: (row: ITemporaryListItem) => (
-							<div className="flex items-start gap-lg">
-								<EditButton id={row.id}/>
-								<DeleteButton
-									onDelete={() =>
-										!isDeleteLoading &&
-										del(row?.id).then(() => refetchTemporaryList?.())
-									}
-								/>
-							</div>
-						),
-						style: {
-							width: '5rem'
-						}
-					}
-				]
-				: [])
+			// {
+			// 	Header: t('Price'),
+			// 	accessor: row => decimalToPrice(row.price)
+			// },
+			// {
+			// 	Header: `${t('Total')} ${t('Price')?.toLowerCase()}`,
+			// 	accessor: row => decimalToPrice(row.total_price)
+			// },
+			...(!retrieve ? [{
+				Header: t('Actions'),
+				accessor: (row: ITemporaryListItem) => (
+					<div className="flex items-start gap-lg">
+						<EditButton id={row.id}/>
+						<DeleteButton
+							id={row?.id}
+						/>
+					</div>
+				),
+				style: {
+					width: '5rem'
+				}
+			}] : [])
 		],
-		[isDeleteLoading, retrieve, t, refetchTemporaryList, del]
+		[isDeleteLoading, retrieve, t, del]
 	)
 
 	const {
@@ -134,94 +146,448 @@ const AddTransfer: FC<IProperties> = ({
 		watch,
 		reset,
 		control,
+		setValue,
+		getValues,
 		setFocus,
 		formState: {errors}
 	} = useForm({
 		mode: 'onSubmit',
 		defaultValues: {
 			unit_quantity: '1',
-			product: undefined
+			product: undefined,
+			temp_quantities: [] as { purchase_item: number, quantity: string, serial_numbers: string[] }[]
 		},
 		resolver: yupResolver(temporaryTransferItemSchema)
 	})
 
-	const {mutateAsync, isPending: isAdding} = useAdd('movements/temporaries')
-	const {mutateAsync: update, isPending: isUpdating} = useUpdate(
-		'movements/temporaries/',
-		updateId
+	const {
+		data: validationData,
+		isPending: isValidationDataLoading,
+		isFetching: isValidationDataFetching
+	} = useDetail<IValidationData>('products/val-data/', watch('product'), !retrieve)
+
+
+	const seriesColumns: Column<{ name: string, id: number | string }>[] = useMemo(
+		() => [
+			{
+				Header: t('№'),
+				accessor: (_, index: number) => `${(index + 1)})`,
+				style: {
+					width: '1rem',
+					textAlign: 'center'
+				}
+			},
+			{
+				Header: t('Name'),
+				accessor: row => `${row?.name}`
+			},
+			{
+				Header: t('Actions'),
+				accessor: row => (
+					<div className="flex items-start gap-lg">
+						<DeleteButton onDelete={() => removeSeries(Number(row.id))}/>
+					</div>
+				),
+				style: {
+					width: '3rem'
+				}
+			}
+		],
+		[watch('temp_quantities'), activeBatchIndex]
 	)
 
-	const {data: detail, isPending: isDetailLoading} =
-		useDetail<ITemporaryListItem>(
-			'movements/temporaries/',
-			updateId,
-			!retrieve
-		)
+	const purchaseColumns: Column<IPurchasesItem>[] = useMemo(
+		() => [
+			{
+				Header: t('Quantity'),
+				accessor: (row: IPurchasesItem, index: number) => {
+					return (
+						<Controller
+							control={control}
+							name={`temp_quantities.${index}.quantity`}
+							render={({field, fieldState: {error}}) => (
+								<NumberFormattedInput
+									disabled={retrieve}
+									{...field}
+									onFocus={() => setActiveBatchIndex(index)}
+									id={`temp_quantity_input_${row.id}`}
+									placeholder={t('Quantity')}
+									allowDecimals={measurementUnits?.find(i => i.id == validationData?.measure)?.type == 'float'}
+									disableGroupSeparators={false}
+									error={error?.message}
+								/>
+							)}
+						/>
+					)
+				}
+			},
+			{
+				Header: t('Remainder'),
+				// accessor: row => decimalToInteger(row?.quantity),
+				accessor: (row, index) => edit ? decimalToInteger(Number(row?.quantity || 0) + Number(watch('temp_quantities')?.[index]?.quantity || 0)) : decimalToInteger(row?.quantity),
+				style: {
+					whiteSpace: 'nowrap'
+				}
+			},
+			{
+				Header: t('Full name'),
+				accessor: row => row?.supplier_name
+			},
+			{
+				Header: t('Date'),
+				accessor: row => getDate(row?.purchase_date)
+			}
+		],
+		[validationData, watch('temp_quantities'), edit]
+	)
 
-	const {data: validationData, isFetching: isValidationDataFetching} =
-		useDetail<IValidationData>(
-			'products/val-data/',
-			watch('product'),
-			!retrieve
-		)
+
+	const {mutateAsync, isPending: isAdding} = useAdd('movements/temporaries')
+	const {
+		mutateAsync: update,
+		isPending: isUpdating
+	} = useUpdate(edit ? 'movements/items/' : 'movements/temporaries/', updateId)
+
+	const {
+		data: detail,
+		isPending: isDetailLoading
+	} = useDetail<ITemporaryListItem>((edit || retrieve) ? 'movements/items/' : 'movements/temporaries/', updateId)
+
+	const {
+		data: purchases = [],
+		isFetching
+	} = useDetail<IPurchasesItem[]>(`residues/${watch('product')}/`, 'purchase-items', !!watch('product') && !retrieve, {store: store?.value})
+
+	useEffect(() => {
+		activeIndexRef.current = activeBatchIndex
+	}, [activeBatchIndex])
+
+	useEffect(() => {
+		const subscription = watch((value, {name, type}) => {
+			if (name === 'unit_quantity' && type === 'change' && !updateId) {
+				let remainingQuantity = Number(decimalToNumber(value.unit_quantity || '0'))
+
+				const currentTempQuantities = getValues('temp_quantities') || []
+
+				const newTempQuantities = purchases.map((purchaseItem, index) => {
+					const available = Number(decimalToNumber(purchaseItem.quantity))
+					let quantityToSet = ''
+
+					if (remainingQuantity > 0) {
+						const take = Math.min(remainingQuantity, available)
+						quantityToSet = String(take)
+						remainingQuantity -= take
+					}
+
+					return {
+						...(currentTempQuantities[index] || {}),
+						purchase_item: purchaseItem.id,
+						quantity: quantityToSet,
+						serial_numbers: quantityToSet !== currentTempQuantities[index]?.quantity ? [] : currentTempQuantities[index]?.serial_numbers || []
+					}
+				})
+
+				setValue('temp_quantities', newTempQuantities)
+			}
+		})
+		return () => subscription.unsubscribe()
+	}, [updateId, purchases])
+
+	useEffect(() => {
+		const subscription = watch((value, {name}) => {
+			if (name && name.startsWith('temp_quantities')) {
+				const tempQuantities = value.temp_quantities || []
+				const total = tempQuantities.reduce((acc, item) => {
+					return acc + Number(decimalToNumber(item?.quantity || '0'))
+				}, 0)
+
+				const currentTotal = Number(decimalToNumber(getValues('unit_quantity') || '0'))
+
+				if (total !== currentTotal) {
+					setValue('unit_quantity', String(total))
+				}
+			}
+		})
+		return () => subscription.unsubscribe()
+	}, [])
+
 
 	useEffect(() => {
 		if (detail && !isDetailLoading && !retrieve) {
 			reset({
 				product: detail.product.id,
-				unit_quantity: decimalToInteger(detail.total_quantity)
+				temp_quantities: detail?.quantities?.map((i) => {
+					return {
+						...i,
+						quantity: decimalToNumber(i.quantity),
+						serial_numbers: i.serial_numbers || []
+					}
+				}) || [],
+				unit_quantity: measurementUnits.find(i => i.id == detail.product?.measure)?.type == 'int'
+					? decimalToNumber(detail.total_quantity)
+					: detail.total_quantity
 			})
 		}
-	}, [detail, isDetailLoading, retrieve, reset])
+	}, [detail, isDetailLoading, retrieve])
+
+
+	useEffect(() => {
+		if (detail && !isDetailLoading && !retrieve && !!purchases?.length) {
+			const originalTempQuantities = detail.quantities || []
+			const sortedTempQuantities = purchases.map(purchaseItem => {
+				const tempItem = originalTempQuantities.find(
+					(t) => t.purchase_item === purchaseItem.id
+				)
+
+				return {
+					purchase_item: purchaseItem.id,
+					quantity: tempItem ? decimalToNumber(tempItem.quantity) : '',
+					serial_numbers: tempItem?.serial_numbers || []
+				}
+			})
+
+			reset({
+				product: detail.product.id,
+				// price: detail.price,
+				temp_quantities: sortedTempQuantities,
+				unit_quantity: measurementUnits.find(i => i.id == detail.product?.measure)?.type == 'int'
+					? decimalToNumber(detail.total_quantity)
+					: detail.total_quantity
+			})
+		}
+	}, [detail, isDetailLoading, retrieve, purchases, reset])
+
+	useEffect(() => {
+		if (validationData && !isValidationDataLoading && !updateId && !retrieve) {
+			reset((prevValues) => ({
+				...prevValues,
+				price: '',
+				unit_quantity: '1'
+			}))
+		}
+	}, [validationData, isValidationDataLoading, updateId, retrieve, reset])
+
+	useEffect(() => {
+		if (!updateId && !retrieve) {
+			reset({
+				// price: '',
+				unit_quantity: '1',
+				product: undefined,
+				temp_quantities: []
+			})
+		}
+	}, [updateId, retrieve])
+
+	useEffect(() => {
+		if (store?.value && !retrieve) {
+			setTimeout(() => {
+				setFocus('product')
+			}, 0)
+		}
+	}, [store?.value, retrieve, setFocus])
+
+	useEffect(() => {
+		if (!isValidationDataFetching && !retrieve) {
+			setTimeout(() => {
+				setFocus('unit_quantity')
+			}, 0)
+		}
+	}, [isValidationDataFetching, retrieve, setFocus])
 
 	const onSubmit = () => {
 		handleSubmit((data) => {
-			if (updateId) {
-				const newData = {
+				const cleanedData = {
 					product: data?.product,
-					unit_quantity: data?.unit_quantity,
+					// price: data?.price,
 					from_store: store?.value,
-					temp_quantities: []
+					unit_quantity: data?.unit_quantity,
+					// customer: clientId,
+					temp_quantities: data?.temp_quantities
+						?.filter(i => !!i?.quantity && Number(i.quantity) > 0)
+						.map(item => ({
+							purchase_item: item.purchase_item,
+							quantity: item.quantity,
+							serial_numbers: validationData?.is_serial ? item.serial_numbers || [] : []
+						})) || [],
+					quantities: data?.temp_quantities
+						?.filter(i => !!i?.quantity && Number(i.quantity) > 0)
+						.map(item => ({
+							purchase_item: item.purchase_item,
+							quantity: item.quantity,
+							serial_numbers: validationData?.is_serial ? item.serial_numbers || [] : []
+						})) || []
 				}
-				update(cleanParams(newData as unknown as ISearchParams)).then(
-					async () => {
+
+				if (updateId) {
+					update(cleanParams(cleanedData as unknown as ISearchParams)).then(async () => {
 						removeParams('updateId')
-						reset({unit_quantity: '1', product: undefined})
+						setSeries('')
+						reset({unit_quantity: '1', product: undefined, temp_quantities: []})
 						setTimeout(() => {
 							setFocus('product')
 						}, 0)
-						refetchTemporaryList?.()
-					}
-				)
-			} else {
-				const newData = {
-					product: data?.product,
-					unit_quantity: data?.unit_quantity,
-					from_store: store?.value,
-					temp_quantities: []
+						await queryClient.invalidateQueries({queryKey: [edit ? 'movements/parties/' : 'movements/temporaries']})
+					})
+				} else {
+					mutateAsync(cleanParams(cleanedData as unknown as ISearchParams)).then(async () => {
+						setSeries('')
+						reset({unit_quantity: '1', product: undefined, temp_quantities: []})
+						setTimeout(() => {
+							setFocus('product')
+						}, 0)
+						await queryClient.invalidateQueries({queryKey: [edit ? 'movements/parties/' : 'movements/temporaries']})
+					})
 				}
-				mutateAsync(cleanParams(newData as unknown as ISearchParams)).then(
-					async () => {
-						reset({unit_quantity: '1', product: undefined})
-						setTimeout(() => {
-							setFocus('product')
-						}, 0)
-						removeParams('modal')
-						refetchTemporaryList?.()
-					}
-				)
 			}
-		})()
+		)()
 	}
+
+	const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+		if (e.key === 'Enter') {
+			e.preventDefault()
+			onSubmit()
+		}
+	}
+
+	const addSeries = (newSeries: string) => {
+		const trimmedSeries = newSeries.trim()
+		if (trimmedSeries === '') return
+
+		const tempQuantities = getValues('temp_quantities') || []
+		const activeBatch = tempQuantities[activeBatchIndex]
+		if (!activeBatch) return
+
+		const batchQuantity = Number(decimalToNumber(activeBatch.quantity || '0'))
+		const currentSerials = activeBatch.serial_numbers || []
+
+		if (currentSerials.length >= batchQuantity) {
+			showMessage(t('Serial numbers limit reached for this batch'))
+			return
+		}
+
+		const isDuplicate = tempQuantities.some(batch => batch.serial_numbers?.includes(trimmedSeries))
+
+		if (!isDuplicate) {
+			const updatedSerials = [...currentSerials, trimmedSeries]
+			setValue(`temp_quantities.${activeBatchIndex}.serial_numbers`, updatedSerials)
+			setSeries('')
+		} else {
+			showMessage(t('Serial number already exist', {number: trimmedSeries}))
+		}
+	}
+
+	const removeSeries = (seriesIndex: number) => {
+		const currentSerials = getValues(`temp_quantities.${activeBatchIndex}.serial_numbers`) || []
+		currentSerials.splice(seriesIndex, 1)
+		setValue(`temp_quantities.${activeBatchIndex}.serial_numbers`, [...currentSerials])
+	}
+
+	const handleSeriesKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+		if (e?.key === 'Enter') {
+			e?.preventDefault()
+			addSeries(series)
+		}
+	}
+
+	const handleFileChange = (arr: string[] | undefined) => {
+		const activeIndex = activeIndexRef.current
+		const tempQuantities = getValues('temp_quantities') || []
+		const activeBatch = tempQuantities[activeIndex]
+		if (!activeBatch) return
+
+		const batchQuantity = Number(decimalToNumber(activeBatch.quantity || '0'))
+		const currentSerials = activeBatch.serial_numbers || []
+
+		const allSerialsInForm = tempQuantities.flatMap(batch => batch.serial_numbers || [])
+
+		const newSerials = Array.isArray(arr) ? arr.map(s => s.trim()).filter(Boolean) : []
+		const uniqueNewSerials = newSerials.filter(s => !allSerialsInForm.includes(s))
+
+		const availableSlots = batchQuantity - currentSerials.length
+		const serialsToAdd = uniqueNewSerials.slice(0, availableSlots)
+
+		if (serialsToAdd.length > 0) {
+			const updatedSerials = [...currentSerials, ...serialsToAdd]
+			setValue(`temp_quantities.${activeIndex}.serial_numbers`, Array.from(new Set(updatedSerials)))
+		}
+
+		if (uniqueNewSerials.length > serialsToAdd.length) {
+			showMessage(t('Some serial numbers were not added due to limit or duplicates'))
+		}
+	}
+
+
+	// useEffect(() => {
+	// 	if (purchases && Array.isArray(purchases) && !isFetching && watch('product') && !retrieve) {
+	// 		const newTempQuantities = purchases?.map((purchase: IPurchasesItem) => ({
+	// 			purchase_item: purchase.id,
+	// 			quantity: '',
+	// 			serial_numbers: []
+	// 		}))
+	// 		setValue('temp_quantities', newTempQuantities)
+	// 		setActiveBatchIndex(0)
+	// 	} else if (!watch('product') && !retrieve) {
+	// 		setValue('temp_quantities', [])
+	// 	}
+	// }, [isFetching, purchases])
+
+
+	const activeBatchSerials = watch(`temp_quantities.${activeBatchIndex}.serial_numbers`) || []
+	const activeBatchQuantity = Number(decimalToNumber(watch(`temp_quantities.${activeBatchIndex}.quantity`) || '0'))
+
+
+	const isSerialInputDisabled = useMemo(() => {
+		if (!validationData?.is_serial || retrieve || activeBatchQuantity <= 0) {
+			return true
+		}
+		return activeBatchSerials.length >= activeBatchQuantity
+	}, [activeBatchSerials.length, activeBatchQuantity, validationData?.is_serial, retrieve])
+
 
 	return (
 		<Form onSubmit={(e) => e.preventDefault()}>
 			<div className="grid gap-lg">
-				<div className={'span-12'}>
+				<div className="span-12 grid gap-lg">
+					{
+						!retrieve && !edit &&
+						<>
+							<div className="span-4">
+								<Select
+									id="type"
+									label="Type"
+									options={types}
+									isClearable={true}
+									value={getSelectValue(types, type)}
+									defaultValue={getSelectValue(types, type)}
+									handleOnChange={(e) => {
+										setValue('product', undefined as unknown as number)
+										setType(e as string)
+									}}
+								/>
+							</div>
+							<div className="span-4">
+								<Select
+									id="brandAdd"
+									label="Brand"
+									isClearable={true}
+									options={brands}
+									value={getSelectValue(brands, brand)}
+									defaultValue={getSelectValue(brands, brand)}
+									handleOnChange={(e) => {
+										setValue('product', undefined as unknown as number)
+										setBrand(e as string)
+									}}
+								/>
+							</div>
+						</>
+					}
+				</div>
+				<div className={(validationData?.is_serial || !!purchases?.length) && !retrieve ? 'span-8' : 'span-12'}>
 					<div className="grid gap-lg">
-						{!retrieve && (
+						{
+							!retrieve &&
 							<div className="flex gap-lg span-12">
-								<div className={'flex-5'}>
+								<div className="flex-5">
 									<Controller
 										name="product"
 										control={control}
@@ -229,26 +595,36 @@ const AddTransfer: FC<IProperties> = ({
 											<Select
 												ref={ref}
 												id="product"
-												label="Product"
+												label={`${t('Product')} (${t('Total')?.toLowerCase()} ${t('Count')?.toLowerCase()} - ${products?.find(i => i?.value == watch('product'))?.quantity || 0})`}
+												redLabel={true}
 												onBlur={onBlur}
+												isDisabled={!!updateId || retrieve || edit}
+												error={errors.product?.message}
 												options={getSelectOptionsWithBrandName(products)}
 												value={getSelectValue(getSelectOptionsWithBrandName(products), value)}
 												defaultValue={getSelectValue(getSelectOptionsWithBrandName(products), value)}
-												isDisabled={!!updateId || retrieve}
-												error={errors.product?.message}
-												handleOnChange={(e) => onChange(e as string)}
+												handleOnChange={(e) => {
+													onChange(e as string)
+													reset(prev => ({
+														...prev,
+														unit_quantity: '1',
+														price: '',
+														temp_quantities: []
+													}))
+												}}
 											/>
-										)}
+										)
+										}
 									/>
 								</div>
 
 								{isValidationDataFetching ? (
-									<div style={{flex: '6'}}>
+									<div style={{flex: '7'}}>
 										<Loader/>
 									</div>
 								) : validationData ? (
 									<>
-										<div className="flex-3">
+										<div className="flex-7 flex gap-lg">
 											<Controller
 												control={control}
 												name="unit_quantity"
@@ -256,61 +632,153 @@ const AddTransfer: FC<IProperties> = ({
 													<NumberFormattedInput
 														id="unit_quantity"
 														disableGroupSeparators={false}
+														redLabel={true}
 														disabled={retrieve}
-														allowDecimals={false}
-														maxLength={6}
+														allowDecimals={measurementUnits?.find(i => i.id == validationData?.measure)?.type == 'float'}
+														maxLength={measurementUnits?.find(i => i.id == validationData?.measure)?.type == 'int' ? 6 : 9}
+														onKeyDown={handleKeyDown}
 														error={errors?.unit_quantity?.message}
-														label={`${t('Count')} (${t(
-															measurementUnits
-																.find((i) => i.id == validationData?.measure)
-																?.label?.toString() || ''
-														)})`}
+														label={measurementUnits?.find(i => i.id == validationData?.measure)?.type == 'int' ? t('Count') + ` (${t(measurementUnits?.find(i => i.id == validationData?.measure)?.label?.toString() || '')})` : t('Quantity') + ` (${t(measurementUnits?.find(i => i.id == validationData?.measure)?.label?.toString() || '')})`}
 														{...field}
 													/>
 												)}
 											/>
+											{
+												!retrieve &&
+												<div className="gap-md flex align-start" style={{paddingTop: '1.5rem'}}>
+													<Button
+														icon={updateId ? <Edit/> : <Plus/>}
+														mini={true}
+														type="submit"
+														disabled={isAdding || isUpdating || retrieve}
+														onClick={() => onSubmit()}
+													/>
+													<Button
+														theme={BUTTON_THEME.DANGER_OUTLINE}
+														icon={<Delete/>}
+														type="button"
+														mini={true}
+														onClick={() => {
+															if (updateId) {
+																removeParams('updateId', 'modal')
+															}
+															reset({
+																	unit_quantity: '1',
+																	product: undefined,
+																	temp_quantities: []
+																}
+															)
+														}}
+													/>
+												</div>
+											}
 										</div>
-										{!retrieve && (
-											<div className="gap-md flex align-start" style={{paddingTop: '1.5rem'}}>
-												<Button
-													icon={updateId ? <Edit/> : <Plus/>}
-													mini={true}
-													type="submit"
-													disabled={isAdding || isUpdating || retrieve}
-													onClick={() => onSubmit()}
-												/>
-												<Button
-													theme={BUTTON_THEME.DANGER_OUTLINE}
-													icon={<Delete/>}
-													type="button"
-													mini={true}
-													onClick={() => {
-														if (updateId) {
-															removeParams('updateId')
-														}
-														reset({
-															unit_quantity: '1',
-															product: undefined
-														})
-													}}
-												/>
-											</div>
-										)}
 									</>
 								) : (
-									<div style={{flex: '6'}}></div>
+									<div style={{flex: '7'}}></div>
 								)}
 							</div>
-						)}
+						}
+
 
 						<div className="span-12">
-							<div className={styles.title}>{t('Products')}</div>
+							<div className="flex gap-lg align-center justify-between">
+								<div className={styles['price-wrapper']}>
+									<div className={styles.price}>
+										<p>{`${t('Products all count')}`}:</p>
+										<span>{decimalToInteger(sumDecimals(((edit || retrieve) ? saleDetail?.items : temporaryList)?.map(i => i?.total_quantity ?? '0.00') ?? []))}</span>
+									</div>
+									<div className={styles.price}>
+										<p>{t('Summa')}:</p>
+										<span>{decimalToPrice(sumDecimals(((edit || retrieve) ? saleDetail?.items : temporaryList)?.map(i => i?.total_price ?? '0.00') ?? []))} {t(currencyOptions?.find(i => i?.value == ((edit || retrieve) ? saleDetail?.currency : parentWatch?.('currency')))?.label?.toString() || '')?.toLowerCase() ?? ''}</span>
+									</div>
+								</div>
+							</div>
 							<ReactTable
 								columns={columns}
-								data={retrieve ? detailItems ?? [] : temporaryList ?? []}
+								data={(edit || retrieve) ? detailItems ?? [] : temporaryList ?? []}
 								isLoading={isTemporaryListFetching}
+
 							/>
 						</div>
+					</div>
+				</div>
+
+				<div className="span-4">
+					<div className="grid gap-lg">
+						{
+							!retrieve && watch('product') && !!purchases?.length &&
+							<div className="span-12" style={{maxHeight: '25rem', overflowY: 'auto'}}>
+								<div className={styles.title}>{t('Parties')}</div>
+								<ReactTable
+									columns={purchaseColumns}
+									data={purchases as unknown as IPurchasesItem[]}
+									isLoading={isFetching}
+									activeIndex={activeBatchIndex}
+								/>
+							</div>
+						}
+
+						{
+							validationData?.is_serial && !retrieve &&
+							<>
+								<div className="flex gap-lg span-12">
+									<Input
+										className="flex-1"
+										id="serial_numbers_input"
+										label="Series"
+										disabled={isSerialInputDisabled}
+										redLabel={true}
+										value={series}
+										onChange={(e) => {
+											setSeries(e.target.value)
+										}}
+										onKeyDown={handleSeriesKeyDown as unknown as KeyboardEventHandler<HTMLInputElement> & KeyboardEventHandler<HTMLTextAreaElement>}
+									/>
+
+									<div className="gap-md flex align-start" style={{paddingTop: '1.5rem'}}>
+										<Button
+											disabled={!series?.trim() || isSerialInputDisabled}
+											icon={<Plus/>}
+											type="button"
+											mini={true}
+											onClick={() => addSeries(series)}
+										/>
+										<FileUploader
+											content={
+												<Button
+													icon={<FileUploaderIcon style={{maxWidth: '1.2rem'}}/>}
+													mini={true}
+													type="button"
+													disabled={isSerialInputDisabled}
+												/>
+											}
+											type="txt"
+											handleOnChange={handleFileChange}
+											value={undefined}
+											id="series_file_uploader"
+										/>
+									</div>
+								</div>
+
+								<div className="span-12" style={{maxHeight: '25rem', overflowY: 'auto'}}>
+									<div
+										className={styles.title}>{t('Series')} ({activeBatchSerials.length}/{activeBatchQuantity})
+									</div>
+									<ReactTable
+										columns={seriesColumns}
+										data={
+											activeBatchSerials.filter(i => !!i)?.map((i, index) => ({
+												name: String(i),
+												id: index
+											})) || []
+										}
+									/>
+								</div>
+
+							</>
+						}
+
 					</div>
 				</div>
 			</div>
@@ -318,4 +786,4 @@ const AddTransfer: FC<IProperties> = ({
 	)
 }
 
-export default AddTransfer
+export default Index

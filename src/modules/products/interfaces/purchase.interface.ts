@@ -12,6 +12,8 @@ export interface ITemporaryListItem {
 	unit_quantity?: string;
 	serial_numbers?: string[];
 	temp_quantities?: { quantity: string, purchase_item: number, serial_numbers: string[] }[];
+	mtq?: { quantity: string, purchase_item: number, serial_numbers: string[] }[];
+	quantities?: { quantity: string, purchase_item: number, serial_numbers: string[] }[];
 	store: IIDName;
 	expiry_date?: string | null;
 	supplier: IIDName;
@@ -39,6 +41,7 @@ export interface IValidationData {
 export interface IPurchaseItem {
 	id: number;
 	store: IIDName;
+	to_store: IIDName;
 	supplier: {
 		id: number;
 		full_name: string;
@@ -55,6 +58,7 @@ export interface IPurchaseItem {
 	total_price: string;
 	cost_amount: string;
 	comment: string;
+	date: string;
 	created_at: string;
 	items: ITemporaryListItem[];
 	items_count: number;

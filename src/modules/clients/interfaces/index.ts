@@ -17,6 +17,7 @@ export interface ICustomerDetail {
 export interface IExchange {
 	readonly id: number
 	store: IIDName;
+	customer: IIDName;
 	currency: string;
 	service_type: IIDName | null;
 	type: number;

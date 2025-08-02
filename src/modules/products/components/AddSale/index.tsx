@@ -84,7 +84,7 @@ const Index: FC<IProperties> = ({
 	} = useSearchParams()
 	const {mutateAsync: del, isPending: isDeleteLoading} = useDelete(edit ? 'sale-items/' : 'sale-temporaries/')
 
-	const {data: products = []} = useData<ISelectOption[]>(`stores/${store?.value}/stock/select`, !retrieve && !!store?.value)
+	const {data: products = []} = useData<ISelectOption[]>(`stores/${store?.value}/stock/select`, !retrieve && !!store?.value, {edit: edit ? 'true' : ''})
 
 	const columns: Column<ITemporaryListItem>[] = useMemo(
 		() => [
@@ -216,7 +216,7 @@ const Index: FC<IProperties> = ({
 			},
 			{
 				Header: t('Remainder'),
-				accessor: row => decimalToInteger(row?.quantity),
+				accessor: (row, index) => edit ? decimalToInteger(Number(row?.quantity || 0) + Number(watch('temp_quantities')?.[index]?.quantity || 0)) : decimalToInteger(row?.quantity),
 				style: {
 					whiteSpace: 'nowrap'
 				}
@@ -230,7 +230,7 @@ const Index: FC<IProperties> = ({
 				accessor: row => getDate(row?.purchase_date)
 			}
 		],
-		[validationData]
+		[validationData, watch('temp_quantities'), edit]
 	)
 
 

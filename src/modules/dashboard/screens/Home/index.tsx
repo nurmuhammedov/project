@@ -1,8 +1,8 @@
 import {CurrencyExchange} from 'assets/icons'
 import {Button, PageTitle} from 'components'
 import {BUTTON_THEME} from 'constants/fields'
-import ExchangesHistory from 'modules/dashboard/components/ExchangesHistory'
-import ProductsExchange from 'modules/dashboard/components/ProductsExchange'
+// import ExchangesHistory from 'modules/dashboard/components/ExchangesHistory'
+// import ProductsExchange from 'modules/dashboard/components/ProductsExchange'
 // import {useTranslation} from 'react-i18next'
 import {useNavigate} from 'react-router-dom'
 import Currencies from 'modules/dashboard/components/Currencies'
@@ -58,12 +58,12 @@ const Index = () => {
 					<Cashier className="span-4"/>
 					<Currencies className="span-4"/>
 				</div>
-				<div className="grid gap-lg space-12">
-				</div>
-				<div className="grid gap-lg space-12">
-					<ExchangesHistory className="span-6"/>
-					<ProductsExchange className="span-6"/>
-				</div>
+				{/*<div className="grid gap-lg space-12">*/}
+				{/*</div>*/}
+				{/*<div className="grid gap-lg space-12">*/}
+				{/*	<ExchangesHistory className="span-6"/>*/}
+				{/*	<ProductsExchange className="span-6"/>*/}
+				{/*</div>*/}
 			</div>
 		</>
 	)

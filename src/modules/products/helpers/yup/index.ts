@@ -64,7 +64,18 @@ export const saleItemSchema = yup.object().shape({
 
 export const temporaryTransferItemSchema = yup.object().shape({
 	unit_quantity: yup.string().trim().required('This field is required'),
-	product: yup.number().required('This field is required')
+	product: yup.number().required('This field is required'),
+	temp_quantities: yup
+		.array()
+		.default([])
+		.optional()
+		.nullable()
+		.of(yup.object().shape({
+			purchase_item: yup.number().optional().nullable().transform(value => value ? value : null),
+			quantity: yup.string().trim().optional().nullable().transform(value => value ? value : null),
+			serial_numbers: yup.array().default([]).required('This field is required')
+		}))
+		.transform(value => (value && Array.isArray(value)) ? value : [])
 })
 
 export const transferItemSchema = yup.object().shape({

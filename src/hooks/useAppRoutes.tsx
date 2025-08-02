@@ -29,8 +29,9 @@ import {
 	Service,
 	SaleTemporaries,
 	Temporaries,
-	DailyCurrencyHistory
+	DailyCurrencyHistory, TransferReport
 } from 'modules'
+import Transfer from 'modules/products/components/Transfer'
 
 
 function useAppRoutes() {
@@ -238,6 +239,33 @@ function useAppRoutes() {
 									{
 										path: 'by-temporaries',
 										element: <Temporaries/>
+									},
+									{
+										path: 'by-transfer',
+										children: [
+											{
+												index: true,
+												element: <TransferReport/>
+											},
+											{
+												path: ':id',
+												children: [
+													{
+														index: true,
+														element: <Transfer detail={true}/>
+													}
+												]
+											},
+											{
+												path: 'edit/:id',
+												children: [
+													{
+														index: true,
+														element: <Transfer edit={true}/>
+													}
+												]
+											}
+										]
 									}
 								]
 							},

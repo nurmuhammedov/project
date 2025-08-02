@@ -5,7 +5,7 @@ import {
 } from 'components'
 import Filter from 'components/Filter'
 import {currencyOptions} from 'constants/options'
-import useTypedSelector from 'hooks/useTypedSelector'
+// import useTypedSelector from 'hooks/useTypedSelector'
 import {ITemporaryListItem} from 'modules/products/interfaces/purchase.interface'
 import {useMemo} from 'react'
 import {Column} from 'react-table'
@@ -19,11 +19,11 @@ const Index = () => {
 	const {t} = useTranslation()
 	const {page, pageSize} = usePagination()
 	const {paramsObject} = useSearchParams()
-	const {store} = useTypedSelector(state => state.stores)
-	const {data, isPending: isLoading, totalPages} = usePaginatedData<ITemporaryListItem[]>(
-		`stores/${store?.value}/sales`,
+	// const {store} = useTypedSelector(state => state.stores)
+	const {data, isFetching: isLoading, totalPages} = usePaginatedData<ITemporaryListItem[]>(
+		`sales`,
 		{...paramsObject, page: page, page_size: pageSize},
-		!!store?.value
+		!!paramsObject?.from_date
 	)
 
 	const columns: Column<ITemporaryListItem>[] = useMemo(() =>
@@ -39,6 +39,10 @@ const Index = () => {
 				{
 					Header: t('Full name'),
 					accessor: row => row?.customer?.name || ''
+				},
+				{
+					Header: t('Store'),
+					accessor: row => row?.store?.name || ''
 				},
 				{
 					Header: `${t('Total')} ${t('Price')?.toLowerCase()}`,
@@ -77,7 +81,7 @@ const Index = () => {
 			{/*<Card screen={true} className="span-12 gap-2xl flex-1">*/}
 			<div className="flex justify-between align-center">
 				<Filter
-					fieldsToShow={['search', 'store', 'customer', 'currency', 'price_type', 'from_date', 'to_date']}
+					fieldsToShow={['search', 'store', 'customer', 'price_type', 'from_date', 'to_date']}
 				/>
 			</div>
 			<div className="flex flex-col gap-md flex-1">

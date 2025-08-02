@@ -48,8 +48,8 @@ const Products = () => {
 		removeParams,
 		paramsObject: {updateId = undefined, modal = undefined, product_type = undefined, ...params}
 	} = useSearchParams()
-	const {data: types = []} = useData<ISelectOption[]>('product-types/select', modal === 'product' || modal === 'edit')
 	const {data: countries = []} = useData<ISelectOption[]>('countries/select', modal === 'product' || modal === 'edit')
+	const {data: types = []} = useData<ISelectOption[]>('product-types/select', modal === 'product' || modal === 'edit')
 	const {data: brands = []} = useData<ISelectOption[]>('brands/select', modal === 'product' || modal === 'edit')
 
 	const {data, totalPages, isPending: isLoading, refetch} = usePaginatedData<IProductDetail[]>(

@@ -11,11 +11,6 @@ export const currencyExchangeOptions: ISelectOption[] = [
 export const exchangeOptions: ISelectOption[] = [
 	{label: 'Income', value: 1, color: 'var(--teal-green)'},
 	{label: 'Loss', value: 2, color: 'var(--red-alert)'}
-	// {label: 'Expense', value: 3}
-]
-
-export const expenseOptions: ISelectOption[] = [
-	{label: 'Expense', value: 3}
 ]
 
 export const exchangeTabs: ISelectOption[] = [

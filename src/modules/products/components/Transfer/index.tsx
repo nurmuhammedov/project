@@ -13,7 +13,7 @@ import {
 	Select
 } from 'components'
 import {BUTTON_THEME, FIELD} from 'constants/fields'
-import {useAdd, useData, useDetail, useSearchParams} from 'hooks'
+import {useAdd, useData, useDetail, useSearchParams, useUpdate} from 'hooks'
 import useTypedSelector from 'hooks/useTypedSelector'
 import {ISelectOption} from 'interfaces/form.interface'
 import AddTransfer from 'modules/products/components/AddTransfer'
@@ -29,33 +29,33 @@ import {useNavigate, useParams} from 'react-router-dom'
 import {
 	decimalToInteger,
 	decimalToPrice,
-	getSelectValue,
-	sumDecimals
+	getSelectValue
 } from 'utilities/common'
 import {getDate} from 'utilities/date'
 import styles from '../Purchase/styles.module.scss'
 import {Column} from 'react-table'
+import {useQueryClient} from '@tanstack/react-query'
 
 
 interface IProperties {
 	detail?: boolean;
+	edit?: boolean;
 }
 
-const Index: FC<IProperties> = ({detail: retrieve = false}) => {
+const Index: FC<IProperties> = ({detail: retrieve = false, edit = false}) => {
 	const {t} = useTranslation()
 	const {removeParams} = useSearchParams()
 	const {id: transferId = undefined} = useParams()
-	const {mutateAsync, isPending: isAdding} = useAdd('movements/parties')
-	const {store} = useTypedSelector((state) => state.stores)
-	const {data: stores = []} = useData<ISelectOption[]>(
-		'stores/select',
-		true
-	)
 	const navigate = useNavigate()
+	const queryClient = useQueryClient()
+	const {mutateAsync, isPending: isAdding} = useAdd('movements/parties')
+	const {mutateAsync: update, isPending: isUpdating} = useUpdate('movements/parties/', transferId, 'put')
+	const {store} = useTypedSelector((state) => state.stores)
+	const {data: stores = []} = useData<ISelectOption[]>('stores/select', true)
 	const [wrongNames, setWrongNames] = useState<ITemporaryListItem[]>([])
 
 	const {data: transferDetail, isPending: isTransferDetailLoading} =
-		useDetail<IPurchaseItem>('movements/parties/', transferId, !!(transferId && retrieve))
+		useDetail<IPurchaseItem>('movements/parties/', transferId, !!(transferId && (retrieve || edit)))
 
 	const {
 		reset,
@@ -63,7 +63,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 		register,
 		handleSubmit,
 		setFocus,
-		trigger,
+		// trigger,
 		formState: {errors}
 	} = useForm({
 		mode: 'onSubmit',
@@ -80,13 +80,23 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 		isFetching: isTemporaryListFetching,
 		refetch: refetchTemporaryList
 	} = useData<ITemporaryListItem[]>(
-		'movements/temporaries',
-		!retrieve,
+		edit ? 'movements/items' : 'movements/temporaries',
+		!retrieve && !edit,
 		{from_store: store?.value}
 	)
 
 	useEffect(() => {
-		if (store?.value && !retrieve) {
+		if (transferDetail && (retrieve || edit)) {
+			reset({
+				comment: transferDetail?.comment ?? '',
+				to_store: transferDetail?.to_store?.id ?? undefined,
+				date: getDate(transferDetail.date)
+			})
+		}
+	}, [transferDetail, retrieve, edit, reset])
+
+	useEffect(() => {
+		if (store?.value && !retrieve && !edit) {
 			setTimeout(() => {
 				setFocus('to_store')
 			}, 0)
@@ -96,7 +106,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 				date: getDate()
 			})
 		}
-	}, [store?.value, retrieve, setFocus, reset])
+	}, [store?.value, retrieve, edit, setFocus, reset])
 
 	const columns: Column<ITemporaryListItem>[] = useMemo(
 		() => [
@@ -124,13 +134,13 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 		[t]
 	)
 
-	if (isTransferDetailLoading && retrieve) {
+	if (isTransferDetailLoading && (retrieve || edit)) {
 		return <Loader/>
 	}
 
 	return (
 		<>
-			<PageTitle title="Swap">
+			<PageTitle title={edit ? t('Edit') : t('Transfer')}>
 				<div className="flex align-center gap-lg">
 					<Button onClick={() => navigate(-1)} theme={BUTTON_THEME.DANGER_OUTLINE}>
 						{t('Back')}
@@ -143,7 +153,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 				style={{padding: '.5rem 1.5rem 1.5rem'}}
 				className={classNames(styles.root)}
 			>
-				<div className={classNames('grid gap-lg')} style={{paddingTop: '.5rem'}}>
+				<div className={classNames('grid gap-lg')} style={{paddingTop: '.5rem', marginBottom: '1rem'}}>
 					<div className="flex gap-lg span-12 flex-wrap">
 						<div className="flex-5" style={{minWidth: '200px'}}>
 							<Controller
@@ -155,6 +165,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 										isDisabled={retrieve}
 										id="to_store"
 										label="To store"
+										redLabel
 										onBlur={onBlur}
 										options={stores.filter((s) => s.value !== store?.value)}
 										error={errors.to_store?.message}
@@ -175,6 +186,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 										id="date"
 										disabled={retrieve}
 										label="Date"
+										redLabel
 										placeholder={getDate()}
 										mask="99.99.9999"
 										error={errors?.date?.message}
@@ -187,7 +199,8 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 						<div className="flex-4" style={{minWidth: '200px'}}>
 							<Input
 								id="comment"
-								label={`Comment`}
+								label="Comment"
+								redLabel={true}
 								disabled={retrieve}
 								error={errors?.comment?.message}
 								{...register(`comment`)}
@@ -197,13 +210,14 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 
 					<div className="span-12">
 						<AddTransfer
-							trigger={trigger}
-							focus={setFocus}
+							// trigger={trigger}
+							// focus={setFocus}
 							detail={retrieve}
+							edit={edit}
 							detailItems={transferDetail?.items}
 							temporaryList={temporaryList}
 							isTemporaryListFetching={
-								retrieve ? isTransferDetailLoading : isTemporaryListFetching
+								retrieve || edit ? isTransferDetailLoading : isTemporaryListFetching
 							}
 							refetchTemporaryList={refetchTemporaryList}
 						/>
@@ -217,40 +231,35 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 							type={FIELD.BUTTON}
 							theme={BUTTON_THEME.PRIMARY}
 							onClick={handleSubmit((data) => {
-								mutateAsync({
-									...data,
-									from_store: store?.value ? Number(store?.value) : null,
-									temporary_items: temporaryList?.map((i) => i?.id)
-								}).then(async () => {
-									removeParams('updateId', 'type')
-									reset({
-										comment: '',
-										to_store: undefined,
-										date: getDate()
+								if (edit) {
+									update({
+										...data,
+										from_store: store?.value ? Number(store.value) : null,
+										to_store: transferDetail?.to_store?.id
+									}).then(() => {
+										navigate(-1)
 									})
-									await refetchTemporaryList()
-								})
+								} else {
+									mutateAsync({
+										...data,
+										from_store: store?.value ? Number(store.value) : null,
+										temporary_items: temporaryList?.map((i) => i?.id)
+									}).then(async () => {
+										removeParams('updateId', 'type')
+										reset({
+											comment: '',
+											to_store: undefined,
+											date: getDate()
+										})
+										await refetchTemporaryList()
+									})
+								}
 							})}
-							disabled={isAdding || retrieve || temporaryList?.length < 1}
+							disabled={isAdding || isUpdating || (temporaryList?.length < 1 && !edit)}
 						>
-							Swap
+							{edit ? t('Edit') : t('Swap')}
 						</Button>
 					)}
-
-					<div className={styles['price-wrapper']} style={{direction: 'ltr'}}>
-						<div className={styles.price}>
-							<p>{`${t('Total')} ${t('Count')?.toLowerCase()}`}:</p>
-							<span>
-                {decimalToInteger(
-	                sumDecimals(
-		                (retrieve ? transferDetail?.items : temporaryList)?.map(
-			                (i) => i?.total_quantity ?? '0.00'
-		                ) ?? []
-	                )
-                )}
-              </span>
-						</div>
-					</div>
 				</div>
 			</Card>
 			<Modal
@@ -264,13 +273,11 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 			>
 				<ReactTable columns={columns} data={wrongNames}/>
 			</Modal>
-			{!retrieve && temporaryList?.length > 0 && (
-				<DeleteModal
-					endpoint="movements/temporaries/"
-					onDelete={() => refetchTemporaryList()}
-					removedParams={['updateId', 'type']}
-				/>
-			)}
+			<DeleteModal
+				endpoint={edit ? 'movements/items/' : 'movements/temporaries/'}
+				onDelete={async () => await queryClient.invalidateQueries({queryKey: [edit ? 'movements/parties/' : 'movements/temporaries']})}
+				removedParams={['updateId', 'type', 'modal']}
+			/>
 		</>
 	)
 }

@@ -91,3 +91,12 @@ export interface ISaleProduct {
 	total_price: string;
 	price: string;
 }
+
+export interface ITransferHistory {
+	id: number;
+	from_store: IIDName;
+	to_store: IIDName;
+	date: string;
+	is_received: boolean;
+	items_count: number;
+}
