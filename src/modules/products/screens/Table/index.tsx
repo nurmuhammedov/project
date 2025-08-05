@@ -2,6 +2,7 @@ import {useQueryClient} from '@tanstack/react-query'
 import {Box, Cart, Plus} from 'assets/icons'
 import {Button, FileUploader, HorizontalTab, PageTitle} from 'components'
 import {useSearchParams} from 'hooks'
+import useTypedSelector from 'hooks/useTypedSelector'
 import {ISelectOption} from 'interfaces/form.interface'
 import Products from 'modules/products/components/Products'
 import {interceptor} from 'libraries/index'
@@ -26,11 +27,13 @@ const tabOptions: ISelectOption[] = [
 ]
 
 const Index = () => {
-	const {paramsObject: {tab = tabOptions[0]?.value}, addParams} = useSearchParams()
+	const {paramsObject: {tab = tabOptions[0]?.value, ...rest}, addParams} = useSearchParams()
 	const {t} = useTranslation()
 	const query = useQueryClient()
 	const [isXMLLoading, setIsXMLLoading] = useState<boolean>(false)
 	const [exelLoader, setIsLoading] = useState<boolean>(false)
+	const {store} = useTypedSelector(state => state.stores)
+
 
 	return (
 		<>
@@ -51,7 +54,11 @@ const Index = () => {
 							onClick={() => {
 								setIsXMLLoading(true)
 								interceptor.get(`products/download/template`, {
-									responseType: 'blob'
+									responseType: 'blob',
+									params: {
+										...rest,
+										store: store?.value
+									}
 								}).then(res => {
 									const blob = new Blob([res.data])
 									const link = document.createElement('a')
@@ -73,7 +80,11 @@ const Index = () => {
 							onClick={() => {
 								setIsXMLLoading(true)
 								interceptor.get(`products/export`, {
-									responseType: 'blob'
+									responseType: 'blob',
+									params: {
+										...rest,
+										store: store?.value
+									}
 								}).then(res => {
 									const blob = new Blob([res.data])
 									const link = document.createElement('a')
@@ -110,6 +121,10 @@ const Index = () => {
 									.post(`products/import/new`, formData, {
 										headers: {
 											'Content-Type': 'multipart/form-data'
+										},
+										params: {
+											...rest,
+											store: store?.value
 										}
 									})
 									.then(() => {
@@ -148,6 +163,10 @@ const Index = () => {
 									.post(`products/import`, formData, {
 										headers: {
 											'Content-Type': 'multipart/form-data'
+										},
+										params: {
+											...rest,
+											store: store?.value
 										}
 									})
 									.then(() => {

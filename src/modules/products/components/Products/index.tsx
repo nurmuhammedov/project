@@ -1,4 +1,5 @@
 import Filter from 'components/Filter'
+import useTypedSelector from 'hooks/useTypedSelector'
 import {ISearchParams} from 'interfaces/params.interface'
 import {measurementUnits} from 'modules/database/helpers/options'
 import {IProductDetail} from 'modules/products/interfaces'
@@ -51,10 +52,11 @@ const Products = () => {
 	const {data: countries = []} = useData<ISelectOption[]>('countries/select', modal === 'product' || modal === 'edit')
 	const {data: types = []} = useData<ISelectOption[]>('product-types/select', modal === 'product' || modal === 'edit')
 	const {data: brands = []} = useData<ISelectOption[]>('brands/select', modal === 'product' || modal === 'edit')
-
+	const {store} = useTypedSelector(state => state.stores)
 	const {data, totalPages, isPending: isLoading, refetch} = usePaginatedData<IProductDetail[]>(
 		`products`,
-		{...params, page: page, page_size: pageSize, type: product_type}
+		{...params, page: page, page_size: pageSize, type: product_type, store: store?.value},
+		!!store?.value
 	)
 
 	const {

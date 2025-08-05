@@ -1,5 +1,6 @@
 import Filter from 'components/Filter'
 import {currencyOptions} from 'constants/options'
+import useTypedSelector from 'hooks/useTypedSelector'
 import {IStockByPrice} from 'modules/reports/interfaces'
 import {Column} from 'react-table'
 import {useMemo, useState} from 'react'
@@ -22,18 +23,22 @@ const Stores = () => {
 		paramsObject: {product_type = undefined, currency = undefined, ...params}
 	} = useSearchParams()
 	const [isXMLLoading, setIsXMLLoading] = useState<boolean>(false)
+	const {store} = useTypedSelector(state => state.stores)
+
 
 	const {
 		data,
 		totalPages,
 		isPending: isLoading
 	} = usePaginatedData<IStockByPrice[]>('stocks/by-price', {
-		...params,
-		page,
-		type: product_type,
-		refer_currency: currency,
-		page_size: pageSize
-	})
+			...params,
+			page,
+			type: product_type,
+			refer_currency: currency,
+			page_size: pageSize,
+			store: store?.value
+		}, !!store?.value
+	)
 
 
 	const columns: Column<IStockByPrice>[] = useMemo(
@@ -55,10 +60,10 @@ const Stores = () => {
 			// 	Header: t('Code'),
 			// 	accessor: 'code'
 			// },
-			{
-				Header: t('Store'),
-				accessor: 'store_name'
-			},
+			// {
+			// 	Header: t('Store'),
+			// 	accessor: 'store_name'
+			// },
 			// {
 			// 	Header: t('Brand'),
 			// 	accessor: 'brand_name'
@@ -101,7 +106,8 @@ const Stores = () => {
 									page,
 									type: product_type,
 									refer_currency: currency,
-									page_size: pageSize
+									page_size: pageSize,
+									store: store?.value
 								}
 							}).then(res => {
 								const blob = new Blob([res.data])
@@ -121,7 +127,7 @@ const Stores = () => {
 			</PageTitle>
 			<Card screen={true} className="span-9 gap-xl">
 				<div className="flex justify-between align-center">
-					<Filter fieldsToShow={['search', 'product', 'store', 'product_type', 'single_currency']}/>
+					<Filter fieldsToShow={['search', 'product', 'product_type', 'single_currency']}/>
 				</div>
 
 				<div className="flex flex-col gap-md flex-1">

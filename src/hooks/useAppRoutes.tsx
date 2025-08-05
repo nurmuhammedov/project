@@ -66,41 +66,41 @@ function useAppRoutes() {
 										index: true,
 										element: <Home/>
 									},
-									{
-										path: 'service',
-										element: <Service/>
-									},
-									{
-										path: 'product-exchange',
-										children: [
-											{
-												index: true,
-												element: <ProductExchange/>
-											},
-											{
-												path: 'history',
-												children: [
-													{
-														index: true,
-														element: <ProductExchangeHistory/>
-													},
-													{
-														path: ':id',
-														element: <ProductExchange detail={true}/>
-													},
-													{
-														path: 'edit',
-														children: [
-															{
-																path: ':id',
-																element: <ProductExchange edit={true}/>
-															}
-														]
-													}
-												]
-											}
-										]
-									},
+									// {
+									// 	path: 'service',
+									// 	element: <Service/>
+									// },
+									// {
+									// 	path: 'product-exchange',
+									// 	children: [
+									// 		{
+									// 			index: true,
+									// 			element: <ProductExchange/>
+									// 		},
+									// 		{
+									// 			path: 'history',
+									// 			children: [
+									// 				{
+									// 					index: true,
+									// 					element: <ProductExchangeHistory/>
+									// 				},
+									// 				{
+									// 					path: ':id',
+									// 					element: <ProductExchange detail={true}/>
+									// 				},
+									// 				{
+									// 					path: 'edit',
+									// 					children: [
+									// 						{
+									// 							path: ':id',
+									// 							element: <ProductExchange edit={true}/>
+									// 						}
+									// 					]
+									// 				}
+									// 			]
+									// 		}
+									// 	]
+									// },
 									{
 										path: 'daily-currency',
 										children: [
@@ -119,37 +119,37 @@ function useAppRoutes() {
 											}
 										]
 									},
-									{
-										path: 'currency-exchange',
-										children: [
-											{
-												index: true,
-												element: <CurrencyExchange/>
-											},
-											{
-												path: 'history',
-												element: <CurrencyExchangeHistory/>
-											},
-											{
-												path: ':exchangeId',
-												children: [
-													{
-														index: true,
-														element: <CurrencyExchange detail={true}/>
-													}
-												]
-											},
-											{
-												path: 'expense/:exchangeId',
-												children: [
-													{
-														index: true,
-														element: <Service detail={true}/>
-													}
-												]
-											}
-										]
-									}
+									// {
+									// 	path: 'currency-exchange',
+									// 	children: [
+									// 		{
+									// 			index: true,
+									// 			element: <CurrencyExchange/>
+									// 		},
+									// 		{
+									// 			path: 'history',
+									// 			element: <CurrencyExchangeHistory/>
+									// 		},
+									// 		{
+									// 			path: ':exchangeId',
+									// 			children: [
+									// 				{
+									// 					index: true,
+									// 					element: <CurrencyExchange detail={true}/>
+									// 				}
+									// 			]
+									// 		},
+									// 		{
+									// 			path: 'expense/:exchangeId',
+									// 			children: [
+									// 				{
+									// 					index: true,
+									// 					element: <Service detail={true}/>
+									// 				}
+									// 			]
+									// 		}
+									// 	]
+									// }
 								]
 							},
 							{
@@ -164,7 +164,25 @@ function useAppRoutes() {
 										element: <Service/>
 									},
 									{
-										path: 'product-exchange',
+										path: 'product-exchange/sale',
+										children: [
+											{
+												index: true,
+												element: <ProductExchange/>
+											}
+										]
+									},
+									{
+										path: 'product-exchange/purchase',
+										children: [
+											{
+												index: true,
+												element: <ProductExchange/>
+											}
+										]
+									},
+									{
+										path: 'product-exchange/transfer',
 										children: [
 											{
 												index: true,
@@ -177,7 +195,16 @@ function useAppRoutes() {
 										element: <DailyCurrency/>
 									},
 									{
-										path: 'currency-exchange',
+										path: 'currency-exchange/purchase',
+										children: [
+											{
+												index: true,
+												element: <CurrencyExchange/>
+											}
+										]
+									},
+									{
+										path: 'currency-exchange/sale',
 										children: [
 											{
 												index: true,
@@ -239,6 +266,64 @@ function useAppRoutes() {
 									{
 										path: 'by-temporaries',
 										element: <Temporaries/>
+									},
+									{
+										path: 'currency-exchange',
+										children: [
+											{
+												path: 'history',
+												element: <CurrencyExchangeHistory/>
+											}
+										]
+									},
+									{
+										path: 'product-exchange',
+										children: [
+											{
+												path: 'history/purchase',
+												children: [
+													{
+														index: true,
+														element: <ProductExchangeHistory/>
+													},
+													{
+														path: ':id',
+														element: <ProductExchange detail={true}/>
+													},
+													{
+														path: 'edit',
+														children: [
+															{
+																path: ':id',
+																element: <ProductExchange edit={true}/>
+															}
+														]
+													}
+												]
+											},
+											{
+												path: 'history/sale',
+												children: [
+													{
+														index: true,
+														element: <ProductExchangeHistory/>
+													},
+													{
+														path: ':id',
+														element: <ProductExchange detail={true}/>
+													},
+													{
+														path: 'edit',
+														children: [
+															{
+																path: ':id',
+																element: <ProductExchange edit={true}/>
+															}
+														]
+													}
+												]
+											}
+										]
 									},
 									{
 										path: 'by-transfer',

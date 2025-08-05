@@ -82,7 +82,7 @@ const Index = () => {
 		<>
 			<Card screen={true} className="span-9 gap-2xl flex-1">
 				<div className="flex justify-between align-center">
-					<Filter fieldsToShow={['store', 'customer', 'currency', 'from_date', 'to_date']}/>
+					<Filter fieldsToShow={['customer', 'currency', 'from_date', 'to_date']}/>
 				</div>
 				<div className="flex flex-col gap-md flex-1">
 					<ReactTable columns={columns} data={data} isLoading={isLoading}/>

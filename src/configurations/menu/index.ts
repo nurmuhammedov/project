@@ -26,30 +26,30 @@ export const menu: IMenuItem[] = [
 		},
 		children: [
 			{
-				id: 'admin/trade/product-exchange?tab=purchase',
+				id: 'admin/trade/product-exchange/purchase?tab=purchase',
 				label: 'Trade (income)',
-				href: '/admin/trade/product-exchange?tab=purchase',
+				href: '/admin/trade/product-exchange/purchase?tab=purchase',
 				allowedRoles: [ROLE_LIST.ADMIN],
 				order: {[ROLE_LIST.ADMIN]: 1}
 			},
 			{
-				id: 'admin/trade/product-exchange?tab=sale',
+				id: 'admin/trade/product-exchange/sale?tab=sale',
 				label: 'Trade (loss)',
-				href: '/admin/trade/product-exchange?tab=sale',
+				href: '/admin/trade/product-exchange/sale?tab=sale',
 				allowedRoles: [ROLE_LIST.ADMIN],
 				order: {[ROLE_LIST.ADMIN]: 1}
 			},
 			{
-				id: 'admin/trade/currency-exchange?tab=1',
+				id: 'admin/trade/currency-exchange/purchase?tab=1',
 				label: 'Currency exchange (income)',
-				href: '/admin/trade/currency-exchange?tab=1',
+				href: '/admin/trade/currency-exchange/purchase?tab=1',
 				allowedRoles: [ROLE_LIST.ADMIN],
 				order: {[ROLE_LIST.ADMIN]: 2}
 			},
 			{
-				id: 'admin/trade/currency-exchange?tab=2',
+				id: 'admin/trade/currency-exchange/sale?tab=2',
 				label: 'Currency exchange (loss)',
-				href: '/admin/trade/currency-exchange?tab=2',
+				href: '/admin/trade/currency-exchange/sale?tab=2',
 				allowedRoles: [ROLE_LIST.ADMIN],
 				order: {[ROLE_LIST.ADMIN]: 2}
 			},
@@ -61,9 +61,9 @@ export const menu: IMenuItem[] = [
 				order: {[ROLE_LIST.ADMIN]: 2}
 			},
 			{
-				id: 'admin/trade/product-exchange?tab=transfer',
+				id: 'admin/trade/product-exchange/transfer?tab=transfer',
 				label: 'Swap',
-				href: '/admin/trade/product-exchange?tab=transfer',
+				href: '/admin/trade/product-exchange/transfer?tab=transfer',
 				allowedRoles: [ROLE_LIST.ADMIN],
 				order: {[ROLE_LIST.ADMIN]: 3}
 			}
@@ -126,23 +126,23 @@ export const menu: IMenuItem[] = [
 		},
 		children: [
 			{
-				id: '/admin/home/product-exchange/history',
+				id: '/admin/reports/product-exchange/history/purchase',
 				label: 'Product exchange history (income)',
-				href: '/admin/home/product-exchange/history',
+				href: '/admin/reports/product-exchange/history/purchase',
 				allowedRoles: [ROLE_LIST.ADMIN],
 				order: {[ROLE_LIST.ADMIN]: 2}
 			},
 			{
-				id: '/admin/home/product-exchange/history?tab=2',
+				id: '/admin/reports/product-exchange/history/sale?tab=2',
 				label: 'Product exchange history (sale)',
-				href: '/admin/home/product-exchange/history?tab=2',
+				href: '/admin/reports/product-exchange/history/sale?tab=2',
 				allowedRoles: [ROLE_LIST.ADMIN],
 				order: {[ROLE_LIST.ADMIN]: 2}
 			},
 			{
-				id: '/admin/home/currency-exchange/history?tab=currencies',
+				id: '/admin/reports/currency-exchange/history?tab=currencies',
 				label: 'Currency exchange history',
-				href: '/admin/home/currency-exchange/history?tab=currencies',
+				href: '/admin/reports/currency-exchange/history?tab=currencies',
 				allowedRoles: [ROLE_LIST.ADMIN],
 				order: {[ROLE_LIST.ADMIN]: 2}
 			},

@@ -1,4 +1,5 @@
 import Filter from 'components/Filter'
+import useTypedSelector from 'hooks/useTypedSelector'
 import {IPurchasedProduct} from 'modules/reports/interfaces'
 import {Column} from 'react-table'
 import {useMemo, useState} from 'react'
@@ -21,17 +22,20 @@ const Stores = () => {
 		paramsObject: {product_type = undefined, customer = undefined, ...params}
 	} = useSearchParams()
 	const [isXMLLoading, setIsXMLLoading] = useState<boolean>(false)
-
+	const {store} = useTypedSelector(state => state?.stores)
 	const {
 		data,
 		isPending: isLoading
 	} = usePaginatedData<IPurchasedProduct[]>('temporaries/all', {
-		...params,
-		page,
-		type: product_type,
-		supplier: customer,
-		page_size: pageSize
-	})
+			...params,
+			page,
+			type: product_type,
+			supplier: customer,
+			page_size: pageSize,
+			store: store?.value
+		},
+		!!store?.value
+	)
 
 	const columns: Column<IPurchasedProduct>[] = useMemo(
 		() => [
@@ -47,10 +51,10 @@ const Stores = () => {
 				Header: t('Product'),
 				accessor: (row) => row?.product?.name || ''
 			},
-			{
-				Header: t('Store'),
-				accessor: (row) => row?.supplier?.store_name || ''
-			},
+			// {
+			// 	Header: t('Store'),
+			// 	accessor: (row) => row?.supplier?.store_name || ''
+			// },
 			{
 				Header: t('Customer'),
 				accessor: (row) => row?.supplier?.name || ''
@@ -87,7 +91,8 @@ const Stores = () => {
 									page,
 									type: product_type,
 									supplier: customer,
-									page_size: pageSize
+									page_size: pageSize,
+									store: store?.value
 								}
 							}).then(res => {
 								const blob = new Blob([res.data])

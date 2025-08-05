@@ -2,6 +2,8 @@ import {
 	Button,
 	PageTitle
 } from 'components'
+import {useSearchParams} from 'hooks/index'
+import useTypedSelector from 'hooks/useTypedSelector'
 import ProductWarehouse from 'modules/products/components/ProductWarehouse'
 import {interceptor} from 'libraries/index'
 import {useState} from 'react'
@@ -11,6 +13,8 @@ import {useTranslation} from 'react-i18next'
 const Stores = () => {
 	const [isXMLLoading, setIsXMLLoading] = useState<boolean>(false)
 	const {t} = useTranslation()
+	const {paramsObject} = useSearchParams()
+	const {store} = useTypedSelector(state => state.stores)
 
 	return (
 		<>
@@ -22,7 +26,11 @@ const Stores = () => {
 						onClick={() => {
 							setIsXMLLoading(true)
 							interceptor.get(`stocks/export`, {
-								responseType: 'blob'
+								responseType: 'blob',
+								params: {
+									...paramsObject,
+									store: store?.value
+								}
 							}).then(res => {
 								const blob = new Blob([res.data])
 								const link = document.createElement('a')

@@ -27,6 +27,17 @@ const getDate = (dateStr?: string): string => {
 	return `${day}.${month}.${year}`
 }
 
+export const getTwoDaysAgoDate = (): string => {
+	const date = new Date()
+
+	date.setDate(date.getDate() - 2)
+
+	const day = String(date.getDate()).padStart(2, '0')
+	const month = String(date.getMonth() + 1).padStart(2, '0') // getMonth() 0 dan boshlanadi (0 = Yanvar), shuning uchun +1 qo'shamiz
+	const year = date.getFullYear()
+
+	return `${year}-${month}-${day}`
+}
 
 export {
 	formatDate,

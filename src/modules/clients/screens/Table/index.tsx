@@ -73,7 +73,8 @@ const Index = () => {
 
 	const {data, totalPages, isPending: isLoading, refetch} = usePaginatedData<ICustomerDetail[]>(
 		`customers`,
-		{...params, page: page, page_size: pageSize}
+		{...params, page: page, page_size: pageSize, store: store?.value},
+		!!store?.value
 	)
 
 	const {
@@ -148,10 +149,10 @@ const Index = () => {
 				Header: t('Full name'),
 				accessor: row => row.name
 			},
-			{
-				Header: t('Store'),
-				accessor: row => row.store?.name
-			},
+			// {
+			// 	Header: t('Store'),
+			// 	accessor: row => row.store?.name
+			// },
 			// {
 			// 	Header: t('Client code'),
 			// 	accessor: row => row.code
@@ -212,7 +213,7 @@ const Index = () => {
 							interceptor.get(`customers/download/template`, {
 								responseType: 'blob',
 								params: {
-									...params, page: page, page_size: pageSize
+									...params, page: page, page_size: pageSize, store: store?.value
 								}
 							}).then(res => {
 								const blob = new Blob([res.data])
@@ -237,7 +238,7 @@ const Index = () => {
 							interceptor.get(`customers/export`, {
 								responseType: 'blob',
 								params: {
-									...params, page: page, page_size: pageSize
+									...params, page: page, page_size: pageSize, store: store?.value
 								}
 							}).then(res => {
 								const blob = new Blob([res.data])
@@ -277,7 +278,7 @@ const Index = () => {
 										'Content-Type': 'multipart/form-data'
 									},
 									params: {
-										...params, page: page, page_size: pageSize
+										...params, page: page, page_size: pageSize, store: store?.value
 									}
 								})
 								.then(() => {
@@ -318,7 +319,7 @@ const Index = () => {
 										'Content-Type': 'multipart/form-data'
 									},
 									params: {
-										...params, page: page, page_size: pageSize
+										...params, page: page, page_size: pageSize, store: store?.value
 									}
 								})
 								.then(() => {
@@ -339,7 +340,7 @@ const Index = () => {
 			</PageTitle>
 			<Card screen={true} className="span-9 gap-2xl">
 				<div className="flex justify-between align-center">
-					<Filter fieldsToShow={['search', 'store', 'price_type', 'currency', 'is_user', 'region']}/>
+					<Filter fieldsToShow={['search', 'price_type', 'currency', 'is_user', 'region']}/>
 				</div>
 				<ReactTable columns={columns} data={data} isLoading={isLoading}/>
 				<HR/>

@@ -1,4 +1,5 @@
 import Filter from 'components/Filter'
+import useTypedSelector from 'hooks/useTypedSelector'
 import {IStock} from 'modules/products/interfaces'
 import {useTranslation} from 'react-i18next'
 import {useMemo} from 'react'
@@ -24,10 +25,12 @@ const ProductWarehouse = () => {
 	const {
 		paramsObject: {product_type = undefined, ...params}
 	} = useSearchParams()
+	const {store} = useTypedSelector(state => state.stores)
 
 	const {data, totalPages, isPending: isLoading} = usePaginatedData<IStock[]>(
 		`stocks`,
-		{...params, page: page, page_size: pageSize, type: product_type, tab: undefined}
+		{...params, page: page, page_size: pageSize, type: product_type, tab: undefined, store: store?.value},
+		!!store?.value
 	)
 
 	const columns: Column<IStock>[] = useMemo(
@@ -52,14 +55,14 @@ const ProductWarehouse = () => {
 			// 	Header: `${t('Customer')} ${t('Count')?.toLowerCase()}`,
 			// 	accessor: (row) => decimalToInteger(row?.customer_count)
 			// },
-			{
-				Header: t('Store'),
-				accessor: (row) => row.store_name
-			},
+			// {
+			// 	Header: t('Store'),
+			// 	accessor: (row) => row.store_name
+			// },
 			{
 				Header: t('Type'),
 				accessor: (row) => row.type_name
-			},
+			}
 			// {
 			// 	Header: t('Code'),
 			// 	accessor: (row) => row.code
@@ -81,7 +84,7 @@ const ProductWarehouse = () => {
 		<>
 			<Card screen={true} className="span-9 gap-xl">
 				<div className="flex justify-between align-center">
-					<Filter fieldsToShow={['search', 'customer', 'product_type', 'store', 'product']}/>
+					<Filter fieldsToShow={['search', 'customer', 'product_type', 'product']}/>
 				</div>
 				<ReactTable columns={columns} data={data} isLoading={isLoading}/>
 				<Pagination totalPages={totalPages}/>

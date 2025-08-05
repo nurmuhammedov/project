@@ -140,7 +140,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false, edit = false}) => {
 
 	return (
 		<>
-			<PageTitle title={edit ? t('Edit') : t('Transfer')}>
+			<PageTitle title={edit ? t('Edit') : t('Swap')}>
 				<div className="flex align-center gap-lg">
 					<Button onClick={() => navigate(-1)} theme={BUTTON_THEME.DANGER_OUTLINE}>
 						{t('Back')}

@@ -1,5 +1,6 @@
 import Filter from 'components/Filter'
 import {currencyOptions} from 'constants/options'
+import UseTypedSelector from 'hooks/useTypedSelector'
 import {ISaleByCustomer} from 'modules/reports/interfaces'
 import {Column} from 'react-table'
 import {useMemo, useState} from 'react'
@@ -23,17 +24,21 @@ const Stores = () => {
 		paramsObject: {product_type = undefined, ...params}
 	} = useSearchParams()
 	const [isXMLLoading, setIsXMLLoading] = useState<boolean>(false)
+	const {store} = UseTypedSelector(state => state?.stores)
 
 	const {
 		data,
 		totalPages,
 		isPending: isLoading
 	} = usePaginatedData<ISaleByCustomer[]>('sale-items', {
-		...params,
-		page,
-		type: product_type,
-		page_size: pageSize
-	})
+			...params,
+			page,
+			type: product_type,
+			page_size: pageSize,
+			store: store?.value
+		},
+		!!store?.value
+	)
 
 
 	const columns: Column<ISaleByCustomer>[] = useMemo(
@@ -52,10 +57,10 @@ const Stores = () => {
 				accessor: (row) => `${row?.product?.name}${row?.brand?.name ? ` - (${row?.brand?.name})` : ``}`
 
 			},
-			{
-				Header: t('Store'),
-				accessor: (row) => row?.store?.name || ''
-			},
+			// {
+			// 	Header: t('Store'),
+			// 	accessor: (row) => row?.store?.name || ''
+			// },
 			{
 				Header: t('Customer'),
 				accessor: (row) => row?.customer?.name || ''
@@ -103,7 +108,8 @@ const Stores = () => {
 									...params,
 									page,
 									type: product_type,
-									page_size: pageSize
+									page_size: pageSize,
+									store: store?.value
 								}
 							}).then(res => {
 								const blob = new Blob([res.data])
@@ -124,7 +130,7 @@ const Stores = () => {
 			<Card screen={true} className="span-9 gap-xl">
 				<div className="flex justify-between align-center">
 					<Filter
-						fieldsToShow={['search', 'product', 'store', 'product_type', 'customer', 'from_date', 'to_date']}/>
+						fieldsToShow={['search', 'product', 'product_type', 'customer', 'from_date', 'to_date']}/>
 				</div>
 
 				<div className="flex flex-col gap-md flex-1">

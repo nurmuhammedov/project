@@ -1,6 +1,7 @@
 import {DetailButton, EditButton, HR, Modal, PageTitle, Pagination, ReactTable} from 'components/index'
 import {Button} from 'components/UI'
 import {BUTTON_THEME} from 'constants/fields'
+import useTypedSelector from 'hooks/useTypedSelector'
 import {useTranslation} from 'react-i18next'
 import {useNavigate} from 'react-router-dom'
 import Filter from 'components/Filter'
@@ -18,12 +19,12 @@ const Index = () => {
 	const {t} = useTranslation()
 	const navigate = useNavigate()
 	const {page, pageSize} = usePagination()
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	const {paramsObject: {id, modal: _modal, ...rest}, addParams, removeParams} = useSearchParams()
+	const {store} = useTypedSelector(state => state.stores)
+	const {paramsObject: {id, ...rest}, addParams, removeParams} = useSearchParams()
 	const {data, isFetching: isLoading, totalPages, refetch} = usePaginatedData<ITransferHistory[]>(
 		`movements/parties`,
-		{...rest, page: page, page_size: pageSize}
-		// !!paramsObject?.from_date
+		{...rest, page: page, page_size: pageSize, from_store: store?.value},
+		!!store?.value
 	)
 	const [loader, setLoader] = useState(false)
 
@@ -56,10 +57,6 @@ const Index = () => {
 					}
 				},
 				{
-					Header: t('From store'),
-					accessor: row => row?.to_store?.name || ''
-				},
-				{
 					Header: t('To store'),
 					accessor: row => row?.to_store?.name || ''
 				},
@@ -81,8 +78,11 @@ const Index = () => {
 						<div className="flex items-start gap-lg">
 							{
 								!row?.is_received &&
-								<Button style={{whiteSpace: 'nowrap'}} mini={true}
-								        onClick={() => addParams({modal: 'accept', id: row?.id})}>
+								<Button
+									style={{whiteSpace: 'nowrap'}}
+									mini={true}
+									onClick={() => addParams({modal: 'accept', id: row?.id})}
+								>
 									Accept
 								</Button>
 							}
@@ -94,7 +94,7 @@ const Index = () => {
 						</div>
 					),
 					style: {
-						width: '5rem'
+						maxWidth: '5rem'
 					}
 				}
 			],
@@ -117,7 +117,7 @@ const Index = () => {
 			<Card screen={true} className="span-12 gap-md flex-1">
 				<div className="flex justify-between align-center">
 					<Filter
-						fieldsToShow={['search', 'store', 'customer', 'price_type', 'from_date', 'to_date']}
+						fieldsToShow={['search', 'customer', 'price_type', 'from_date', 'to_date']}
 					/>
 				</div>
 				<div className="flex flex-col gap-md flex-1">

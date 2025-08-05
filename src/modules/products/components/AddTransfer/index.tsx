@@ -90,8 +90,8 @@ const Index: FC<IProperties> = ({
 		type,
 		brand
 	})
-	const {data: types = []} = useData<ISelectOption[]>('product-types/select', !retrieve && !edit)
-	const {data: brands = []} = useData<ISelectOption[]>('brands/select', !retrieve && !edit)
+	const {data: types = []} = useData<ISelectOption[]>(brand ? `brands/${brand}/types` : 'product-types/select', !retrieve && !edit)
+	const {data: brands = []} = useData<ISelectOption[]>(type ? `product-types/${type}/brands` : 'brands/select', !retrieve && !edit)
 
 	const columns: Column<ITemporaryListItem>[] = useMemo(
 		() => [

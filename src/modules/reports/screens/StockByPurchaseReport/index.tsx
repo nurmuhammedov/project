@@ -1,5 +1,6 @@
 import Filter from 'components/Filter'
 import {currencyOptions} from 'constants/options'
+import useTypedSelector from 'hooks/useTypedSelector'
 import {IStockByPurchase} from 'modules/reports/interfaces'
 import {Column} from 'react-table'
 import {useMemo, useState} from 'react'
@@ -23,6 +24,7 @@ const Stores = () => {
 		paramsObject: {product_type = undefined, customer = undefined, ...params}
 	} = useSearchParams()
 	const [isXMLLoading, setIsXMLLoading] = useState<boolean>(false)
+	const {store} = useTypedSelector(state => state.stores)
 
 	const {
 		data,
@@ -33,8 +35,9 @@ const Stores = () => {
 		page,
 		type: product_type,
 		supplier: customer,
-		page_size: pageSize
-	})
+		page_size: pageSize,
+		store: store?.value
+	}, !!store?.value)
 
 
 	const columns: Column<IStockByPurchase>[] = useMemo(
@@ -56,10 +59,10 @@ const Stores = () => {
 			// 	Header: t('Code'),
 			// 	accessor: 'code'
 			// },
-			{
-				Header: t('Store'),
-				accessor: (row) => row?.store?.name || ''
-			},
+			// {
+			// 	Header: t('Store'),
+			// 	accessor: (row) => row?.store?.name || ''
+			// },
 			{
 				Header: t('Customer'),
 				accessor: (row) => row?.supplier?.name || ''
@@ -108,7 +111,8 @@ const Stores = () => {
 									page,
 									type: product_type,
 									supplier: customer,
-									page_size: pageSize
+									page_size: pageSize,
+									store: store?.value
 								}
 							}).then(res => {
 								const blob = new Blob([res.data])
@@ -129,7 +133,7 @@ const Stores = () => {
 			<Card screen={true} className="span-9 gap-xl">
 				<div className="flex justify-between align-center">
 					<Filter
-						fieldsToShow={['search', 'product', 'store', 'currency', 'customer', 'from_date', 'to_date']}/>
+						fieldsToShow={['search', 'product', 'currency', 'customer', 'from_date', 'to_date']}/>
 				</div>
 
 				<div className="flex flex-col gap-md flex-1">
