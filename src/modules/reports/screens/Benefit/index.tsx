@@ -101,7 +101,7 @@ const Stores = () => {
 
 	return (
 		<>
-			<PageTitle title="Balance">
+			<PageTitle title="Benefit">
 				{/*<div className="flex items-center gap-lg">*/}
 				{/*	<Button*/}
 				{/*		style={{marginTop: 'auto'}}*/}
