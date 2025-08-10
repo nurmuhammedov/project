@@ -29,7 +29,7 @@ import {
 	Service,
 	SaleTemporaries,
 	Temporaries,
-	DailyCurrencyHistory, TransferReport
+	DailyCurrencyHistory, TransferReport, Balance, Benefit
 } from 'modules'
 import Transfer from 'modules/products/components/Transfer'
 
@@ -118,7 +118,7 @@ function useAppRoutes() {
 												]
 											}
 										]
-									},
+									}
 									// {
 									// 	path: 'currency-exchange',
 									// 	children: [
@@ -238,6 +238,14 @@ function useAppRoutes() {
 									{
 										index: true,
 										element: <ProductsWarehouseReport/>
+									},
+									{
+										path: 'balance',
+										element: <Balance/>
+									},
+									{
+										path: 'benefit',
+										element: <Benefit/>
 									},
 									{
 										path: 'by-warehouse',

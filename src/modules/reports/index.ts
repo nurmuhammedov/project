@@ -6,11 +6,15 @@ import SalesTotalReport from './screens/SalesTotalReport'
 import SaleTemporaries from './screens/SaleTemporaries'
 import Temporaries from './screens/Temporaries'
 import TransferReport from './screens/Transfer'
+import Balance from './screens/Balance'
+import Benefit from './screens/Benefit'
 
 
 export {
 	ProductsWarehouseReport,
 	StocksByPriceReport,
+	Balance,
+	Benefit,
 	SalesTotalReport,
 	SaleTemporaries,
 	TransferReport,

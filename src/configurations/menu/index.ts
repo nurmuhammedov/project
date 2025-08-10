@@ -184,6 +184,33 @@ export const menu: IMenuItem[] = [
 		]
 	},
 	{
+		id: '/admin/reports/cash',
+		label: 'Reports (Cash)',
+		href: '/admin/reports/cash',
+		allowedRoles: [
+			ROLE_LIST.ADMIN
+		],
+		order: {
+			[ROLE_LIST.ADMIN]: 1
+		},
+		children: [
+			{
+				id: '/admin/reports/balance',
+				label: 'Balance',
+				href: '/admin/reports/balance',
+				allowedRoles: [ROLE_LIST.ADMIN],
+				order: {[ROLE_LIST.ADMIN]: 1}
+			},
+			{
+				id: '/admin/reports/benefit',
+				label: 'Benefit',
+				href: '/admin/reports/benefit',
+				allowedRoles: [ROLE_LIST.ADMIN],
+				order: {[ROLE_LIST.ADMIN]: 2}
+			}
+		]
+	},
+	{
 		id: '/database',
 		label: 'Database',
 		href: '/admin/database',

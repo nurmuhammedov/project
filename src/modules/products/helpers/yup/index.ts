@@ -78,6 +78,22 @@ export const temporaryTransferItemSchema = yup.object().shape({
 		.transform(value => (value && Array.isArray(value)) ? value : [])
 })
 
+export const StockItemSchema = yup.object().shape({
+	to_store: yup.number().required('This field is required'),
+	date: isNotFutureDate,
+	comment: yup.string().transform(value => value ? String(value) : '').trim().nullable(),
+	data: yup
+		.array()
+		.default([])
+		.optional()
+		.nullable()
+		.of(yup.object().shape({
+			purchase_item: yup.number().optional().nullable().transform(value => value ? value : null),
+			quantity: yup.string().trim().optional().nullable().transform(value => value ? value : null)
+		}))
+		.transform(value => (value && Array.isArray(value)) ? value : [])
+})
+
 export const transferItemSchema = yup.object().shape({
 	to_store: yup.number().required('This field is required'),
 	date: isNotFutureDate,

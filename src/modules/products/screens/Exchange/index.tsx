@@ -6,7 +6,7 @@ import {useSearchParams} from 'hooks'
 import {productExchangeTabOptions} from 'modules/products/helpers/options'
 import {FC} from 'react'
 // import {useNavigate} from 'react-router-dom'
-import Transfer from 'modules/products/components/Transfer'
+import Transfer2 from 'modules/products/components/Transfer2'
 
 // import edit from 'assets/icons/Edit'
 
@@ -36,7 +36,7 @@ const Index: FC<IProperties> = ({detail = false, edit = false}) => {
 			{
 				tab === 'purchase' ? <Purchase edit={edit} detail={detail}/> :
 					tab === 'sale' ? <Sale edit={edit} detail={detail}/> :
-						tab === 'transfer' ? <Transfer detail={detail}/> :
+						tab === 'transfer' ? <Transfer2 detail={detail}/> :
 							null
 			}
 

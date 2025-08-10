@@ -205,6 +205,7 @@
   "Value": "Қиймати",
   "Exchange rate history": "Курслар тарихи",
   "Exchange rate": "Валюталар курси",
+  "Rate": "Курс",
   "Previous currency": "Эски курс",
   "New currency": "Янги курс",
   "Invalid username or password": "Логин ёки парол хато",
@@ -249,5 +250,8 @@
   "Transfer history": "Ўтказмалар тарихи",
   "Accept?": "Қабул қилинсинми?",
   "Is received": "Қабул қилинганми?",
+  "Reports (Cash)": "Ҳисоботлар (Пул)",
+  "Balance info": "Баланс бўйича маълумот",
+  "Benefit": "Фойда",
   "Accept": "Қабул қилиш"
 }

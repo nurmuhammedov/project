@@ -100,3 +100,57 @@ export interface ITransferHistory {
 	is_received: boolean;
 	items_count: number;
 }
+
+export interface ITransactionSummary {
+	label: string;
+	currency: string | null;
+	amount: number | null;
+	refer_amount: number;
+}
+
+interface Product {
+	id: number;
+	name: string;
+	type: IIDName;
+	brand: string | null;
+}
+
+
+interface Sale {
+	store: IIDName;
+	customer: IIDName;
+	currency: string;
+	sale_date: string; // ISO format date
+}
+
+interface SaleItem {
+	id: number;
+	product: Product;
+	sale: Sale;
+	price: string; // original format preserved as string
+}
+
+interface Supplier {
+	id: number;
+	name: string;
+}
+
+interface PurchaseItem {
+	id: number;
+	supplier: Supplier;
+	currency: string;
+	price: string;
+	purchase_date: string; // ISO format date
+}
+
+export interface ITransactionDetail {
+	id: number;
+	sale_item: SaleItem;
+	purchase_item: PurchaseItem;
+	quantity: string;
+	currency_rate: number | null;
+	sale_price: string;
+	total_sale_price: string;
+	total_purchase_price: string;
+	profit: string;
+}

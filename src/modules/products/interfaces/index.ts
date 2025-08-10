@@ -29,3 +29,16 @@ export interface IStock {
 	customer_count: number;
 	store_count: number;
 }
+
+
+export interface IStockItem {
+	id: number;
+	price: number;
+	expiry_date: string | null;
+	quantity: number;
+	purchase_date: string; // ISO format: YYYY-MM-DD
+	supplier_name: string;
+	product_name: string;
+	brand_name: string;
+	type_name: string;
+}
