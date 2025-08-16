@@ -4,6 +4,7 @@ import classes from './styles.module.scss'
 import {useTable, TableOptions, ColumnInstance, HeaderGroup, Column} from 'react-table'
 import classNames from 'classnames'
 import {useTranslation} from 'react-i18next'
+import {useSearchParams} from 'hooks/index'
 
 
 interface ICustomProps {
@@ -12,17 +13,20 @@ interface ICustomProps {
 	spacing?: boolean;
 	activeIndex?: number;
 	className?: string;
+	lastRowColor?: string;
 	handleRow?: (id: string | number) => void;
 }
 
 type ICustomColumnProps<T extends object> = ColumnInstance<T> & {
 	style?: CSSProperties;
 	headerRowSpan?: number;
+	ordering?: string;
 }
 
 type ICustomColumn<T extends object> = Column<T> & {
 	style?: CSSProperties;
 	headerRowSpan?: number;
+	ordering?: string;
 }
 
 type ICustomHeaderGroup<T extends object> = HeaderGroup<T> & {
@@ -40,6 +44,7 @@ const Index = <T extends object>({
 	                                 data,
 	                                 isLoading,
 	                                 className,
+	                                 lastRowColor,
 	                                 screen = true,
 	                                 activeIndex = undefined,
 	                                 spacing = false
@@ -55,6 +60,7 @@ const Index = <T extends object>({
 		data
 	})
 
+	const {paramsObject, addParams, removeParams} = useSearchParams()
 	const {t} = useTranslation()
 
 	return (
@@ -72,9 +78,23 @@ const Index = <T extends object>({
 								headerGroup.headers.map((column: ICustomColumnProps<T>, index: number) => (
 									<th
 										{...column.getHeaderProps()}
-										style={{...column.style}}
+										style={{
+											...column.style,
+											color: paramsObject?.ordering == (column.ordering || '') ? 'var(--red)' : paramsObject?.ordering == `-${column.ordering || ''}` ? 'var(--teal-green)' : 'var(--slate-gray)'
+										}}
 										rowSpan={column.headerRowSpan}
 										key={index}
+										onClick={() => {
+											if (column.ordering) {
+												if (paramsObject?.ordering == column.ordering) {
+													addParams({ordering: `-${column.ordering}`}, 'page', 'limit')
+												} else if (paramsObject?.ordering == `-${column.ordering}`) {
+													removeParams('page', 'limit', 'ordering')
+												} else if (!paramsObject?.ordering || paramsObject?.ordering != column.ordering) {
+													addParams({ordering: column.ordering}, 'page', 'limit')
+												}
+											}
+										}}
 									>
 										{column.render('Header')}
 									</th>
@@ -109,7 +129,7 @@ const Index = <T extends object>({
 											className={classes.row}
 											{...row.getRowProps()}
 											key={index}
-											style={{backgroundColor: row.index === activeIndex ? 'var(--light-gray-3)' : 'transparent'}}
+											style={{backgroundColor: lastRowColor && index === data?.length - 1 ? lastRowColor : row.index === activeIndex ? 'var(--light-gray-3)' : 'transparent'}}
 										>
 											{
 												row.cells.map((cell, index) => {

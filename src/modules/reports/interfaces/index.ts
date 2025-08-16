@@ -150,7 +150,7 @@ export interface ITransactionDetail {
 	quantity: string;
 	currency_rate: number | null;
 	sale_price: string;
-	total_sale_price: string;
+	currency_total_price: string;
 	total_purchase_price: string;
 	profit: string;
 }

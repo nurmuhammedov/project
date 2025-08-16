@@ -109,7 +109,7 @@ const Stores = () => {
 				</div>
 
 				<div className="flex flex-col gap-md flex-1">
-					<ReactTable columns={columns} data={data} isLoading={isLoading}/>
+					<ReactTable columns={columns} data={data} isLoading={isLoading} lastRowColor="var(--teal-green)"/>
 				</div>
 			</Card>
 		</>

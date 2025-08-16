@@ -11,6 +11,7 @@
   user-select: none;
 }
 .root table thead tr th {
+  cursor: pointer !important;
   padding: 0.5rem;
   text-align: start;
   color: var(--slate-gray);

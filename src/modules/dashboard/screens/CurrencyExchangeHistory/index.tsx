@@ -69,7 +69,7 @@ const Index = () => {
 						<div className="flex items-start gap-lg">
 							<DetailButton
 								id={row.id}
-								url={row?.type == 3 ? `/admin/home/currency-exchange/expense/${row.id}` : `/admin/home/currency-exchange/${row.id}?tab=${row.type == 2 ? '2' : row.type == 3 ? '3' : '1'}`}
+								url={row?.type == 3 ? `/admin/reports/currency-exchange/expense/${row.id}` : `/admin/reports/currency-exchange/${row.id}?tab=${row.type == 2 ? '2' : row.type == 3 ? '3' : '1'}`}
 							/>
 						</div>
 					)

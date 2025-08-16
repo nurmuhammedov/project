@@ -81,7 +81,7 @@ const Stores = () => {
 			},
 			{
 				Header: `${t('Loss')}`,
-				accessor: row => decimalToPrice(row?.total_sale_price || '')
+				accessor: row => decimalToPrice(row?.currency_total_price || '')
 			},
 			{
 				Header: `${t('Income')}`,

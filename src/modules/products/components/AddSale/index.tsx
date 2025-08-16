@@ -43,6 +43,7 @@ import {ISearchParams} from 'interfaces/params.interface'
 import {InferType} from 'yup'
 import {getDate} from 'utilities/date'
 import {currencyOptions} from 'constants/options'
+import {useQueryClient} from '@tanstack/react-query'
 
 
 interface IProperties {
@@ -83,6 +84,8 @@ const Index: FC<IProperties> = ({
 		paramsObject: {updateId = undefined}
 	} = useSearchParams()
 	const {mutateAsync: del, isPending: isDeleteLoading} = useDelete(edit ? 'sale-items/' : 'sale-temporaries/')
+	const queryClient = useQueryClient()
+
 
 	const {data: products = []} = useData<ISelectOption[]>(`stores/${store?.value}/stock/select`, !retrieve && !!store?.value, {edit: edit ? 'true' : ''})
 
@@ -122,7 +125,10 @@ const Index: FC<IProperties> = ({
 					<div className="flex items-start gap-lg">
 						<EditButton id={row.id}/>
 						<DeleteButton
-							onDelete={() => !isDeleteLoading && del(row?.id).then(() => refetchTemporaryList?.())}/>
+							onDelete={() => !isDeleteLoading && del(row?.id).then(async () => {
+								refetchTemporaryList?.()
+								await queryClient.invalidateQueries({queryKey: ['sales/']})
+							})}/>
 					</div>
 				),
 				style: {
@@ -423,6 +429,7 @@ const Index: FC<IProperties> = ({
 							setFocus('product')
 						}, 0)
 						refetchTemporaryList?.()
+						await queryClient.invalidateQueries({queryKey: ['sales/']})
 					})
 				} else {
 					mutateAsync(cleanParams(cleanedData as unknown as ISearchParams)).then(async () => {
@@ -432,6 +439,7 @@ const Index: FC<IProperties> = ({
 							setFocus('product')
 						}, 0)
 						refetchTemporaryList?.()
+						await queryClient.invalidateQueries({queryKey: ['sales/']})
 					})
 				}
 			}

@@ -281,6 +281,24 @@ function useAppRoutes() {
 											{
 												path: 'history',
 												element: <CurrencyExchangeHistory/>
+											},
+											{
+												path: ':exchangeId',
+												children: [
+													{
+														index: true,
+														element: <CurrencyExchange detail={true}/>
+													}
+												]
+											},
+											{
+												path: 'expense/:exchangeId',
+												children: [
+													{
+														index: true,
+														element: <Service detail={true}/>
+													}
+												]
 											}
 										]
 									},

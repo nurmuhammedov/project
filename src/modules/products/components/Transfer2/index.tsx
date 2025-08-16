@@ -95,11 +95,23 @@ const Index: FC<IProperties> = ({detail: retrieve = false, edit = false}) => {
 			},
 			{
 				Header: t('Full name'),
-				accessor: row => row?.supplier_name
+				accessor: row => row?.supplier_name,
+				ordering: 'supplier_name'
 			},
 			{
 				Header: t('Product'),
-				accessor: row => `${row?.product_name}${row?.brand_name ? ` (${row?.brand_name})` : ``}`
+				accessor: row => `${row?.product_name}${row?.brand_name ? ` (${row?.brand_name})` : ``}`,
+				ordering: 'product_name'
+			},
+			{
+				Header: t('Type'),
+				accessor: row => row?.type_name || '',
+				ordering: 'type_name'
+			},
+			{
+				Header: t('Date'),
+				accessor: row => getDate(row?.purchase_date),
+				ordering: 'purchase_date'
 			},
 			{
 				Header: t('Quantity'),
@@ -128,7 +140,8 @@ const Index: FC<IProperties> = ({detail: retrieve = false, edit = false}) => {
 				accessor: (row, index) => edit ? decimalToInteger(Number(row?.quantity || 0) + Number(watch('data')?.[index]?.quantity || 0)) : decimalToInteger(row?.quantity),
 				style: {
 					whiteSpace: 'nowrap'
-				}
+				},
+				ordering: 'quantity'
 			}
 		],
 		[watch('data'), edit]
