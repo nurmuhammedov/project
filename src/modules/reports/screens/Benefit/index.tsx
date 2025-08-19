@@ -31,6 +31,7 @@ const Stores = () => {
 			...params,
 			page,
 			currency: currency,
+			type: params?.product_type,
 			page_size: pageSize,
 			store: store?.value
 		},
@@ -53,7 +54,15 @@ const Stores = () => {
 			},
 			{
 				Header: t('Seller'),
+				accessor: (row) => row?.purchase_item?.supplier?.name || ''
+			},
+			{
+				Header: t('Customer'),
 				accessor: (row) => row?.sale_item?.sale?.customer?.name || ''
+			},
+			{
+				Header: t('Product'),
+				accessor: (row) => `${row?.sale_item?.product?.name || ''} ${row?.sale_item?.product?.brand?.name || ''}`
 			},
 			{
 				Header: `${t('Income')} ${t('Date')?.toLowerCase()}`,
@@ -136,7 +145,7 @@ const Stores = () => {
 			<Card screen={true} className="span-9 gap-xl">
 				<div className="flex justify-between align-center">
 					<Filter
-						fieldsToShow={['search', 'single_currency']}
+						fieldsToShow={['search', 'single_currency', 'product_type', 'brand', 'customer', 'from_date', 'to_date']}
 					/>
 				</div>
 

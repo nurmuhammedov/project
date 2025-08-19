@@ -112,7 +112,7 @@ interface Product {
 	id: number;
 	name: string;
 	type: IIDName;
-	brand: string | null;
+	brand: IIDName;
 }
 
 
