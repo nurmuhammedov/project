@@ -33,6 +33,8 @@ import styles from '../Purchase/styles.module.scss'
 import {Column} from 'react-table'
 import Filter from 'components/Filter'
 import {IStockItem} from 'modules/products/interfaces'
+import {interceptor} from 'libraries/index'
+import {showMessage} from 'utilities/alert'
 
 
 interface IProperties {
@@ -70,6 +72,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false, edit = false}) => {
 		register,
 		handleSubmit,
 		setFocus,
+		setValue,
 		watch,
 		formState: {errors}
 	} = useForm({
@@ -78,10 +81,41 @@ const Index: FC<IProperties> = ({detail: retrieve = false, edit = false}) => {
 			comment: '',
 			to_store: undefined,
 			date: getDate(),
-			data: []
+			data: [],
+			serial_input: '' // qo‘shildi
 		},
 		resolver: yupResolver(StockItemSchema)
 	})
+
+	// 🔑 Serial check function
+	const handleSerialCheck = async (serial: string) => {
+		try {
+			const res = await interceptor.get('serial-numbers/find-purchase-item', {
+				params: {serial_number: serial}
+			})
+			const {purchase_item_id} = res.data
+
+			const index = purchases.findIndex(p => p.id === purchase_item_id)
+			if (index >= 0) {
+				const currentQty = Number(watch(`data.${index}.quantity`) || 0)
+				const serialNumbers = watch(`data.${index}.serial_numbers`) || []
+				const maxQty = Number(purchases[index]?.quantity || 0)
+
+				if (currentQty < maxQty && !serialNumbers?.includes(serial)) {
+					setValue(`data.${index}.quantity`, String(currentQty + 1))
+					const oldSerials = watch(`data.${index}.serial_numbers`) || []
+					setValue(`data.${index}.serial_numbers`, [...oldSerials, serial])
+				} else {
+					showMessage('Serial number not found!', 'error')
+				}
+			} else {
+				showMessage('Serial number not found!', 'error')
+			}
+			setValue('serial_input', '')
+		} catch (err) {
+			console.error('Serial not found', err)
+		}
+	}
 
 	const columns: Column<IStockItem>[] = useMemo(
 		() => [
@@ -124,6 +158,13 @@ const Index: FC<IProperties> = ({detail: retrieve = false, edit = false}) => {
 								<NumberFormattedInput
 									disabled={retrieve}
 									{...field}
+									onChange={(e) => {
+										if (Number(e || 0) > Number(row?.quantity || 0)) {
+											setValue(`data.${index}.quantity`, String(row?.quantity || 0))
+										} else {
+											field.onChange(e)
+										}
+									}}
 									id={`temp_quantity_input_${row.id}`}
 									placeholder={t('Quantity')}
 									allowDecimals={false}
@@ -146,6 +187,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false, edit = false}) => {
 		],
 		[watch('data'), edit]
 	)
+
 
 	useEffect(() => {
 		if (transferDetail && (retrieve || edit)) {
@@ -177,7 +219,8 @@ const Index: FC<IProperties> = ({detail: retrieve = false, edit = false}) => {
 				...prev,
 				data: purchases?.map(i => ({
 					purchase_item: i?.id,
-					quantity: ''
+					quantity: '',
+					serial_numbers: [] // qo‘shildi
 				}))
 			}))
 		}
@@ -263,6 +306,30 @@ const Index: FC<IProperties> = ({detail: retrieve = false, edit = false}) => {
 								<div className="span-12">
 									<Filter fieldsToShow={['search', 'product_type', 'brand', 'customer']}/>
 								</div>
+								{/* 🔑 Serial Number input */}
+								<div className="span-12">
+									<Controller
+										name="serial_input"
+										control={control}
+										render={({field}) => (
+											// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+											// @ts-expect-error
+											<Input
+												{...field}
+												id="serial_input"
+												label={t('Series')}
+												// placeholder={t('Enter serial number')}
+												disabled={retrieve}
+												onKeyDown={(e) => {
+													if (e.key === 'Enter' && field.value) {
+														e.preventDefault()
+														handleSerialCheck(field.value)
+													}
+												}}
+											/>
+										)}
+									/>
+								</div>
 								<div className="span-12">
 									<div className="flex gap-lg align-center justify-between">
 										<div className={styles['price-wrapper']}>
@@ -276,12 +343,13 @@ const Index: FC<IProperties> = ({detail: retrieve = false, edit = false}) => {
 										columns={columns}
 										data={purchases}
 										isLoading={isFetching}
-
 									/>
 								</div>
 							</div>
 						</Form>
 					</div>
+
+
 				</div>
 
 				<div className={styles.footer}>
@@ -302,7 +370,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false, edit = false}) => {
 									})
 								} else {
 									// eslint-disable-next-line @typescript-eslint/no-unused-vars
-									const {data: m, ...rest} = data
+									const {data: m, serial_input, ...rest} = data
 									mutateAsync({
 										...rest,
 										quantities: data?.data?.filter(i => !!i?.quantity),
@@ -313,7 +381,8 @@ const Index: FC<IProperties> = ({detail: retrieve = false, edit = false}) => {
 											comment: '',
 											data: [],
 											to_store: undefined,
-											date: getDate()
+											date: getDate(),
+											serial_input: ''
 										})
 										await refetch?.()
 									})

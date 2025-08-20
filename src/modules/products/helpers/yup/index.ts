@@ -82,6 +82,7 @@ export const StockItemSchema = yup.object().shape({
 	to_store: yup.number().required('This field is required'),
 	date: isNotFutureDate,
 	comment: yup.string().transform(value => value ? String(value) : '').trim().nullable(),
+	serial_input: yup.string().transform(value => value ? String(value) : '').trim().nullable(),
 	data: yup
 		.array()
 		.default([])
@@ -89,7 +90,14 @@ export const StockItemSchema = yup.object().shape({
 		.nullable()
 		.of(yup.object().shape({
 			purchase_item: yup.number().optional().nullable().transform(value => value ? value : null),
-			quantity: yup.string().trim().optional().nullable().transform(value => value ? value : null)
+			quantity: yup.string().trim().optional().nullable().transform(value => value ? value : null),
+			serial_numbers: yup
+				.array()
+				.default([])
+				.optional()
+				.nullable()
+				.of(yup.string().trim().optional().nullable().transform(value => value ? value : ''))
+				.transform(value => (value && Array.isArray(value)) ? value : []),
 		}))
 		.transform(value => (value && Array.isArray(value)) ? value : [])
 })
