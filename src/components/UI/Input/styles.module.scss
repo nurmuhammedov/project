@@ -23,6 +23,7 @@
   align-items: center;
   gap: .3rem;
   margin-bottom: .3rem;
+  cursor: pointer !important;
 
   label {
     //color: var(--light-gray-2);
@@ -33,6 +34,7 @@
     font-style: normal;
     font-weight: 400;
     white-space: nowrap;
+    cursor: pointer !important;
   }
 }
 

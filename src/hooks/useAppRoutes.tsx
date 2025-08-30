@@ -32,6 +32,7 @@ import {
 	DailyCurrencyHistory, TransferReport, Balance, Benefit
 } from 'modules'
 import Transfer from 'modules/products/components/Transfer'
+import Debtors from 'modules/reports/screens/Debtors'
 
 
 function useAppRoutes() {
@@ -274,6 +275,10 @@ function useAppRoutes() {
 									{
 										path: 'by-temporaries',
 										element: <Temporaries/>
+									},
+									{
+										path: 'by-debtors',
+										element: <Debtors/>
 									},
 									{
 										path: 'currency-exchange',

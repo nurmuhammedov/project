@@ -13,6 +13,7 @@ export interface IFieldProperties {
 	required?: boolean;
 	redLabel?: boolean;
 	radius?: boolean,
+	modalId?: string,
 	icon?: React.ReactNode;
 	iconPosition?: 'right' | 'left';
 	handleIcon?: () => void;
@@ -55,6 +56,7 @@ export interface ISelect extends SelectProps<ISelectOption> {
 	handleOnChange?: (e: string | number | boolean | string[] | number[] | boolean[] | null) => void;
 	disabled?: boolean;
 	label?: string;
+	modalId?: string;
 	redLabel?: boolean;
 	error?: string;
 	top?: boolean;

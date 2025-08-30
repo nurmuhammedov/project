@@ -54,7 +54,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false, edit = false}) => {
 
 	const {
 		data: saleDetail,
-		isPending: isSaleDetailLoading,
+		isPending: isSaleDetailLoading
 	} = useDetail<IPurchaseItem>('sales/', productId, !!(productId && (retrieve || edit)))
 
 
@@ -317,6 +317,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false, edit = false}) => {
 										redLabel={true}
 										id="customer"
 										label="Customer"
+										modalId="customer"
 										onBlur={onBlur}
 										options={clients}
 										error={errors.customer?.message}

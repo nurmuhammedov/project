@@ -80,7 +80,7 @@ const Index = forwardRef<SelectInstance<ISelectOption>, ISelect>((props, ref) =>
 
 	return (
 		<Input id={props.id} label={props.label} redLabel={props.redLabel} error={props.error}
-		       disabled={props.disabled}>
+		       disabled={props.disabled} modalId={props?.modalId}>
 			<Select
 				styles={getSelectStyles(!!props.error, props.top) as StylesConfig<ISelectOption, boolean, GroupBase<ISelectOption>>}
 				menuPlacement={props.top ? 'top' : 'bottom'}

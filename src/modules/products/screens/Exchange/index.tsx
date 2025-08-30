@@ -7,6 +7,7 @@ import {productExchangeTabOptions} from 'modules/products/helpers/options'
 import {FC} from 'react'
 // import {useNavigate} from 'react-router-dom'
 import Transfer2 from 'modules/products/components/Transfer2'
+import {AddClientModal} from 'components/index'
 
 // import edit from 'assets/icons/Edit'
 
@@ -39,7 +40,7 @@ const Index: FC<IProperties> = ({detail = false, edit = false}) => {
 						tab === 'transfer' ? <Transfer2 detail={detail}/> :
 							null
 			}
-
+			<AddClientModal/>
 		</>
 	)
 }

@@ -17,16 +17,20 @@ interface ICustomProps {
 	handleRow?: (id: string | number) => void;
 }
 
+type ICellRowSpanAccessor<T extends object> = (row: T, rowIndex: number) => number | undefined;
+
 type ICustomColumnProps<T extends object> = ColumnInstance<T> & {
 	style?: CSSProperties;
 	headerRowSpan?: number;
 	ordering?: string;
+	cellRowSpan?: ICellRowSpanAccessor<T>;
 }
 
 type ICustomColumn<T extends object> = Column<T> & {
 	style?: CSSProperties;
 	headerRowSpan?: number;
 	ordering?: string;
+	cellRowSpan?: ICellRowSpanAccessor<T>;
 }
 
 type ICustomHeaderGroup<T extends object> = HeaderGroup<T> & {
@@ -134,9 +138,16 @@ const Index = <T extends object>({
 											{
 												row.cells.map((cell, index) => {
 													const customColumn = cell.column as ICustomColumnProps<T>
+													const span = typeof customColumn.cellRowSpan === 'function'
+														? customColumn.cellRowSpan(row.original as T, row.index)
+														: undefined
+
+													if (span === 0) return null
+
 													return (
 														<td
 															{...cell.getCellProps()}
+															rowSpan={span}
 															style={{...customColumn.style}}
 															key={index}
 														>

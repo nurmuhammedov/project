@@ -5,6 +5,7 @@ import React, {forwardRef} from 'react'
 import {FIELD} from 'constants/fields'
 import {Delete} from 'assets/icons'
 import classNames from 'classnames'
+import {useSearchParams} from 'hooks/index'
 
 
 const Index = forwardRef<HTMLInputElement | HTMLTextAreaElement, IField>(
@@ -16,6 +17,7 @@ const Index = forwardRef<HTMLInputElement | HTMLTextAreaElement, IField>(
 			textarea = false,
 			radius = false,
 			redLabel = false,
+			modalId,
 			handleDelete,
 			handleIcon,
 			disabled = false,
@@ -30,6 +32,7 @@ const Index = forwardRef<HTMLInputElement | HTMLTextAreaElement, IField>(
 		ref
 	) => {
 		const {t} = useTranslation()
+		const {addParams} = useSearchParams()
 
 		return (
 			<div className={classNames(styles.root, className, {
@@ -43,7 +46,13 @@ const Index = forwardRef<HTMLInputElement | HTMLTextAreaElement, IField>(
 			})}>
 				{
 					label && (
-						<div className={styles.wrapper}>
+						<div
+							className={styles.wrapper} onClick={() => {
+							if (modalId) {
+								addParams({modal: modalId})
+							}
+						}}
+						>
 							<label htmlFor={id}>{t(label)}</label>
 						</div>
 					)

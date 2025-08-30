@@ -1,6 +1,17 @@
 import {yupResolver} from '@hookform/resolvers/yup'
 import {Exchange} from 'assets/icons'
-import {Button, Card, Form, Info, Input, Loader, NumberFormattedInput, PageTitle, Select} from 'components'
+import {
+	AddClientModal,
+	Button,
+	Card,
+	Form,
+	Info,
+	Input,
+	Loader,
+	NumberFormattedInput,
+	PageTitle,
+	Select
+} from 'components'
 import {BUTTON_THEME, FIELD} from 'constants/fields'
 import {currencyOptions} from 'constants/options'
 import {useAdd, useData, useDetail, useSearchParams} from 'hooks'
@@ -169,7 +180,6 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 				<div className="flex align-center gap-lg">
 
 
-
 					<Button
 						onClick={() => navigate(-1)}
 						theme={BUTTON_THEME.DANGER_OUTLINE}
@@ -233,6 +243,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 											label="Customer"
 											redLabel={exchangeOptions[1].value == tab}
 											onBlur={onBlur}
+											modalId="customer"
 											options={customers}
 											isDisabled={retrieve}
 											error={errors.customer?.message}
@@ -401,6 +412,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false}) => {
 					}
 				</Form>
 			</Card>
+			<AddClientModal/>
 		</>
 	)
 }

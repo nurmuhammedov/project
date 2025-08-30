@@ -207,6 +207,13 @@ export const menu: IMenuItem[] = [
 				href: '/admin/reports/benefit',
 				allowedRoles: [ROLE_LIST.ADMIN],
 				order: {[ROLE_LIST.ADMIN]: 2}
+			},
+			{
+				id: '/admin/reports/by-debtors',
+				label: 'Debtors',
+				href: '/admin/reports/by-debtors',
+				allowedRoles: [ROLE_LIST.ADMIN],
+				order: {[ROLE_LIST.ADMIN]: 3}
 			}
 		]
 	},

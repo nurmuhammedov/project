@@ -304,6 +304,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false, edit = false}) => {
 									<Select
 										ref={ref}
 										id="supplier"
+										modalId="customer"
 										label="Customer"
 										onBlur={onBlur}
 										options={clients}
