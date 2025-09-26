@@ -1,6 +1,18 @@
 import {yupResolver} from '@hookform/resolvers/yup'
 import {Exchange} from 'assets/icons'
-import {Button, Card, Form, Info, Input, Loader, MaskInput, NumberFormattedInput, PageTitle, Select} from 'components'
+import {
+	AddExpenseTypesModal,
+	Button,
+	Card,
+	Form,
+	Info,
+	Input,
+	Loader,
+	MaskInput,
+	NumberFormattedInput,
+	PageTitle,
+	Select
+} from 'components'
 import {BUTTON_THEME, FIELD} from 'constants/fields'
 import {currencyOptions} from 'constants/options'
 import {useAdd, useData, useDetail} from 'hooks'
@@ -221,6 +233,7 @@ const ExpenseTransaction: FC<IProperties> = ({detail: retrieve = false}) => {
 											id="service_type"
 											label="Expense type"
 											options={serviceTypes}
+											modalId="expenses"
 											onBlur={onBlur}
 											isDisabled={retrieve}
 											error={errors.service_type?.message}
@@ -382,6 +395,8 @@ const ExpenseTransaction: FC<IProperties> = ({detail: retrieve = false}) => {
 					}
 				</Form>
 			</Card>
+
+			<AddExpenseTypesModal/>
 		</>
 	)
 }

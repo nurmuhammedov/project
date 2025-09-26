@@ -322,7 +322,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false, edit = false}) => {
 												disabled={retrieve}
 												onKeyDown={(e) => {
 													if (e.key === 'Enter' && field.value) {
-														e.preventDefault()
+														e?.preventDefault()
 														handleSerialCheck(field.value)
 													}
 												}}

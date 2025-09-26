@@ -1,4 +1,5 @@
 import {
+	AddProductModal,
 	Button,
 	Card,
 	Checkbox,
@@ -505,6 +506,7 @@ const Index: FC<IProperties> = ({detail: retrieve = false, edit = false}) => {
 					removedParams={['updateId', 'type']}
 				/>
 			}
+					<AddProductModal trigger={trigger} focus={focus} clientId={watch('supplier')}/>
 			{/*<ScrollButton/>*/}
 		</>
 	)

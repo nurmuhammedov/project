@@ -1,15 +1,10 @@
-// import {Button} from 'components/UI'
-// import {BUTTON_THEME} from 'constants/fields'
 import Purchase from 'modules/products/components/Purchase'
 import Sale from 'modules/products/components/Sale'
 import {useSearchParams} from 'hooks'
 import {productExchangeTabOptions} from 'modules/products/helpers/options'
 import {FC} from 'react'
-// import {useNavigate} from 'react-router-dom'
 import Transfer2 from 'modules/products/components/Transfer2'
-import {AddClientModal} from 'components/index'
-
-// import edit from 'assets/icons/Edit'
+import {AddClientModal} from 'components'
 
 
 interface IProperties {
@@ -19,7 +14,6 @@ interface IProperties {
 
 const Index: FC<IProperties> = ({detail = false, edit = false}) => {
 	const {paramsObject: {tab: tab = productExchangeTabOptions[0]?.value}} = useSearchParams()
-	// const navigate = useNavigate()
 
 	return (
 		<>
@@ -40,7 +34,11 @@ const Index: FC<IProperties> = ({detail = false, edit = false}) => {
 						tab === 'transfer' ? <Transfer2 detail={detail}/> :
 							null
 			}
-			<AddClientModal/>
+			{
+				(!edit && !detail) && <>
+					<AddClientModal/>
+				</>
+			}
 		</>
 	)
 }

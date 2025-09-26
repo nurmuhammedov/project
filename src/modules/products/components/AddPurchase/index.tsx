@@ -49,9 +49,7 @@ import {useQueryClient} from '@tanstack/react-query'
 
 
 interface IProperties {
-	clientId?: number | string
 	refetchTemporaryList?: () => void,
-	focus?: UseFormSetFocus<InferType<typeof purchaseItemSchema>>,
 	isTemporaryListFetching: boolean,
 	detail?: boolean,
 	edit?: boolean,
@@ -59,6 +57,8 @@ interface IProperties {
 	purchase?: IPurchaseItem,
 	parentWatch?: (t: string) => string,
 	temporaryList?: ITemporaryListItem[],
+	clientId?: number | string
+	focus?: UseFormSetFocus<InferType<typeof purchaseItemSchema>>,
 	trigger?: UseFormTrigger<InferType<typeof purchaseItemSchema>>,
 }
 
@@ -407,6 +407,7 @@ const Index: FC<IProperties> = ({
 												ref={ref}
 												id="product"
 												label="Product"
+												modalId="product"
 												onBlur={onBlur}
 												options={getSelectOptionsWithBrandName(products)}
 												isDisabled={!!updateId || retrieve || edit}

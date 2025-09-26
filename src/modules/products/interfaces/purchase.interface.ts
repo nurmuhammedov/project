@@ -68,6 +68,8 @@ export interface IPurchaseItem {
 export interface IPurchasesItem {
 	id: number
 	quantity: string
+	currency: string
+	price: string
 	purchase_date: string
 	supplier_name: string
 }

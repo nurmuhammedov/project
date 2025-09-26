@@ -32,7 +32,7 @@ import {
 	cleanParams,
 	decimalToInteger,
 	decimalToNumber,
-	decimalToPrice,
+	decimalToPrice, findName,
 	getSelectOptionsWithBrandName,
 	getSelectValue,
 	sumDecimals
@@ -219,6 +219,10 @@ const Index: FC<IProperties> = ({
 						/>
 					)
 				}
+			},
+			{
+				Header: t('Price'),
+				accessor: row => ` ${decimalToPrice(row?.price || 0)} ${t(findName(currencyOptions, row?.currency, 'code')).toLowerCase()}`
 			},
 			{
 				Header: t('Remainder'),

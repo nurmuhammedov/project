@@ -18,6 +18,15 @@ import Select, {
 } from 'react-select'
 
 
+
+function fuzzyMatch(label: string, input: string) {
+	const text = label.toLowerCase()
+	const query = input.toLowerCase().trim()
+	if (!query) return true
+	const parts = query.split(/\s+/)
+	return parts.every(part => text.includes(part))
+}
+
 const SingleValue = (props: SingleValueProps<ISelectOption>) => {
 	const {t} = useTranslation()
 	return (
@@ -89,6 +98,21 @@ const Index = forwardRef<SelectInstance<ISelectOption>, ISelect>((props, ref) =>
 				isSearchable={true}
 				isClearable={false}
 				{...props}
+				// filterOption={createFilter({
+				// 	ignoreCase: true,   // katta-kichik harf farqsiz
+				// 	ignoreAccents: true, // diacriticlarni e'tiborsiz
+				// 	matchFrom: 'any',   // boshi, o‘rtasi, oxiri – hammasi
+				// 	stringify: option => option.label || option.value || ''
+				// })}
+
+				// filterOption={(option, inputValue) => {
+				// 	if (!inputValue) return true;
+				// 	const results = matchSorter(props.options, inputValue, {
+				// 		keys: ["label", "value"]
+				// 	});
+				// 	return results.some(r => r.value === option.value);
+				// }}
+				filterOption={(option, inputValue) => fuzzyMatch(option.label, inputValue)}
 				placeholder={props.isDisabled ? '' : props.placeholder ? t(props.placeholder) : t('Choose')}
 				ref={ref as LegacyRef<SelectInstance<ISelectOption, boolean, GroupBase<ISelectOption>>>}
 				onChange={(value) => {

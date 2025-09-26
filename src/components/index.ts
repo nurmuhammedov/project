@@ -1,5 +1,7 @@
+import AddExpenseTypesModal from './AddExpenseTypes'
 import HorizontalTab from './HorizontalTab'
 import TemporaryItem from './TemporaryItem'
+import AddProductModal from './AddProduct'
 import DetailButton from './DetailButton'
 import DeleteButton from './DeleteButton'
 import ScrollButton from './ScrollButton'
@@ -13,7 +15,7 @@ import CardTitle from './CardTitle'
 import PageTitle from './PageTitle'
 import AlertItem from './AlertItem'
 import EditModal from './EditModal'
-import Checkbox  from './Checkbox'
+import Checkbox from './Checkbox'
 import PageInfo from './PageInfo'
 import Info from './Info'
 import CardTab from './CardTab'
@@ -34,6 +36,8 @@ export {
 	HorizontalTab,
 	Info,
 	TemporaryItem,
+	AddProductModal,
+	AddExpenseTypesModal,
 	AddClientModal,
 	DeleteButton,
 	DetailButton,
@@ -46,7 +50,7 @@ export {
 	PageTitle,
 	CardTitle,
 	AlertItem,
-	Checkbox ,
+	Checkbox,
 	EditModal,
 	PageInfo,
 	CardTab,

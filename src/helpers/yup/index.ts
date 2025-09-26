@@ -80,6 +80,28 @@ const productSchema = yup.object().shape({
 })
 
 
+// PRODUCTS
+const productSchema2 = yup.object().shape({
+	unit_quantity: yup.string().trim().required('This field is required'),
+	price: yup.string().trim().required('This field is required'),
+	name: yup.string().trim().required('This field is required'),
+	is_serial: yup.boolean().default(false).optional().nullable().transform(value => value ? value : false),
+	type: yup.number().optional().nullable().transform(value => value ? value : null),
+	// package: yup.number().nullable(),
+	country: yup.number().optional().nullable().transform(value => value ? value : null),
+	expiry: yup.boolean().default(false).optional().nullable().transform(value => value ? value : false),
+	barcodes: yup
+		.array()
+		.optional()
+		.nullable()
+		.of(yup.string().trim().required('This field is required'))
+		.transform(value => value ? value : null),
+	brand: yup.number().optional().nullable().transform(value => value ? value : null),
+	measure: yup.string().trim().required('This field is required')
+})
+
+
 export {
-	productSchema
+	productSchema,
+	productSchema2
 }
